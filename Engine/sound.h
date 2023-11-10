@@ -4,8 +4,8 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
 #define DIRECTSOUND_VERSION 0x0700
-#include "D:\DXSDK\Include\dsound.h" // MUISTA KORJATA POLKU OIKEIN!!!!
-#include <windows.h> 
+//#include "dsound.h" // TODO: DirectX
+//#include <windows.h>
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -22,7 +22,7 @@ typedef unsigned char  UCHAR;
 typedef unsigned char  BYTE;
 
 const int MAX_SOUNDS      = 100;// max number of sounds in system at once 
-const int MAX_POLY_PER_FX = 5;  // max maara samaa ääntä yhtäaikaisesti
+const int MAX_POLY_PER_FX = 5;  // max maara samaa ï¿½ï¿½ntï¿½ yhtï¿½aikaisesti
 
 /* PROTOTYPES --------------------------------------------------------------------------------*/
 

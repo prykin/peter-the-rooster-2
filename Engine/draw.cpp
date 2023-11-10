@@ -5,39 +5,39 @@ PisteEngine - PisteDraw 1.5
 Versio 1.2
 ----------
 
-	Maksimimäärä buffereita korotettu 200 -> 2000.
+	Maksimimï¿½ï¿½rï¿½ buffereita korotettu 200 -> 2000.
 
 	PisteDraw_Buffer_Tayta(int i, int vasen, int yla, int oikea, int ala, UCHAR color);
-	Klipperi lisätty.
+	Klipperi lisï¿½tty.
 
 	PisteDraw_Font_Kirjoita_Lapinakyva(int font_index, char *merkkijono, int buffer_index, int x, int y, int pros)
-	Lisätty. Toimii vain 256-värisessä, 32:n osiin pilkotussa paletissa.
+	Lisï¿½tty. Toimii vain 256-vï¿½risessï¿½, 32:n osiin pilkotussa paletissa.
 
 	PisteDraw_Piirto_Lopeta(int i);
-	Lisätty kuormitettu versio, jossa on int muotoinen parametri. 
-	Mahdollistaa useiden pintojen lukitsemisen yhtäaikaa. Vanha versio toimii myös.
+	Lisï¿½tty kuormitettu versio, jossa on int muotoinen parametri. 
+	Mahdollistaa useiden pintojen lukitsemisen yhtï¿½aikaa. Vanha versio toimii myï¿½s.
 
 	PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool peilaa_x, bool peilaa_y);
-	Lisätty kuormitettu versio. 
-	Mahdollistaa bittikartan piirron, joka on peilattu sivusuunnassa ja/tai ylösalaisin.
+	Lisï¿½tty kuormitettu versio. 
+	Mahdollistaa bittikartan piirron, joka on peilattu sivusuunnassa ja/tai ylï¿½salaisin.
 
 Versio 1.3
 ----------
 
-	char *PisteDraw_Virheilmoitus() lisätty. Helpottaa virheen etsintää.
+	char *PisteDraw_Virheilmoitus() lisï¿½tty. Helpottaa virheen etsintï¿½ï¿½.
 
 	PisteDraw_Lataa_Kuva(int index, char *filename, bool lataa_paletti)
 	Eri kokoisten kuvien lataus on nyt mahdollista.
 
 	int PisteDraw_Paletti_Pyorita(int eka_vari, int vika_vari)
-	mahdollistaa värien pyörittämisen
+	mahdollistaa vï¿½rien pyï¿½rittï¿½misen
 
 Versio 1.4
 ----------
 
 	PCX-kuvien lataus PisteDraw_Lataa_Kuva() -aliohjelmalla. Aliohjelma tutkii onko tiedoston
-	pääte bmp vai pcx ja lataa kuvan sen perusteella. Virhettä pukkaa, jos tiedosto ei ole
-	kumpaakaan tyyppiä.
+	pï¿½ï¿½te bmp vai pcx ja lataa kuvan sen perusteella. Virhettï¿½ pukkaa, jos tiedosto ei ole
+	kumpaakaan tyyppiï¿½.
 
 
 	DWORD PisteDraw_Videomuistia_Max()
@@ -54,14 +54,14 @@ Versio 1.5
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
-#include "PisteDraw.h"
-#include "PisteFont.h"
-#include "PisteLog.h"
-#include <io.h>
+#include "draw.h"
+#include "font.h"
+#include "log.h"
+//#include <io.h>
 #include <stdio.h>
-#include <fstream.h>
-#include <mmsystem.h>
-#include <malloc.h>
+//#include <fstream.h>
+//#include <mmsystem.h>
+//#include <malloc.h>
 #include <memory.h>
 
 /* DEFINES -----------------------------------------------------------------------------------*/
@@ -205,7 +205,7 @@ int	PisteDraw_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app,
 		PD_ruudun_bpp			= bpp;
 		PD_max_varit			= max_colors;
 		
-		LPDIRECTDRAW temp = NULL;				 // väliaikainen rajapinta jolla haetaan uusin versio
+		LPDIRECTDRAW temp = NULL;				 // vï¿½liaikainen rajapinta jolla haetaan uusin versio
 		int i;
 
 		if (FAILED(DirectDrawCreate(NULL, &temp, NULL)))	// luo rajapintaosoitin versioon 1.0
@@ -222,10 +222,10 @@ int	PisteDraw_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app,
 			return PD_VIRHE;
 		}
 
-		temp->Release();	// tuhotaan väliaikainen rajapinta
+		temp->Release();	// tuhotaan vï¿½liaikainen rajapinta
 		temp = NULL;
 		
-		if (FAILED(PD_lpdd->SetCooperativeLevel(PD_main_window_handle, // Yhteistyö Windowsin kanssa..
+		if (FAILED(PD_lpdd->SetCooperativeLevel(PD_main_window_handle, // Yhteistyï¿½ Windowsin kanssa..
 											  DDSCL_FULLSCREEN | DDSCL_ALLOWMODEX |
 											  DDSCL_EXCLUSIVE | DDSCL_ALLOWREBOOT)))
 		{
@@ -297,7 +297,7 @@ int	PisteDraw_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app,
 			return PD_VIRHE;
 		}
 
-		/*LIITETÄÄN KLIPPERI KUVAN REUNOJEN YLIKIRJOITUSTA ESTÄMÄÄN*/
+		/*LIITETï¿½ï¿½N KLIPPERI KUVAN REUNOJEN YLIKIRJOITUSTA ESTï¿½Mï¿½ï¿½N*/
 
 		PD_fontbuffer = PisteDraw_Buffer_Uusi(PD_ruudun_leveys,10,true,255);
 
@@ -418,7 +418,7 @@ int PisteDraw_Buffer_Uusi(int leveys, int korkeus, bool video_muisti, UCHAR colo
 		return PD_VIRHE;
 	}
 
-	if ((unsigned long)(leveys*korkeus) > hal_caps.dwVidMemFree) {		//tarkastetaan riittääkö videomuistia
+	if ((unsigned long)(leveys*korkeus) > hal_caps.dwVidMemFree) {		//tarkastetaan riittï¿½ï¿½kï¿½ videomuistia
 		video_muisti = false;
 		PisteLog_Kirjoita("[Warning] Piste Draw: Out of video memory - creating a new buffer in system memory! \n");
 	}
@@ -639,10 +639,10 @@ int PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool p
 	DD_INIT_STRUCT(PD_ddbltfx);				//Alustetaan Blittaus tehosteet
 	int leveys;								//Apumuuttuja
 	int korkeus;							//Apumuuttuja
-	RECT dest_rect;							//Alue kohdebufferista josta kopioidaan lähdebufferiin
-	RECT source_rect;						//Alue lähdebufferista josta kopioidaan kohdebufferiin
+	RECT dest_rect;							//Alue kohdebufferista josta kopioidaan lï¿½hdebufferiin
+	RECT source_rect;						//Alue lï¿½hdebufferista josta kopioidaan kohdebufferiin
 	RECT *klipperi_kohde;					//Pointteri kohdebufferin leikkuriin 
-	RECT *klipperi_lahde;					//Pointteri lähdebufferin leikkuriin
+	RECT *klipperi_lahde;					//Pointteri lï¿½hdebufferin leikkuriin
 
 	x += vasen_marginaali;
 	y += yla_marginaali;
@@ -667,7 +667,7 @@ int PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool p
 	leveys  = oikea - vasen;	// lasketaan apuja
 	korkeus = ala - yla; 
 
-	if (x+leveys > klipperi_kohde->right)			//Varmistetaan että ei piirretä kohdebufferin
+	if (x+leveys > klipperi_kohde->right)			//Varmistetaan ettï¿½ ei piirretï¿½ kohdebufferin
 	{												//rajojen ulkopuolelle
 		oikea = vasen + klipperi_kohde->right - x;
 	}
@@ -745,7 +745,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y,
 	DD_INIT_STRUCT(PD_ddbltfx);				//Alustetaan Blittaus tehosteet
 	int leveys;								//Apumuuttuja
 	int korkeus;							//Apumuuttuja
-	RECT source_rect;						//Alue lähdebufferista josta kopioidaan kohdebufferiin
+	RECT source_rect;						//Alue lï¿½hdebufferista josta kopioidaan kohdebufferiin
 	RECT *klipperi_kohde;					//Pointteri kohdebufferin leikkuriin 
 	RECT *klipperi_lahde;
 
@@ -755,7 +755,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y,
 	klipperi_kohde = &PD_buffers[kohde_index].klipperi;	
 	klipperi_lahde = &PD_buffers[lahde_index].klipperi;
 
-	if (vasen < PD_buffers[lahde_index].klipperi.left)	//Tarkistetaan että dataa ei oteta lähdebufferin
+	if (vasen < PD_buffers[lahde_index].klipperi.left)	//Tarkistetaan ettï¿½ dataa ei oteta lï¿½hdebufferin
 		vasen = PD_buffers[lahde_index].klipperi.left;	//rajojen ulkopuolelta
 
 	if (oikea > PD_buffers[lahde_index].klipperi.right)
@@ -770,7 +770,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y,
 	leveys  = oikea - vasen;	// lasketaan apuja
 	korkeus = ala - yla; 
 
-	if (x+leveys > klipperi_kohde->right)			//Varmistetaan että ei piirretä kohdebufferin
+	if (x+leveys > klipperi_kohde->right)			//Varmistetaan ettï¿½ ei piirretï¿½ kohdebufferin
 	{												//rajojen ulkopuolelle
 		oikea = vasen + klipperi_kohde->right - x;
 	}
@@ -802,7 +802,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y,
 		if (FAILED(PD_buffers[kohde_index].lpdds->BltFast(x, y, PD_buffers[lahde_index].lpdds, &source_rect,
 			(DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY)))) {
 			PisteLog_Kirjoita("[Error] Piste Draw: Unable to flip surface!\n");
-			return PD_VIRHE; // blitataan kaikki paitsi läpinäkyvyysväri
+			return PD_VIRHE; // blitataan kaikki paitsi lï¿½pinï¿½kyvyysvï¿½ri
 		}
 	}
 
@@ -815,9 +815,9 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y)
 	DD_INIT_STRUCT(PD_ddbltfx);				//Alustetaan Blittaus tehosteet
 	int leveys;								//Apumuuttuja
 	int korkeus;							//Apumuuttuja
-	RECT source_rect;						//Alue lähdebufferista josta kopioidaan kohdebufferiin
+	RECT source_rect;						//Alue lï¿½hdebufferista josta kopioidaan kohdebufferiin
 	RECT *klipperi_kohde;					//Pointteri kohdebufferin leikkuriin 
-	RECT *klipperi_lahde;					//Pointteri lähdebufferin leikkuriin
+	RECT *klipperi_lahde;					//Pointteri lï¿½hdebufferin leikkuriin
 
 	x += vasen_marginaali;
 	y += yla_marginaali;
@@ -833,7 +833,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y)
 	leveys  = oikea - vasen;	// lasketaan apuja
 	korkeus = ala - yla; 
 
-	if (x+leveys > klipperi_kohde->right)			//Varmistetaan että ei piirretä kohdebufferin
+	if (x+leveys > klipperi_kohde->right)			//Varmistetaan ettï¿½ ei piirretï¿½ kohdebufferin
 	{												//rajojen ulkopuolelle
 		oikea = vasen + klipperi_kohde->right - x;
 	}
@@ -865,7 +865,7 @@ int PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y)
 		if (FAILED(PD_buffers[kohde_index].lpdds->BltFast(x, y, PD_buffers[lahde_index].lpdds, &source_rect,
 			(DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY)))) {			
 			PisteLog_Kirjoita("[Error] Piste Draw: BlitFast failed!\n");
-			return PD_VIRHE; // blitataan kaikki paitsi läpinäkyvyysväri
+			return PD_VIRHE; // blitataan kaikki paitsi lï¿½pinï¿½kyvyysvï¿½ri
 		}
 	}
 
@@ -1038,7 +1038,7 @@ void PisteDraw_Aseta_Marginaali_Yla(int yla)
 	yla_marginaali = yla;
 }
 
-// Palettiin liittyvät metodit
+// Palettiin liittyvï¿½t metodit
 
 int PisteDraw_Fade_Paletti_Do(int pros)
 {
@@ -1284,7 +1284,7 @@ int PisteDraw_Font_Uusi(char *polku, char *tiedosto)
 				strcpy(virhe,"PisteEngine can't load a font from file!");
 				PisteLog_Kirjoita("[Error] Piste Draw: Loading font failed!\n");
 				
-				PD_Loki_Kirjoita("Lataus epäonnistui\n");
+				PD_Loki_Kirjoita("Lataus epï¿½onnistui\n");
 
 				return PD_VIRHE;
 			}

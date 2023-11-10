@@ -4,26 +4,26 @@
 Versio 1.2
 ----------
 
-	Maksimimäärä buffereita korotettu 200 => 2000.
+	Maksimimï¿½ï¿½rï¿½ buffereita korotettu 200 => 2000.
 
 	PisteDraw_Buffer_Tayta(int i, int vasen, int yla, int oikea, int ala, UCHAR color);
-	Klipperi lisätty.
+	Klipperi lisï¿½tty.
 
 	PisteDraw_Font_Kirjoita_Lapinakyva(int font_index, char *merkkijono, int buffer_index, int x, int y, int pros)
-	Lisätty. Toimii vain 256-värisessä, 32:n osiin pilkotussa paletissa. 
-	pros -parametri on prosentti (0-100) 0= ei näy, 100 = ei läpinäkyvä.
+	Lisï¿½tty. Toimii vain 256-vï¿½risessï¿½, 32:n osiin pilkotussa paletissa. 
+	pros -parametri on prosentti (0-100) 0= ei nï¿½y, 100 = ei lï¿½pinï¿½kyvï¿½.
 
 	PisteDraw_Font_Kirjoita(int font_index, char *merkkijono, int buffer_index, int x, int y)
-	Piirtorutiini ottaa nyt leikkurit huomioon, joten se ei enää kirjoita ruudun ulkopuolelle.
+	Piirtorutiini ottaa nyt leikkurit huomioon, joten se ei enï¿½ï¿½ kirjoita ruudun ulkopuolelle.
 
 	PisteDraw_Piirto_Lopeta(int i);
-	Lisätty kuormitettu versio, jossa on int muotoinen parametri. 
-	Mahdollistaa useiden pintojen lukitsemisen yhtäaikaa. Vanha versio toimii myös.
-	Vanha versio käy kaikki mahdolliset pinnat läpi ja tarkistaa onko ne lukittu. Hidasta. Älä käytä.
+	Lisï¿½tty kuormitettu versio, jossa on int muotoinen parametri. 
+	Mahdollistaa useiden pintojen lukitsemisen yhtï¿½aikaa. Vanha versio toimii myï¿½s.
+	Vanha versio kï¿½y kaikki mahdolliset pinnat lï¿½pi ja tarkistaa onko ne lukittu. Hidasta. ï¿½lï¿½ kï¿½ytï¿½.
 
 	PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool peilaa_x, bool peilaa_y);
-	Lisätty kuormitettu versio. 
-	Mahdollistaa bittikartan piirron, joka on peilattu sivusuunnassa ja/tai ylösalaisin.
+	Lisï¿½tty kuormitettu versio. 
+	Mahdollistaa bittikartan piirron, joka on peilattu sivusuunnassa ja/tai ylï¿½salaisin.
 
 	PD_VIRHE muutettu 1000 => -1000
 
@@ -33,13 +33,13 @@ Versio 1.2
 Versio 1.3
 ----------
 
-	char *PisteDraw_Virheilmoitus() lisätty. Helpottaa virheen etsintää.
+	char *PisteDraw_Virheilmoitus() lisï¿½tty. Helpottaa virheen etsintï¿½ï¿½.
 
 	PisteDraw_Lataa_Kuva(int index, char *filename, bool lataa_paletti)
 	Eri kokoisten kuvien lataus on nyt mahdollista (ilman bugeja).
 
 	int PisteDraw_Paletti_Pyorita(UCHAR eka_vari, UCHAR vika_vari)
-	Mahdollistaa värien pyörittämisen paletissa.
+	Mahdollistaa vï¿½rien pyï¿½rittï¿½misen paletissa.
 
 Versio 1.4
 ----------
@@ -54,8 +54,8 @@ Versio 1.4
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 #define DIRECTDRAW_VERSION 0x0700
-#include "D:\DXSDK\Include\ddraw.h" // MUISTA KORJATA POLKU OIKEIN!!!!
-#include <windows.h> 
+//#include "ddraw.h" // TODO: DDRAW
+//#include <windows.h>
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -155,24 +155,24 @@ int		PisteDraw_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app,
 						 int leveys, int korkeus, int bpp,
 						 int max_colors);
 
-Tehtävä:	Alustaa PD:n. 
+Tehtï¿½vï¿½:	Alustaa PD:n. 
 	
 Muuttujat:	main_window_handle:		ikkunan kahva
 			hinstance_app:			?
 			leveys:					ruudun leveys
 			korkeus:				ruudun korkeus
 			bpp:					bytes per bixel (ainoastaan arvo 8 toimii)
-			max_colors:				max värejä (vain 256 toimii)
+			max_colors:				max vï¿½rejï¿½ (vain 256 toimii)
 
-Palauttaa:	PD_VIHE, jos epäonnistuu, muuten nolla
+Palauttaa:	PD_VIHE, jos epï¿½onnistuu, muuten nolla
 
 -------------------------------------------------------------------------------------------------------------
 void	PisteDraw_Aseta_Klipperi(int i, int vasen, int yla, int oikea, int ala);
 
-Tehtävä:	Asettaa bufferille rajat, joiden yli ei voi piirtää.
-			Jokaisen bufferin alustuksen yhteydessä sille asetetaan klipperi, jonka
-			reunat ovat samat kuin bufferin reunat. Tällä voi jälkikäteen muokata
-			niitä arvoja.
+Tehtï¿½vï¿½:	Asettaa bufferille rajat, joiden yli ei voi piirtï¿½ï¿½.
+			Jokaisen bufferin alustuksen yhteydessï¿½ sille asetetaan klipperi, jonka
+			reunat ovat samat kuin bufferin reunat. Tï¿½llï¿½ voi jï¿½lkikï¿½teen muokata
+			niitï¿½ arvoja.
 	
 Muuttujat:	i:						halutun bufferin indeksi
 			vasen, yla, oikea, ala:	reunat
@@ -182,7 +182,7 @@ Palauttaa:	-
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Flip(int i);
 
-Tehtävä:	Kopioi koko bufferin sisällön PD_TAUSTABUFFERI-bufferiin.
+Tehtï¿½vï¿½:	Kopioi koko bufferin sisï¿½llï¿½n PD_TAUSTABUFFERI-bufferiin.
 
 Muuttujat:	i:						halutun bufferin indeksi
 
@@ -191,14 +191,14 @@ Palauttaa:	Palauttaa nollan tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool peilaa_x, bool peilaa_y);
 
-Tehtävä:	Kopioi lähdebufferin sisällön toiseen bufferiin kohtaan x,y. Leikkaa piirrettävän 
-			alueen kohdebufferin klipperin mukaan. Kääntää piirrettävän alueen haluattaessa peilikuvaksi
-			ja / tai ylösalaisin.
+Tehtï¿½vï¿½:	Kopioi lï¿½hdebufferin sisï¿½llï¿½n toiseen bufferiin kohtaan x,y. Leikkaa piirrettï¿½vï¿½n 
+			alueen kohdebufferin klipperin mukaan. Kï¿½ï¿½ntï¿½ï¿½ piirrettï¿½vï¿½n alueen haluattaessa peilikuvaksi
+			ja / tai ylï¿½salaisin.
 
-Muuttujat:	lahde_index:			mistä bufferista otetaan
+Muuttujat:	lahde_index:			mistï¿½ bufferista otetaan
 			kohde index:			mihin bufferiin laitetaan
-			x,y						mihin kohtaan kohdebufferia piirretään (vasen- ja yläreuna)
-			peilaa_x				jos true, niin käännetään sivusuunnassa
+			x,y						mihin kohtaan kohdebufferia piirretï¿½ï¿½n (vasen- ja ylï¿½reuna)
+			peilaa_x				jos true, niin kï¿½ï¿½nnetï¿½ï¿½n sivusuunnassa
 			peilaa_y				jos true, -"-			  pystysuunnassa 
 
 Palauttaa:	Palauttaa nollan tai PD_VIRHE
@@ -207,77 +207,77 @@ Palauttaa:	Palauttaa nollan tai PD_VIRHE
 int		PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y, 
 									int vasen, int yla, int oikea, int ala);
 									
-Tehtävä:	Kopioi lähdebufferin sisällön toiseen bufferiin kohtaan x,y. 
-			Leikkaa piirrettävän alueen kohdebufferin klipperin mukaan. 
+Tehtï¿½vï¿½:	Kopioi lï¿½hdebufferin sisï¿½llï¿½n toiseen bufferiin kohtaan x,y. 
+			Leikkaa piirrettï¿½vï¿½n alueen kohdebufferin klipperin mukaan. 
 
-Muuttujat:	lahde_index:			mistä bufferista otetaan
+Muuttujat:	lahde_index:			mistï¿½ bufferista otetaan
 			kohde index:			mihin bufferiin laitetaan
-			x,y:					mihin kohtaan kohdebufferia piirretään (vasen- ja yläreuna)
-			vasen,yla,oikea,ala:	kopioitava alue lähdebufferista.
+			x,y:					mihin kohtaan kohdebufferia piirretï¿½ï¿½n (vasen- ja ylï¿½reuna)
+			vasen,yla,oikea,ala:	kopioitava alue lï¿½hdebufferista.
 
 Palauttaa:	Palauttaa nollan tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Flip_Nopea(int lahde_index, int kohde_index, int x, int y);
 
-Tehtävä:	Kopioi koko lähdebufferin sisällön toiseen bufferiin kohtaan x,y. 
-			Leikkaa piirrettävän alueen kohdebufferin klipperin mukaan.
+Tehtï¿½vï¿½:	Kopioi koko lï¿½hdebufferin sisï¿½llï¿½n toiseen bufferiin kohtaan x,y. 
+			Leikkaa piirrettï¿½vï¿½n alueen kohdebufferin klipperin mukaan.
 
-Muuttujat:	lahde_index:			mistä bufferista otetaan
+Muuttujat:	lahde_index:			mistï¿½ bufferista otetaan
 			kohde index:			mihin bufferiin laitetaan
-			x,y:					mihin kohtaan kohdebufferia piirretään (vasen- ja yläreuna)
+			x,y:					mihin kohtaan kohdebufferia piirretï¿½ï¿½n (vasen- ja ylï¿½reuna)
 
 Palauttaa:	Palauttaa nollan tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Tayta(int i, UCHAR color);
 
-Tehtävä:	Täyttää halutun bufferin yhdellä värillä.
+Tehtï¿½vï¿½:	Tï¿½yttï¿½ï¿½ halutun bufferin yhdellï¿½ vï¿½rillï¿½.
 
 Muuttujat:	i:						kohdebufferin indeksi
-			color:					väri jolla täytetään (0-255)
+			color:					vï¿½ri jolla tï¿½ytetï¿½ï¿½n (0-255)
 
 Palauttaa:	Palauttaa nollan tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Tayta(int i, int vasen, int yla, int oikea, int ala, UCHAR color);
 
-Tehtävä:	Sama kuin edellinen, mutta tässä määritellään tarkka alue, joka täytetään.
-			Ottaa myös klipperin huomioon.
+Tehtï¿½vï¿½:	Sama kuin edellinen, mutta tï¿½ssï¿½ mï¿½ï¿½ritellï¿½ï¿½n tarkka alue, joka tï¿½ytetï¿½ï¿½n.
+			Ottaa myï¿½s klipperin huomioon.
 
 Muuttujat:	i:						kohdebufferin indeksi
-			vasen,yla...			alue joka täytetään
-			color:					väri jolla täytetään (0-255)
+			vasen,yla...			alue joka tï¿½ytetï¿½ï¿½n
+			color:					vï¿½ri jolla tï¿½ytetï¿½ï¿½n (0-255)
 
 Palauttaa:	Nolla tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 bool	PisteDraw_Buffer_Tuhoa(int i);
 
-Tehtävä:	Vapauttaa varatun bufferin.
+Tehtï¿½vï¿½:	Vapauttaa varatun bufferin.
 
 Muuttujat:	i:						Vapautettavan bufferin indeksi
 
-Palauttaa:	true = onnistui, false = ei onnistunut (bufferia ei ehkä ollut)
+Palauttaa:	true = onnistui, false = ei onnistunut (bufferia ei ehkï¿½ ollut)
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Buffer_Uusi(int leveys, int korkeus, bool video_muisti, UCHAR color);
 
-Tehtävä:	Varaa uuden bufferin, asettaa sille klipperin ja palauttaa bufferin indeksin.
+Tehtï¿½vï¿½:	Varaa uuden bufferin, asettaa sille klipperin ja palauttaa bufferin indeksin.
 
 Muuttujat:	leveys, korkeus:		bufferin leveys ja korkeus
-			videomuisti:			jos true, bufferi varataan näyttämuistista,	jos ei niin
-									työmuistista. Jos videomuisti loppuu, niin bufferit varataan
-									automaattisesti työmuistista. Työmuisti on hidasta, videomuisti
+			videomuisti:			jos true, bufferi varataan nï¿½yttï¿½muistista,	jos ei niin
+									tyï¿½muistista. Jos videomuisti loppuu, niin bufferit varataan
+									automaattisesti tyï¿½muistista. Tyï¿½muisti on hidasta, videomuisti
 									on nopeaa.
-			color:					Läpinäkyvyysväri (0-255)
+			color:					Lï¿½pinï¿½kyvyysvï¿½ri (0-255)
 
 Palauttaa:	Varatun bufferin indeksi tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Fade_Paletti(void);
 
-Tehtävä:	Suorittaa paletin sisään tai ulos feidausta. Feidauksen suunta riippuu
+Tehtï¿½vï¿½:	Suorittaa paletin sisï¿½ï¿½n tai ulos feidausta. Feidauksen suunta riippuu
 			allaolevista aliohjelmista.
 
 Muuttujat:	-
@@ -287,7 +287,7 @@ Palauttaa:	Nolla tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 void	PisteDraw_Fade_Paletti_In(int laskuri);
 
-Tehtävä:	Aloittaan paletin feidaamisen mustasta normaaliksi.
+Tehtï¿½vï¿½:	Aloittaan paletin feidaamisen mustasta normaaliksi.
 
 Muuttujat:	laskuri:				feidauksen nopeus
 
@@ -296,7 +296,7 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 void	PisteDraw_Fade_Paletti_Out(int laskuri);
 
-Tehtävä:	Aloittaan paletin feidaamisen normaalista mustaksi.
+Tehtï¿½vï¿½:	Aloittaan paletin feidaamisen normaalista mustaksi.
 
 Muuttujat:	laskuri:				feidauksen nopeus
 
@@ -305,7 +305,7 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 bool	PisteDraw_Fade_Paletti_Valmis(void);
 
-Tehtävä:	Ilmoittaa, onko paletin feidaus kesken vai onko se loppunut.
+Tehtï¿½vï¿½:	Ilmoittaa, onko paletin feidaus kesken vai onko se loppunut.
 
 Muuttujat:	-
 
@@ -314,10 +314,10 @@ Palauttaa:	true jos paletin feidaus on loppunut.
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Font_Uusi(int buffer_index, int buffer_x, int buffer_y, int leveys, int korkeus, int lkm);
 
-Tehtävä:	Luo uuden fontin ja palauttaa sen indeksin. Merkkien pitää olla bitmäpissä seuraavassa
-			järjestyksessä: 
+Tehtï¿½vï¿½:	Luo uuden fontin ja palauttaa sen indeksin. Merkkien pitï¿½ï¿½ olla bitmï¿½pissï¿½ seuraavassa
+			jï¿½rjestyksessï¿½: 
 
-  a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,t,s,u,v,w,x,y,z,å,ä,ö,0,1,2,3,4,5,6,7,8,9,.,!,?,:,-,pilkku,+,=,(,),/,"
+  a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,t,s,u,v,w,x,y,z,ï¿½,ï¿½,ï¿½,0,1,2,3,4,5,6,7,8,9,.,!,?,:,-,pilkku,+,=,(,),/,"
 			
 
 Muuttujat:	buffer_index:			bufferi, jossa fontin bitmappi majailee.
@@ -325,24 +325,24 @@ Muuttujat:	buffer_index:			bufferi, jossa fontin bitmappi majailee.
 			buffer_y:				fontti-bitmapin ylareuna
 			leveys:					yhden fontin leveys
 			korkeus:				yhden fontin korkeus
-			lkm:					fonttien lukumäärä
+			lkm:					fonttien lukumï¿½ï¿½rï¿½
 
 Palauttaa:	PD_VIRHE tai varatun fontin indeksi
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Font_Uusi(char *polku, char* file);
 
-Tehtävä:	Luo uuden fontin ja palauttaa sen indeksin. Fontin parametrit luetaan tiedostosta: 
+Tehtï¿½vï¿½:	Luo uuden fontin ja palauttaa sen indeksin. Fontin parametrit luetaan tiedostosta: 
 
 Esim:
 	*image: 	bigfont.pcx
 	*image x:	0
 	*image y:	0
-	*letters: 	abcdefghijklmnopqrstuvwxyzåäö0123456789.!?
+	*letters: 	abcdefghijklmnopqrstuvwxyzï¿½ï¿½ï¿½0123456789.!?
 	*letter width:	15
 	*letter height:	21			
 
-Muuttujat:	polku:					tiedoston hakemisto. fontin bitmapin pitää olla samassa hakemistossa.
+Muuttujat:	polku:					tiedoston hakemisto. fontin bitmapin pitï¿½ï¿½ olla samassa hakemistossa.
 			file:					tiedston nimi
 			
 Palauttaa:	PD_VIRHE tai varatun fontin indeksi
@@ -351,7 +351,7 @@ Palauttaa:	PD_VIRHE tai varatun fontin indeksi
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Font_Kirjoita(int font_index, char *merkkijono, int buffer_index, int x, int y);
 
-Tehtävä:
+Tehtï¿½vï¿½:
 
 Muuttujat:
 
@@ -360,7 +360,7 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Font_Kirjoita_Lapinakyva(int font_index, char *merkkijono, int buffer_index, int x, int y, int pros);
 
-Tehtävä:
+Tehtï¿½vï¿½:
 
 Muuttujat:
 
@@ -369,18 +369,18 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Lataa_Kuva(int i, char *filename, bool lataa_paletti);
 
-Tehtävä:	Lataa BMP-muotoisen kuvan bufferiin.
+Tehtï¿½vï¿½:	Lataa BMP-muotoisen kuvan bufferiin.
 
 Muuttujat:	i:						kohdebufferin indeksi
 			filename:				tiedoston polku ja nimi
-			lataa_paletti:			true = lataa paletti kuvasta, false = säilytä vanha paletti
+			lataa_paletti:			true = lataa paletti kuvasta, false = sï¿½ilytï¿½ vanha paletti
 			
 Palauttaa:	Nolla tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Lopeta();
 
-Tehtävä:	Lopettaa PD:n.
+Tehtï¿½vï¿½:	Lopettaa PD:n.
 
 Muuttujat:
 
@@ -389,17 +389,17 @@ Palauttaa:	Nolla tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Paletti_Pyorita(UCHAR eka_vari, UCHAR vika_vari);
 
-Tehtävä:	Pyörittää haluttua osaa paletista.
+Tehtï¿½vï¿½:	Pyï¿½rittï¿½ï¿½ haluttua osaa paletista.
 
-Muuttujat:	eka_vari:				ensimmäinen väri, jota pyöritetään.
-			vika_vari:				viimeinen vari, jota pyöritetään.
+Muuttujat:	eka_vari:				ensimmï¿½inen vï¿½ri, jota pyï¿½ritetï¿½ï¿½n.
+			vika_vari:				viimeinen vari, jota pyï¿½ritetï¿½ï¿½n.
 
 Palauttaa:	Nolla tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------  
 void	PisteDraw_Paivita_Naytto();
 
-Tehtävä:	Kopioi PD_TAUSTABUFFER-puskurin sisällön näyttömuistiin.
+Tehtï¿½vï¿½:	Kopioi PD_TAUSTABUFFER-puskurin sisï¿½llï¿½n nï¿½yttï¿½muistiin.
 
 Muuttujat:	-
 
@@ -408,7 +408,7 @@ Palauttaa:	-
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Paletti_Get(PALETTEENTRY *&paletti);
 
-Tehtävä:
+Tehtï¿½vï¿½:
 
 Muuttujat:
 
@@ -417,7 +417,7 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Paletti_Set(void);
 
-Tehtävä:
+Tehtï¿½vï¿½:
 
 Muuttujat:
 
@@ -426,18 +426,18 @@ Palauttaa:
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Piirto_Aloita(int i, UCHAR *&back_buffer, DWORD &lPitch);
 
-Tehtävä:	Lukitsee halutun bufferin, jotta siihen voitaisiin piirtää "manuaalisesti".
+Tehtï¿½vï¿½:	Lukitsee halutun bufferin, jotta siihen voitaisiin piirtï¿½ï¿½ "manuaalisesti".
 
 Muuttujat:	i:						lukittavan bufferin indeksi
-			back_buffer:			viittaus taulukkoon, joka sisältää bufferissa olevat pikselit
-			lPitch:					bufferin (oikea) leveys pikseleinä
+			back_buffer:			viittaus taulukkoon, joka sisï¿½ltï¿½ï¿½ bufferissa olevat pikselit
+			lPitch:					bufferin (oikea) leveys pikseleinï¿½
 
 Palauttaa:	Nolla tai PD_VIRHE
 
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Piirto_Lopeta(void);
 
-Tehtävä:	Vapauttaa kaikki bufferit, jotka on lukittu. Älä käytä! Hidas!
+Tehtï¿½vï¿½:	Vapauttaa kaikki bufferit, jotka on lukittu. ï¿½lï¿½ kï¿½ytï¿½! Hidas!
 
 Muuttujat:
 
@@ -446,7 +446,7 @@ Palauttaa:	Nolla tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Piirto_Lopeta(int i);
 
-Tehtävä:	Vapauttaa halutun bufferin lukituksen (jos se on lukittu)
+Tehtï¿½vï¿½:	Vapauttaa halutun bufferin lukituksen (jos se on lukittu)
 
 Muuttujat:	i:						halutun bufferin indeksi
 
@@ -455,7 +455,7 @@ Palauttaa:	Nolla tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 int		PisteDraw_Reset_paletti(void);
 
-Tehtävä:	Palauttaa alkuperäisen kuvasta ladatun paletin.
+Tehtï¿½vï¿½:	Palauttaa alkuperï¿½isen kuvasta ladatun paletin.
 
 Muuttujat:	-
 
@@ -464,20 +464,20 @@ Palauttaa:	Nolla tai PD_VIRHE
 -------------------------------------------------------------------------------------------------------------
 DWORD	PisteDraw_Videomuistia();
 
-Tehtävä:	Palauttaa vapaana olevan videomuistin määrän bitteinä
+Tehtï¿½vï¿½:	Palauttaa vapaana olevan videomuistin mï¿½ï¿½rï¿½n bitteinï¿½
 
 Muuttujat:
 
-Palauttaa:	Vapaan videomuistin määrä.
+Palauttaa:	Vapaan videomuistin mï¿½ï¿½rï¿½.
 
 -------------------------------------------------------------------------------------------------------------
 char   *PisteDraw_Virheilmoitus();
 
-Tehtävä:	Palauttaa (aina) viimeisimmän virheilmoituksen. 
+Tehtï¿½vï¿½:	Palauttaa (aina) viimeisimmï¿½n virheilmoituksen. 
 
 Muuttujat:
 
-Palauttaa:	Vapaan videomuistin määrä.
+Palauttaa:	Vapaan videomuistin mï¿½ï¿½rï¿½.
 
 -------------------------------------------------------------------------------------------------------------
 

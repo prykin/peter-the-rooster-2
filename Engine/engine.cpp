@@ -1,28 +1,28 @@
 /* GAME.CPP		PisteEngine Esimerkki-ohjelma v0.1 by Janne Kivilahti 27.12.2001
 				Ohjelman toiminta:
 				Ruudulla on taustakuva, joka vierii vasemmalta oikealle.
-				Ruudulla leijuu pallo, jota voi ohjata hiirellä tai peliohjaimella.
-				A-näppäimestä ruutu feidaa mustaksi ja S-näppäimestä takaisin.
-				Ohjelman suoritus loppuu ESC:stä, hiiren oikeasta napista tai peliohjaimen napista 2.
+				Ruudulla leijuu pallo, jota voi ohjata hiirellï¿½ tai peliohjaimella.
+				A-nï¿½ppï¿½imestï¿½ ruutu feidaa mustaksi ja S-nï¿½ppï¿½imestï¿½ takaisin.
+				Ohjelman suoritus loppuu ESC:stï¿½, hiiren oikeasta napista tai peliohjaimen napista 2.
 				
-				Tällä hetkellä PisteEnginestä on valmiina:
-				PisteInput = Hiiren, näppäimistön ja peliohjainten hallinta.
-				PisteDraw  = Ruudulle piirtely. Sisältää myös PisteFontin.
-				PisteWait  = Tahdistus (peli pyörii kaikissa koneissa samaa nopeutta).
+				Tï¿½llï¿½ hetkellï¿½ PisteEnginestï¿½ on valmiina:
+				PisteInput = Hiiren, nï¿½ppï¿½imistï¿½n ja peliohjainten hallinta.
+				PisteDraw  = Ruudulle piirtely. Sisï¿½ltï¿½ï¿½ myï¿½s PisteFontin.
+				PisteWait  = Tahdistus (peli pyï¿½rii kaikissa koneissa samaa nopeutta).
 
-				Ikkuna-sälän piilottaminen ei ollutkaan niin yksinkertaista kuin kuvittelin,
-				joten kaikki ikkunan alustamiseen yms. liittyvä on "piilotettu" ihan koodin
+				Ikkuna-sï¿½lï¿½n piilottaminen ei ollutkaan niin yksinkertaista kuin kuvittelin,
+				joten kaikki ikkunan alustamiseen yms. liittyvï¿½ on "piilotettu" ihan koodin
 				pohjalle.
 
-				En ole kommentoinut noita Piste-koodeja juuri mitenkään, mutta tässä esimerkissä
-				on aika paljon selityksiä. Koeta saada niistä jotakin irti :)
+				En ole kommentoinut noita Piste-koodeja juuri mitenkï¿½ï¿½n, mutta tï¿½ssï¿½ esimerkissï¿½
+				on aika paljon selityksiï¿½. Koeta saada niistï¿½ jotakin irti :)
 
 				Rajoituksia:
 				
 			-	Vapaassa piirrossa ei voi olla kuin yksi pinta lukittuna kerrallaan.
 			-	Kun jokin pinta on lukittuna vapaassa piirrossa, 
-				et voi käyttää PisteDraw_Font_Kirjoita()-metodia.
-			-	Älä flippaa samasta pinnasta samaan pintaan.
+				et voi kï¿½yttï¿½ï¿½ PisteDraw_Font_Kirjoita()-metodia.
+			-	ï¿½lï¿½ flippaa samasta pinnasta samaan pintaan.
 
 */
 
@@ -34,17 +34,16 @@
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-#include <windows.h>   
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <math.h>
-#include "PisteInput.h"
-#include "PisteDraw.h"
-#include "PisteSound.h"
-#include "PisteWait.h"
-#include "resource.h"
+#include "input.h"
+#include "draw.h"
+#include "sound.h"
+#include "wait.h"
 
-/* TYYPPIMÄÄRITTELYT ---------------------------------------------------------------------------*/
+/* TYYPPIMï¿½ï¿½RITTELYT ---------------------------------------------------------------------------*/
 
 typedef unsigned short USHORT;
 typedef unsigned short WORD;
@@ -52,24 +51,24 @@ typedef unsigned long  DWORD;
 typedef unsigned char  UCHAR;
 typedef unsigned char  BYTE;
 
-/* MÄÄRITTELYT --------------------------------------------------------------------------------*/
+/* Mï¿½ï¿½RITTELYT --------------------------------------------------------------------------------*/
 
 #define WINDOW_CLASS_NAME "WINCLASS1"
 #define	GAME_NAME		  "ANY GAME"
 
-const int SCREEN_WIDTH			= 800;	// Älä koske! Muut arvot eivät (vielä) toimi!
-const int SCREEN_HEIGHT			= 600;	// Älä koske!
-const int SCREEN_BPP			= 8;	// Älä koske!
-const int MAX_COLORS_PALETTE	= 256;	// Älä koske!
+const int SCREEN_WIDTH			= 800;	// ï¿½lï¿½ koske! Muut arvot eivï¿½t (vielï¿½) toimi!
+const int SCREEN_HEIGHT			= 600;	// ï¿½lï¿½ koske!
+const int SCREEN_BPP			= 8;	// ï¿½lï¿½ koske!
+const int MAX_COLORS_PALETTE	= 256;	// ï¿½lï¿½ koske!
 
 /* GLOBAALIT MUUTTUJAT ---------------------------------------------------------------------------*/
 
-HWND      ikkunan_kahva			= NULL; // pääikkunan kahva
+HWND      ikkunan_kahva			= NULL; // pï¿½ï¿½ikkunan kahva
 HINSTANCE hinstance_app			= NULL; // hinstance?
 HDC       global_dc				= NULL; // global dc?
 
-bool DirectX_virhe				= false;// jos tämä muuttuu todeksi niin ohjelma lopetetaan
-char DirectX_virhe_viesti[2]	= " ";  // ei vielä (kunnolla) käytössä
+bool DirectX_virhe				= false;// jos tï¿½mï¿½ muuttuu todeksi niin ohjelma lopetetaan
+char DirectX_virhe_viesti[2]	= " ";  // ei vielï¿½ (kunnolla) kï¿½ytï¿½ssï¿½
 
 bool window_closed				= false;// onko ikkuna kiinni
 
@@ -79,8 +78,8 @@ int	kuvabufferi2	= NULL;				// indeksi PisteDraw:n kuvabufferitaulukkoon
 int	fontti1,							// indeksi PisteDraw:n fonttitaulukkoon
 	fontti2;							// indeksi PisteDraw:n fonttitaulukkoon
 
-int aani1;								// indeksi PisteSoundin äänitaulukkoon
-int aani2;								// indeksi PisteSoundin äänitaulukkoon
+int aani1;								// indeksi PisteSoundin ï¿½ï¿½nitaulukkoon
+int aani2;								// indeksi PisteSoundin ï¿½ï¿½nitaulukkoon
 
 int pallo_x = 320;
 int pallo_y = 240;
@@ -100,7 +99,7 @@ int Game_Init(void)
 		return 1;
 	}	
 	
-	// Alustetaan PisteInput - Hiiren ja näppäimistön hallinta
+	// Alustetaan PisteInput - Hiiren ja nï¿½ppï¿½imistï¿½n hallinta
 	if ((PisteInput_Alusta((HWND &)ikkunan_kahva, (HINSTANCE &)hinstance_app)) == PI_VIRHE)
 	{
 		DirectX_virhe = true;
@@ -117,10 +116,10 @@ int Game_Init(void)
 	}
 
 	
-	// Luodaan ensimmäinen kuvabufferi:
-	// SCREEN_WIDTH ja SCREEN_HEIGHT: koko ruudun korkeus ja leveys (melko itsestäänselvää?)
+	// Luodaan ensimmï¿½inen kuvabufferi:
+	// SCREEN_WIDTH ja SCREEN_HEIGHT: koko ruudun korkeus ja leveys (melko itsestï¿½ï¿½nselvï¿½ï¿½?)
 	// true: Bufferi sijaitsee videomuistissa (VRAM). Jos systeemimuistissa niin false.
-	// 255: Läpinäkyvyysväri.
+	// 255: Lï¿½pinï¿½kyvyysvï¿½ri.
 	// Metodi palauttaa integerin, joka on indeksiavain bufferitaulukkoon. Eli ota avain talteen. 
 	if ((kuvabufferi1 = PisteDraw_Buffer_Uusi(SCREEN_WIDTH,SCREEN_HEIGHT, true, 255)) == PD_VIRHE)
 	{
@@ -129,7 +128,7 @@ int Game_Init(void)
 	}
 
 	
-	// Tehdään toinen samanlainen
+	// Tehdï¿½ï¿½n toinen samanlainen
 	if ((kuvabufferi2 = PisteDraw_Buffer_Uusi(SCREEN_WIDTH,SCREEN_HEIGHT, true, 255)) == PD_VIRHE)
 	{
 		DirectX_virhe = true;	
@@ -137,10 +136,10 @@ int Game_Init(void)
 	}
 
 
-	// Ladataan kuva ensimmäiseen bufferiin. Tässä tapauksessa taustakuva.  
+	// Ladataan kuva ensimmï¿½iseen bufferiin. Tï¿½ssï¿½ tapauksessa taustakuva.  
 	// kuvabufferi1: indeksi PisteDraw:n taulukkoon, jossa on kuvabuffereita.
 	// "wormz.bmp": Kuva joka ladataan.
-	// true: Ladataan ja määrätään paletti. Jos ei ladata palettia, niin false
+	// true: Ladataan ja mï¿½ï¿½rï¿½tï¿½ï¿½n paletti. Jos ei ladata palettia, niin false
 	
 	if (PisteDraw_Lataa_Kuva(kuvabufferi1,"wormz.bmp", true) == PD_VIRHE)
 	{
@@ -149,7 +148,7 @@ int Game_Init(void)
 	}
 
 
-	// Ladataan toinen kuva tokaan bufferiin. Ei ladata palettia. Kuvassa on spritejä yms...
+	// Ladataan toinen kuva tokaan bufferiin. Ei ladata palettia. Kuvassa on spritejï¿½ yms...
 	if (PisteDraw_Lataa_Kuva(kuvabufferi2,"wormz2.bmp", false) == PD_VIRHE)
 	{
 		DirectX_virhe = true;
@@ -157,11 +156,11 @@ int Game_Init(void)
 	}
 
 
-	// Luodaan uusi fontti. Vähän kinkkisempi juttu: Joutuu laskeskelemaan pikseleitä kuvassa.
+	// Luodaan uusi fontti. Vï¿½hï¿½n kinkkisempi juttu: Joutuu laskeskelemaan pikseleitï¿½ kuvassa.
 	// kuvabufferi2: Bufferi, josta fontin grafiikat otetaan.
-	// 1,422: X- ja Y-kordinaatit josta kohtaa bufferista fontin grafiikat alkavat. Vasen- ja yläkulma.
+	// 1,422: X- ja Y-kordinaatit josta kohtaa bufferista fontin grafiikat alkavat. Vasen- ja ylï¿½kulma.
 	// 14,14: Yhden kirjaimen leveys ja korkeus. 
-	// 29: Kuinka monta eri kirjainta tässä fontissa on.
+	// 29: Kuinka monta eri kirjainta tï¿½ssï¿½ fontissa on.
 	if ((fontti1 = PisteDraw_Font_Uusi(kuvabufferi2,1,422,14,14,29)) == PD_VIRHE)
 	{
 		DirectX_virhe = true;
@@ -175,14 +174,14 @@ int Game_Init(void)
 		return 1;
 	}
 
-	// Asetetaan taustabufferille reunat joiden yli ei voi piirtää. PD_TAUSTABUFFER viittaa
-	// siihen kuvabufferiin, joka flipataan näytölle kerran framessa. Jos halutaan asettaa
-	// reunat jollekin muulle kuvabufferille, käytetään indeksiavainta: esim. kuvabufferi1.
+	// Asetetaan taustabufferille reunat joiden yli ei voi piirtï¿½ï¿½. PD_TAUSTABUFFER viittaa
+	// siihen kuvabufferiin, joka flipataan nï¿½ytï¿½lle kerran framessa. Jos halutaan asettaa
+	// reunat jollekin muulle kuvabufferille, kï¿½ytetï¿½ï¿½n indeksiavainta: esim. kuvabufferi1.
 	// HUOM.! Jokaiselle PisteDraw_Buffer_Uusi() metodilla luodulle kuvabufferille asetetaan
-	// automaattisesti reunat: ruudun leveys ja korkeus. Mutta tällä siis voidaan erikseen
+	// automaattisesti reunat: ruudun leveys ja korkeus. Mutta tï¿½llï¿½ siis voidaan erikseen
 	// asettaa ne.
 	// PD_TAUSTABUFFER: kuvabufferi, jolle reunat asetetaan.
-	// 20,20,620,460: Vasen reuna, yläreuna, oikea reuna, alareuna.
+	// 20,20,620,460: Vasen reuna, ylï¿½reuna, oikea reuna, alareuna.
 	PisteDraw_Aseta_Klipperi(PD_TAUSTABUFFER,20,20,620,460);
 
 
@@ -203,7 +202,7 @@ int Game_Init(void)
 
 
 	
-/*	Tai koko homma lyhyesti ilman virhetarkistuksia ja höpinöitä...
+/*	Tai koko homma lyhyesti ilman virhetarkistuksia ja hï¿½pinï¿½itï¿½...
 
 	PisteInput_Alusta((HWND &)ikkunan_kahva, (HINSTANCE &)hinstance_app);
 	PisteDraw_Alusta((HWND &)ikkunan_kahva, (HINSTANCE &) hinstance_app, 
@@ -225,58 +224,58 @@ int Game_Main_Piirra(void)
 	int x, y;
 	map_x = 1 + map_x%640;
 
-	/* TÄYTETÄÄN RUUTU HARMAALLA VÄRILLÄ */
+	/* Tï¿½YTETï¿½ï¿½N RUUTU HARMAALLA Vï¿½RILLï¿½ */
 
-	// Kuvaruudun täyttö värillä:
-	// PD_TAUSTABUFFER: bufferi joka täytetään
-	// 10: Paletin väri jolla täytetään.
+	// Kuvaruudun tï¿½yttï¿½ vï¿½rillï¿½:
+	// PD_TAUSTABUFFER: bufferi joka tï¿½ytetï¿½ï¿½n
+	// 10: Paletin vï¿½ri jolla tï¿½ytetï¿½ï¿½n.
 	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,10);
 	// Tai:
 	// PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, 0, 0, 640, 480, 10);
 
-	/* TEHDÄÄN TAUSTAN RULLAUS */
+	/* TEHDï¿½ï¿½N TAUSTAN RULLAUS */
 
 	// KOKONAISTEN buffereiden kopiointi toisiin buffereihin:
-	// kuvabufferi1: lähdebufferi, josta kopioidaan
+	// kuvabufferi1: lï¿½hdebufferi, josta kopioidaan
 	// PD_TAUSTABUFFER: kohdebufferi johon kopioidaan.
 	// map_x,0: X ja Y eli mihin kohtaan kohdebufferia kopioidaan
 
 	PisteDraw_Buffer_Flip_Nopea(kuvabufferi1,PD_TAUSTABUFFER,map_x,0);
-	// Sama juttu kuin edellisessä
+	// Sama juttu kuin edellisessï¿½
 	PisteDraw_Buffer_Flip_Nopea(kuvabufferi1,PD_TAUSTABUFFER,map_x-640,0);
 
-	/* PIIRRETÄÄN PALLO HIIREN KURSORIN KOHDALLE */
+	/* PIIRRETï¿½ï¿½N PALLO HIIREN KURSORIN KOHDALLE */
 
 	// Bufferin OSAN kopiointi toiseen bufferiin tiettyyn kohtaan:
-	// kuvabufferi2: Lähdebufferi josta kopioidaan
-	// PD_TAUSTABUFFER: kohdebufferi johon kopioidaan (tässä tapauksessa pinta joka lopussa flipataan näytölle)
-	// pallo_x, pallo_y: X- ja Y-kordinaatit mihin kohtaan kohdebufferia kopioidaan (vasen yläkulma)
-	// 200,141,219,160: Alue lähdebufferista, jolta kopioidaan.
+	// kuvabufferi2: Lï¿½hdebufferi josta kopioidaan
+	// PD_TAUSTABUFFER: kohdebufferi johon kopioidaan (tï¿½ssï¿½ tapauksessa pinta joka lopussa flipataan nï¿½ytï¿½lle)
+	// pallo_x, pallo_y: X- ja Y-kordinaatit mihin kohtaan kohdebufferia kopioidaan (vasen ylï¿½kulma)
+	// 200,141,219,160: Alue lï¿½hdebufferista, jolta kopioidaan.
 	PisteDraw_Buffer_Flip_Nopea(kuvabufferi2,PD_TAUSTABUFFER,pallo_x,pallo_y,200,141,219,160);
 	//PisteDraw_Buffer_Flip(kuvabufferi2,PD_TAUSTABUFFER,pallo_x,pallo_y,true,true);
 
 
-	/* PIIRRETÄÄN LUMISADE KUVABUFFERIIN JA TAUSTABUFFERIIN*/ 
+	/* PIIRRETï¿½ï¿½N LUMISADE KUVABUFFERIIN JA TAUSTABUFFERIIN*/ 
 	
 	// Valmistellaan Vapaa piirto bufferiin
 	UCHAR *buffer = NULL;
 	DWORD tod_leveys;
-	// Ennen kuin voidaan sorkkia mitään kuvabufferia niin se pitää lukita ensin.
-	// kuvabufferi1: Bufferi joka lukitaan piirtämistä varten
-	// buffer: Pointteri kuvabufferin sisältöön
+	// Ennen kuin voidaan sorkkia mitï¿½ï¿½n kuvabufferia niin se pitï¿½ï¿½ lukita ensin.
+	// kuvabufferi1: Bufferi joka lukitaan piirtï¿½mistï¿½ varten
+	// buffer: Pointteri kuvabufferin sisï¿½ltï¿½ï¿½n
 	// tod_leveys: Kuvabufferin todellinen leveys 
-	// Vaikka ruudun leveys olisi asetettu 640x480, se voi oikeasti olla leveämpi
+	// Vaikka ruudun leveys olisi asetettu 640x480, se voi oikeasti olla leveï¿½mpi
 	PisteDraw_Piirto_Aloita(kuvabufferi1, *&buffer, (DWORD &)tod_leveys);
 	
-	// Piirretään kuvabufferiin lumisadetta
+	// Piirretï¿½ï¿½n kuvabufferiin lumisadetta
 
 	for (x=100;x<200;x++)
 		for (y=100;y<200;y++)
 			buffer[x+y*tod_leveys] = rand()%30;
 
-	PisteDraw_Piirto_Lopeta(kuvabufferi1); //Tässä välissä mahdollinen, mutta ei pakollinen
+	PisteDraw_Piirto_Lopeta(kuvabufferi1); //Tï¿½ssï¿½ vï¿½lissï¿½ mahdollinen, mutta ei pakollinen
 	
-	// Valmistellaan toinen bufferi piirtämistä varten. Sitä ennen tarkistetaan,
+	// Valmistellaan toinen bufferi piirtï¿½mistï¿½ varten. Sitï¿½ ennen tarkistetaan,
 	// onko jokin toinen bufferi lukittu. Jos on niin vapautetaan se ensin.
 	PisteDraw_Piirto_Aloita(PD_TAUSTABUFFER, *&buffer, (DWORD &)tod_leveys);
 	
@@ -284,34 +283,34 @@ int Game_Main_Piirra(void)
 		for (y=300;y<350;y++)
 			buffer[x+y*tod_leveys] = rand()%30;
 
-	// Lopetaan piirtäminen vapauttamalla lukittu bufferi.
+	// Lopetaan piirtï¿½minen vapauttamalla lukittu bufferi.
 	PisteDraw_Piirto_Lopeta(PD_TAUSTABUFFER);
 
-	/* PIIRRETÄÄN "TESTI"-TEKSTI RUUDULLE */
+	/* PIIRRETï¿½ï¿½N "TESTI"-TEKSTI RUUDULLE */
 
 	// Kirjoitetaan teksti ruudulle aikaisemmin varatulla fontilla //
 	// fontti1: indeksiavain luotuun fonttiin jolla kirjoitetaan
 	// "testi": oiskohan teksti joka ruudulle kirjoitetaan :)
 	// 10,10  : mihin kirjoitetaan.
 	// VARO! Fontin piirto ei reunoista piittaa vaan kirjoittaa surutta
-	// myös ruudun ulkopuoliseen muistiin jos sinne pääsee käsiksi.
-	// Paluuarvona saadaan kirjoitetun tekstin leveys pikseleinä
+	// myï¿½s ruudun ulkopuoliseen muistiin jos sinne pï¿½ï¿½see kï¿½siksi.
+	// Paluuarvona saadaan kirjoitetun tekstin leveys pikseleinï¿½
 	PisteDraw_Font_Kirjoita(fontti1,"piste engine testi",PD_TAUSTABUFFER,10,10);
 	
-	/* PIIRRETÄÄN OHJETEKSTEJÄ-TEKSTEJÄ RUUDULLE */
+	/* PIIRRETï¿½ï¿½N OHJETEKSTEJï¿½-TEKSTEJï¿½ RUUDULLE */
 
 	int tekstin_leveys = 0;
 	tekstin_leveys += PisteDraw_Font_Kirjoita(fontti2,"lopetus: esc, oikea hiiren nappi tai peliohjaimen nappi 2.",PD_TAUSTABUFFER,10,40);
 	PisteDraw_Font_Kirjoita(fontti2,"a ja s: feidaus.",PD_TAUSTABUFFER,10,60);
 
-	/* PIIRRETÄÄN RUUDULLE VAPAAN VIDEOMUISTIN MÄÄRÄ*/
+	/* PIIRRETï¿½ï¿½N RUUDULLE VAPAAN VIDEOMUISTIN Mï¿½ï¿½Rï¿½*/
 
 	char  vram[30];
 	ltoa(PisteDraw_Videomuistia(), vram, 10);
 	PisteDraw_Font_Kirjoita(fontti2,vram,PD_TAUSTABUFFER,300,10);
 
 	
-	/* PIIRRETÄÄN RUUDULLE TEKSTI JOS PELIOHJAIMEN NAPPIA 2 ON PAINETTU */
+	/* PIIRRETï¿½ï¿½N RUUDULLE TEKSTI JOS PELIOHJAIMEN NAPPIA 2 ON PAINETTU */
 
 	if (PisteInput_Ohjain_Nappi(PI_PELIOHJAIN_1, PI_OHJAIN_NAPPI_1))
 		PisteDraw_Font_Kirjoita(fontti2,"peliohjaimen nappi 1 painettu",PD_TAUSTABUFFER,10,75);
@@ -322,17 +321,17 @@ int Game_Main_Piirra(void)
 	// 10 sadasosasekuntia (muistaakseni)
 	PisteWait_Wait(10);
 
-	/* FLIPATAAN TAUSTABUFFERI (PD_TAUSTABUFFER) NÄYTÖLLE */
+	/* FLIPATAAN TAUSTABUFFERI (PD_TAUSTABUFFER) Nï¿½YTï¿½LLE */
 	
-	// Dumpataan kaksoispuskurin PD_TAUSTABUFFER sisältö näyttömuistiin
+	// Dumpataan kaksoispuskurin PD_TAUSTABUFFER sisï¿½ltï¿½ nï¿½yttï¿½muistiin
 	PisteDraw_Paivita_Naytto();
 
-	// Käynnistetään taas ajastin, jota tutkitaan taas PisteWait()-metodilla.
+	// Kï¿½ynnistetï¿½ï¿½n taas ajastin, jota tutkitaan taas PisteWait()-metodilla.
 	PisteWait_Start();
 
 
 
-	/* Kaikki edellinen ilman turhaa sälää...
+	/* Kaikki edellinen ilman turhaa sï¿½lï¿½ï¿½...
 
 	int x, y;
 	map_x = 1 + map_x%640;
@@ -375,10 +374,10 @@ int Game_Main(void)
 	if (window_closed)
 		return(0);
 
-	/* HAETAAN NÄPPÄIMISTÖN, HIIREN JA PELIOHJAINTEN TÄMÄNHETKISET TILAT */
+	/* HAETAAN Nï¿½PPï¿½IMISTï¿½N, HIIREN JA PELIOHJAINTEN Tï¿½Mï¿½NHETKISET TILAT */
 
-	// Näppäimistö 
-	if (!PisteInput_Hae_Nappaimet())		//Haetaan näppäinten tilat
+	// Nï¿½ppï¿½imistï¿½ 
+	if (!PisteInput_Hae_Nappaimet())		//Haetaan nï¿½ppï¿½inten tilat
 		DirectX_virhe = true;
 	
 	// Hiirulainen
@@ -389,12 +388,12 @@ int Game_Main(void)
 	if (!PisteInput_Hae_Ohjaimet()){}
 		//DirectX_virhe = true;
 
-	// Lisätään pallon x- ja y-muuttujiin hiiren kursorin sijainnin muutos
+	// Lisï¿½tï¿½ï¿½n pallon x- ja y-muuttujiin hiiren kursorin sijainnin muutos
 
 	pallo_x = PisteInput_Hiiri_X(pallo_x);	//Tai: pallo_x += PisteInput_Hiiri_X(0);
 	pallo_y = PisteInput_Hiiri_Y(pallo_y);
 	
-	// Lisätään pallon x- ja y-muuttujiin peliohjaimen 1 liikkeet
+	// Lisï¿½tï¿½ï¿½n pallon x- ja y-muuttujiin peliohjaimen 1 liikkeet
 
 	pallo_x += PisteInput_Ohjain_X(PI_PELIOHJAIN_1)/50;
 	pallo_y += PisteInput_Ohjain_Y(PI_PELIOHJAIN_1)/50;
@@ -414,14 +413,14 @@ int Game_Main(void)
 	Game_Main_Piirra();
 
 	
-	/* FEIDATAAN PALETTIA JOS KÄYTTÄJÄ PAINELEE A- JA S-NAPPULOITA */
+	/* FEIDATAAN PALETTIA JOS Kï¿½YTTï¿½Jï¿½ PAINELEE A- JA S-NAPPULOITA */
 
-	// Luetaan onko käyttäjä painanut A-näppäintä
+	// Luetaan onko kï¿½yttï¿½jï¿½ painanut A-nï¿½ppï¿½intï¿½
 	if (PisteInput_Keydown(DIK_A))
 		PisteDraw_Fade_Paletti_Out(PD_FADE_HIDAS);
 		// Jos on, niin aloitetaan paletin feidaus mustaksi.
 		// Valmiita nopeuksia: PD_FADE_HIDAS (=1), PD_FADE_NORMAALI (=2), PD_FADE_NOPEA (=5)
-		// Parametriksi voi antaa oikeastaan minkä tahansa positiivisen arvon.
+		// Parametriksi voi antaa oikeastaan minkï¿½ tahansa positiivisen arvon.
 		// Feidaus tapahtuu arvosta 100 - 0. 
 	if (PisteInput_Keydown(DIK_S))
 		PisteDraw_Fade_Paletti_In(PD_FADE_NORMAALI);
@@ -446,9 +445,9 @@ int Game_Main(void)
 	else
 		key_delay--;
 	
-	/* LOPETETAAN OHJELMA JOS KÄYTTÄJÄ PAINAA ESC:Ä TAI HIIREN OIKEAA NAPPIA */
+	/* LOPETETAAN OHJELMA JOS Kï¿½YTTï¿½Jï¿½ PAINAA ESC:ï¿½ TAI HIIREN OIKEAA NAPPIA */
 
-	// Jos käyttäjä painaa ESC:ä tai Hiiren oikeaa namiskuukkelia, tai peliohjaimen nappia 2,
+	// Jos kï¿½yttï¿½jï¿½ painaa ESC:ï¿½ tai Hiiren oikeaa namiskuukkelia, tai peliohjaimen nappia 2,
 	// poistutaan ohjelmasta.
 	// PisteInputHiiriVasen() = hiiren vasen nappi
 	
@@ -470,8 +469,8 @@ int Game_Quit(void)
 	PisteDraw_Lopeta();
 	PisteInput_Lopeta();
 
-	// Jos on ilmennyt virhe niin näytetään tekstiboksi jossa lukee "Virhe!".
-	// Kyllä se käyttäjä yllättyy tästä informatiivisesta viestistä :)
+	// Jos on ilmennyt virhe niin nï¿½ytetï¿½ï¿½n tekstiboksi jossa lukee "Virhe!".
+	// Kyllï¿½ se kï¿½yttï¿½jï¿½ yllï¿½ttyy tï¿½stï¿½ informatiivisesta viestistï¿½ :)
 
 	if (DirectX_virhe)
 	{
@@ -542,7 +541,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 } 
 
-// Kaiken alku ja juuri: WinMain. Tästä se kaikki alkaa ja tämän sisällä peli pyörii.
+// Kaiken alku ja juuri: WinMain. Tï¿½stï¿½ se kaikki alkaa ja tï¿½mï¿½n sisï¿½llï¿½ peli pyï¿½rii.
 
 int WINAPI WinMain(	HINSTANCE hinstance,
 					HINSTANCE hprevinstance,

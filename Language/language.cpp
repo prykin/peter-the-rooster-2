@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <fstream.h>
-#include <iostream.h>
-#include <io.h>
+//#include <fstream.h>
+//#include <iostream.h>
+//#include <io.h>
 #include <fcntl.h>
-#include <windows.h> 
+//#include <windows.h>
 
-#include "PisteLanguage.h"
+#include "language.h"
 
 PisteLanguage::PisteLanguage()
 {

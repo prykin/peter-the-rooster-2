@@ -1,13 +1,14 @@
-#include <windows.h>   
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fstream.h>
-#include "PK2Sprite.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteDraw.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteSound.h"
+//#include <fstream.h>
+#include "sprites.h"
+#include "Engine/draw.h"
+#include "Engine/sound.h"
 
+#include "old_headers.h"
 
 /* -------- PK2Sprite Prototyyppi ------------------------------------------------------------------ */
 
@@ -1222,15 +1223,15 @@ int PK2Sprite::Animoi()
 	
 	frame = animaatio.sekvenssi[sekvenssi_index]-1;
 
-	// Lasketaan kuinka paljon tällä hetkellä voimassa olevaa framea vielä näytetään
+	// Lasketaan kuinka paljon tï¿½llï¿½ hetkellï¿½ voimassa olevaa framea vielï¿½ nï¿½ytetï¿½ï¿½n
 	if (frame_aika < tyyppi->frame_rate)
 		frame_aika++;
-	// Jos aika on kulunut loppuun, vaihdetaan seuraava frame tämänhetkisestä animaatiosta
+	// Jos aika on kulunut loppuun, vaihdetaan seuraava frame tï¿½mï¿½nhetkisestï¿½ animaatiosta
 	else
 	{
 		frame_aika = 0;
 		
-		// Onko animaatiossa enää frameja?
+		// Onko animaatiossa enï¿½ï¿½ frameja?
 		if (sekvenssi_index < animaatio.frameja-1)
 			sekvenssi_index++;
 		// Jos ei ja animaatio on asetettu luuppaamaan, aloitetaan animaatio alusta.
@@ -1249,7 +1250,7 @@ int PK2Sprite::Animoi()
 
 int PK2Sprite::Piirra(int kamera_x, int kamera_y)
 {
-	// Tehdään apumuuttujia
+	// Tehdï¿½ï¿½n apumuuttujia
 	int	l = (int)tyyppi->kuva_frame_leveys/2,//leveys
 		h = (int)tyyppi->kuva_frame_korkeus/2,
 		x = (int)this->x-(kamera_x),
@@ -2349,11 +2350,11 @@ int PK2Sprite::AI_Teleportti(int oma_i, PK2Sprite *spritet, int max, PK2Sprite &
 			int portti_index = 0;
 			int porttien_maara = 0;	
 	
-			// alustetaan portit-taulukko, johon kerätään kaikkien teleportti spritejen indeksit
+			// alustetaan portit-taulukko, johon kerï¿½tï¿½ï¿½n kaikkien teleportti spritejen indeksit
 			for (int i=0;i<max;i++)
 				portit[i] = -1;
 
-			// etsitään SAMANTYYPPISET teleportit
+			// etsitï¿½ï¿½n SAMANTYYPPISET teleportit
 			for (i=0;i<max;i++)
 				if (spritet[i].tyyppi != NULL)
 					if (spritet[i].tyyppi->tyyppi == TYYPPI_TELEPORTTI && 
@@ -2364,10 +2365,10 @@ int PK2Sprite::AI_Teleportti(int oma_i, PK2Sprite *spritet, int max, PK2Sprite &
 						porttien_maara++;
 					}
 
-			// jos yhtään samantyyppistä ei löydy...
+			// jos yhtï¿½ï¿½n samantyyppistï¿½ ei lï¿½ydy...
 			if (porttien_maara == 0)
 			{
-				// ...etsitään KAIKKI teleportit
+				// ...etsitï¿½ï¿½n KAIKKI teleportit
 				portti_index = 0;
 				porttien_maara = 0;
 
@@ -2381,7 +2382,7 @@ int PK2Sprite::AI_Teleportti(int oma_i, PK2Sprite *spritet, int max, PK2Sprite &
 						}
 			}
 			
-			// jos vieläkään ei löydy yhtään teleporttia (poislukien teleportti itse), poistutaan.
+			// jos vielï¿½kï¿½ï¿½n ei lï¿½ydy yhtï¿½ï¿½n teleporttia (poislukien teleportti itse), poistutaan.
 			if (porttien_maara <= 1)
 				return 0;
 
@@ -2419,7 +2420,7 @@ int PK2Sprite::AI_Teleportti(int oma_i, PK2Sprite *spritet, int max, PK2Sprite &
 	
 	if (energia > 0 && lataus == 0 && hyokkays1 == 0)
 	{
-		UCHAR todnak = 100; // todennäköisyys tulla valituksi kohdeteleportiksi
+		UCHAR todnak = 100; // todennï¿½kï¿½isyys tulla valituksi kohdeteleportiksi
 
 		if (pelaaja.x <= x + tyyppi->leveys /2 && pelaaja.x >= x - tyyppi->leveys /2 &&
 			pelaaja.y <= y + tyyppi->korkeus/2 && pelaaja.y >= y - tyyppi->korkeus/2 )

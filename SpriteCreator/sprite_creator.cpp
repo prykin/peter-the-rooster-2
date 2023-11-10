@@ -1,13 +1,14 @@
-#define WIN32_LEAN_AND_MEAN  
-#define INITGUID
+//#define WIN32_LEAN_AND_MEAN
+//#define INITGUID
 
-#include "D:\DXSDK\Include\ddraw.h" 
-#include "D:\Visual Studio\MyProjects\Pekka Kana 2\PK2Sprite.h"
+//#include "ddraw.h" //TODO: DDRAW
 #include <string.h>
-#include <istream.h>
+//#include <istream.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <mmsystem.h>
+//#include <mmsystem.h>
+
+#include "../sprites.h"
 
 typedef unsigned char  UCHAR;
 
@@ -12470,8 +12471,8 @@ int main()
 {
 /*
 	// PELIHAHMOT
-	luo_prototyyppi_kukko(				"sprites\\rooster.spr");	// päivitetty - update 1!
-	luo_prototyyppi_kukko_kynitty(		"sprites\\r_naked.spr");	// päivitetty - update 1!
+	luo_prototyyppi_kukko(				"sprites\\rooster.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_kukko_kynitty(		"sprites\\r_naked.spr");	// pï¿½ivitetty - update 1!
 	luo_prototyyppi_kana(				"sprites\\hen.spr");
 	luo_prototyyppi_pikkukana(			"sprites\\smallhen.spr");
 	luo_prototyyppi_sammakko1(			"sprites\\frog1.spr");
@@ -12481,8 +12482,8 @@ int main()
 	luo_prototyyppi_sammakko5(			"sprites\\frog5.spr");		//uusi! - update 2!
 	luo_prototyyppi_hyppija(			"sprites\\jumper.spr");
 	luo_prototyyppi_hyppija2(			"sprites\\jumper2.spr");
-	luo_prototyyppi_kani(				"sprites\\rabbit.spr");		//äänet päivitetty - update 2!
-	luo_prototyyppi_kani2(				"sprites\\rabbit2.spr");	//äänet päivitetty - update 2!
+	luo_prototyyppi_kani(				"sprites\\rabbit.spr");		//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_kani2(				"sprites\\rabbit2.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
 	luo_prototyyppi_siili(				"sprites\\hedgehog.spr");
 	luo_prototyyppi_siili2(				"sprites\\hedgeho2.spr");
 	luo_prototyyppi_siili3(				"sprites\\hedgeho3.spr");
@@ -12496,16 +12497,16 @@ int main()
 /*	luo_prototyyppi_possu(				"sprites\\pig.spr");
 	luo_prototyyppi_possu2(				"sprites\\pig2.spr");
 	luo_prototyyppi_lentava_possu(		"sprites\\fly_pig.spr");
-	luo_prototyyppi_pommi(				"sprites\\bomb.spr");	// päivitetty - update 2!
+	luo_prototyyppi_pommi(				"sprites\\bomb.spr");	// pï¿½ivitetty - update 2!
 	luo_prototyyppi_lintu(				"sprites\\bird1.spr");
 	luo_prototyyppi_lintu2(				"sprites\\bird2.spr");
 	luo_prototyyppi_lintu3(				"sprites\\bird3.spr");
-	luo_prototyyppi_lintu4(				"sprites\\bird4.spr");	// päivitetty - update 2
+	luo_prototyyppi_lintu4(				"sprites\\bird4.spr");	// pï¿½ivitetty - update 2
 	luo_prototyyppi_susi1(				"sprites\\wolf1.spr");
 	luo_prototyyppi_susi2(				"sprites\\wolf2.spr");
 	luo_prototyyppi_susi3(				"sprites\\wolf3.spr");
 	luo_prototyyppi_jattihiiri(			"sprites\\gmouse1.spr");
-	luo_prototyyppi_jattihiiri2(		"sprites\\gmouse2.spr"); // päivitetty - update 1!
+	luo_prototyyppi_jattihiiri2(		"sprites\\gmouse2.spr"); // pï¿½ivitetty - update 1!
 	luo_prototyyppi_jattihiiri3(		"sprites\\gmouse3.spr");
 	luo_prototyyppi_kala1(				"sprites\\fish1.spr");
 	luo_prototyyppi_kala2(				"sprites\\fish2.spr");
@@ -12606,7 +12607,7 @@ int main()
 	luo_prototyyppi_avain1(				"sprites\\key.spr");
 	luo_prototyyppi_avain2(				"sprites\\key2.spr");
 	luo_prototyyppi_avain3(				"sprites\\key3.spr");
-	luo_prototyyppi_avain4(				"sprites\\key4.spr");	// päivitetty - update 2
+	luo_prototyyppi_avain4(				"sprites\\key4.spr");	// pï¿½ivitetty - update 2
 
 	luo_prototyyppi_kello1(				"sprites\\clock1.spr");
 	luo_prototyyppi_kello2(				"sprites\\clock2.spr");
@@ -12689,7 +12690,7 @@ int main()
 	luo_prototyyppi_kallokytkin2(		"sprites\\switch2.spr");
 
 	// TAUSTASPRITET
-	luo_prototyyppi_tausta_kukka1(		"sprites\\bg_flwr1.spr");	// päivitetty - update 1!
+	luo_prototyyppi_tausta_kukka1(		"sprites\\bg_flwr1.spr");	// pï¿½ivitetty - update 1!
 	luo_prototyyppi_tausta_kukka2(		"sprites\\bg_flwr2.spr");
 	luo_prototyyppi_tausta_puu(			"sprites\\bg_tree.spr");
 	luo_prototyyppi_tausta_puu2(		"sprites\\bg_tree2.spr");
@@ -12700,15 +12701,15 @@ int main()
 	luo_prototyyppi_tausta_ketju_vert(  "sprites\\bg_chan1.spr");
 	luo_prototyyppi_tausta_ketju_hori(  "sprites\\bg_chan2.spr");
 	luo_prototyyppi_mato(				"sprites\\worm.spr");
-	luo_prototyyppi_perhonen(			"sprites\\bttrfly.spr");	// päivitetty - update 1!
-	luo_prototyyppi_perhonen2(			"sprites\\bttrfly2.spr");	// päivitetty - update 1!
-	luo_prototyyppi_perhonen3(			"sprites\\bttrfly3.spr");	// päivitetty - update 1!
+	luo_prototyyppi_perhonen(			"sprites\\bttrfly.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_perhonen2(			"sprites\\bttrfly2.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_perhonen3(			"sprites\\bttrfly3.spr");	// pï¿½ivitetty - update 1!
 	luo_prototyyppi_karpanen(			"sprites\\fly.spr");
 	luo_prototyyppi_tausta_kivikasa(	"sprites\\bg_spile.spr");	// uusi - update 2!
 	luo_prototyyppi_tausta_kanto(		"sprites\\bg_stump.spr");	// uusi - update 2!
 	luo_prototyyppi_tausta_mainos(		"sprites\\bg_ad.spr");		// uusi - update 2!
 	
-	// SEINÄT
+	// SEINï¿½T
 	luo_prototyyppi_kivipala(			"sprites\\stncube.spr");
 	luo_prototyyppi_kivipala2(			"sprites\\stncube2.spr");
 	luo_prototyyppi_kivipala3(			"sprites\\stncube3.spr");
@@ -12752,21 +12753,21 @@ int main()
 
 	/* UPDATE 2 
 
-	luo_prototyyppi_kukko(				"sprites\\rooster.spr");	// päivitetty - update 1!
-	luo_prototyyppi_kukko_kynitty(		"sprites\\r_naked.spr");	// päivitetty - update 1!
+	luo_prototyyppi_kukko(				"sprites\\rooster.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_kukko_kynitty(		"sprites\\r_naked.spr");	// pï¿½ivitetty - update 1!
 	luo_prototyyppi_sammakko4(			"sprites\\frog4.spr");		//uusi! - update 2!
 	luo_prototyyppi_sammakko5(			"sprites\\frog5.spr");		//uusi! - update 2!
-	luo_prototyyppi_hyppija(			"sprites\\jumper.spr");		//äänet päivitetty - update 2!
-	luo_prototyyppi_hyppija2(			"sprites\\jumper2.spr");	//äänet päivitetty - update 2!
-	luo_prototyyppi_kani(				"sprites\\rabbit.spr");		//äänet päivitetty - update 2!
-	luo_prototyyppi_kani2(				"sprites\\rabbit2.spr");	//äänet päivitetty - update 2!
-	luo_prototyyppi_pommi(				"sprites\\bomb.spr");	// päivitetty - update 2!
-	luo_prototyyppi_jattihiiri2(		"sprites\\gmouse2.spr"); // päivitetty - update 1!
+	luo_prototyyppi_hyppija(			"sprites\\jumper.spr");		//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_hyppija2(			"sprites\\jumper2.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_kani(				"sprites\\rabbit.spr");		//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_kani2(				"sprites\\rabbit2.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_pommi(				"sprites\\bomb.spr");	// pï¿½ivitetty - update 2!
+	luo_prototyyppi_jattihiiri2(		"sprites\\gmouse2.spr"); // pï¿½ivitetty - update 1!
 	luo_prototyyppi_mehilainen3(		"sprites\\bee3.spr");	// uusi - update 1!
-	luo_prototyyppi_tankki1(			"sprites\\tank.spr");	//äänet päivitetty - update 2!
-	luo_prototyyppi_tankki2(			"sprites\\tank2.spr");	//äänet päivitetty - update 2!
-	luo_prototyyppi_tankki3(			"sprites\\tank3.spr");	//äänet päivitetty - update 2!	
-	luo_prototyyppi_tankki4(			"sprites\\tank4.spr");	//äänet päivitetty - update 2!
+	luo_prototyyppi_tankki1(			"sprites\\tank.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_tankki2(			"sprites\\tank2.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
+	luo_prototyyppi_tankki3(			"sprites\\tank3.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!	
+	luo_prototyyppi_tankki4(			"sprites\\tank4.spr");	//ï¿½ï¿½net pï¿½ivitetty - update 2!
 	luo_prototyyppi_pahakana2(			"sprites\\evilone2.spr"); // uusi - update 2!
 	luo_prototyyppi_jattimehilainen(	"sprites\\gbee.spr");	// uusi - update 2!
 	luo_prototyyppi_robokana(			"sprites\\robohen.spr"); // uusi - update 2!
@@ -12776,12 +12777,12 @@ int main()
 	luo_prototyyppi_jattirobokana_muoto3("sprites\\roboss3.spr"); // uusi - update 2!
 	luo_prototyyppi_jattirobokana_muoto4("sprites\\roboss4.spr"); // uusi - update 2!
 	luo_prototyyppi_jattirobokana_muoto5("sprites\\roboss5.spr"); // uusi - update 2!
-	luo_prototyyppi_lintu4(				"sprites\\bird4.spr");	// päivitetty - update 2!
+	luo_prototyyppi_lintu4(				"sprites\\bird4.spr");	// pï¿½ivitetty - update 2!
 	
 	// BONUKSET
 	luo_prototyyppi_viinirypale(		"sprites\\wgrape.spr"); // uusi - update 2!
 	luo_prototyyppi_rypaleterttu(		"sprites\\wgrapes.spr"); // uusi - update 2!
-	luo_prototyyppi_avain4(				"sprites\\key4.spr");	// päivitetty - update 2!
+	luo_prototyyppi_avain4(				"sprites\\key4.spr");	// pï¿½ivitetty - update 2!
 	
 	// "AMMUKSET"
 	luo_prototyyppi_muna_jaa(			"sprites\\egg_ice.spr");	// uusi! - update 2
@@ -12815,10 +12816,10 @@ int main()
 	// KYTKIMET
 
 	// TAUSTASPRITET
-	luo_prototyyppi_tausta_kukka1(		"sprites\\bg_flwr1.spr");	// päivitetty - update 1!
-	luo_prototyyppi_perhonen(			"sprites\\bttrfly.spr");	// päivitetty - update 1!
-	luo_prototyyppi_perhonen2(			"sprites\\bttrfly2.spr");	// päivitetty - update 1!
-	luo_prototyyppi_perhonen3(			"sprites\\bttrfly3.spr");	// päivitetty - update 1!
+	luo_prototyyppi_tausta_kukka1(		"sprites\\bg_flwr1.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_perhonen(			"sprites\\bttrfly.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_perhonen2(			"sprites\\bttrfly2.spr");	// pï¿½ivitetty - update 1!
+	luo_prototyyppi_perhonen3(			"sprites\\bttrfly3.spr");	// pï¿½ivitetty - update 1!
 	luo_prototyyppi_tausta_kivikasa(	"sprites\\bg_spile.spr");	// uusi - update 2!
 	luo_prototyyppi_tausta_kanto(		"sprites\\bg_stump.spr");	// uusi - update 2!
 	luo_prototyyppi_tausta_mainos(		"sprites\\bg_ad.spr");		// uusi - update 2!	

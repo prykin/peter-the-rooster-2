@@ -5,26 +5,25 @@
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-#include <windows.h>   
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <direct.h>
-#include <io.h>
-#include <fstream.h>
-#include <iostream.h>
+//#include <direct.h>
+//#include <io.h>
+//#include <fstream.h>
+//#include <iostream.h>
 #include <string.h>
-#include "G:\Microsoft Visual Studio\MyProjects\PisteEngine\PisteInput.h"
-#include "G:\Microsoft Visual Studio\MyProjects\PisteEngine\PisteDraw.h"
-#include "G:\Microsoft Visual Studio\MyProjects\PisteEngine\PisteSound.h"
-#include "G:\Microsoft Visual Studio\MyProjects\PisteEngine\PisteWait.h"
-#include "G:\Microsoft Visual Studio\MyProjects\Pekka Kana 2\PK2Map.h"
-#include "G:\Microsoft Visual Studio\MyProjects\Pekka Kana 2\PK2Sprite.h"
-#include "Resource.h"
+#include "../Engine/input.h"
+#include "../Engine/draw.h"
+#include "../Engine/sound.h"
+#include "../Engine/wait.h"
+#include "../map.h"
+#include "../sprites.h"
 
-/* TYYPPIMÄÄRITTELYT ---------------------------------------------------------------------------*/
+/* TYYPPIMï¿½ï¿½RITTELYT ---------------------------------------------------------------------------*/
 
 typedef unsigned short USHORT;
 typedef unsigned short WORD; 
@@ -72,7 +71,7 @@ struct LOKIMERKINTA
 	UCHAR	tyyppi;
 };
 
-/* MÄÄRITTELYT --------------------------------------------------------------------------------*/
+/* Mï¿½ï¿½RITTELYT --------------------------------------------------------------------------------*/
 
 #define WINDOW_CLASS_NAME "WINCLASS1"
 #define	GAME_NAME		  "PK2 LEVEL EDITOR"
@@ -143,11 +142,11 @@ struct ASETUKSET
 
 /* GLOBAALIT MUUTTUJAT ---------------------------------------------------------------------------*/
 
-HWND      ikkunan_kahva			= NULL; // pääikkunan kahva
+HWND      ikkunan_kahva			= NULL; // pï¿½ï¿½ikkunan kahva
 HINSTANCE hinstance_app			= NULL; // hinstance?
 HDC       global_dc				= NULL; // global dc?
 
-bool DirectX_virhe				= false;// jos tämä muuttuu todeksi niin ohjelma lopetetaan
+bool DirectX_virhe				= false;// jos tï¿½mï¿½ muuttuu todeksi niin ohjelma lopetetaan
 char virheviesti[60];		
 
 bool window_closed				= false;// onko ikkuna kiinni
@@ -234,7 +233,7 @@ int spriteja = 0;
 
 int proto_valittu = MAX_PROTOTYYPPEJA;
 
-// TEKSTINKÄSITTELY
+// TEKSTINKï¿½SITTELY
 int editKenttaId = 0;
 char editTeksti[500];
 int editKursori = 0;
@@ -388,7 +387,7 @@ void Level_Editor_Asetukset_Tallenna(void)
 	delete (tiedosto);
 }
 
-// LEIKEPÖYTÄ ///////////////////////////////////////////////
+// LEIKEPï¿½YTï¿½ ///////////////////////////////////////////////
 
 void Level_Editor_Leikepoyta_Alusta(void)
 {
@@ -880,7 +879,7 @@ int Level_Editor_Prototyyppi_Lataa_Vanha(char *polku, char *tiedosto)
 	return 0;
 }
 /*
-// Tarvitaan jotta myös yhteysspritet tulisi lisättyä kertan tietoihin
+// Tarvitaan jotta myï¿½s yhteysspritet tulisi lisï¿½ttyï¿½ kertan tietoihin
 int Level_Editor_Prototyyppi_Lataa_Yhteyssprite(char *polku, char *tiedosto)
 {
 	
@@ -1144,7 +1143,7 @@ int Level_Editor_Prototyyppi_Lataa_Kaikki()
 			spriteja++;
 
 			if (Level_Editor_Prototyyppi_Lataa_Vanha(tiedosto,kartta->protot[i])==1) {
-				Level_Editor_Loki_Tallenna("lataus epäonnistui.\n");
+				Level_Editor_Loki_Tallenna("lataus epï¿½onnistui.\n");
 				
 				//seuraava_vapaa_proto++;
 
@@ -1409,7 +1408,7 @@ int Level_Editor_Kartta_Lataa(char *filename)
 		if (virhe == 1)
 		{
 			Level_Editor_Loki_Kirjaa("could not load map!", LOKI_VIRHE);
-			//Level_Editor_Loki_Tallenna("Kartan lataus epäonnistui.\n");
+			//Level_Editor_Loki_Tallenna("Kartan lataus epï¿½onnistui.\n");
 			strcpy(karttatiedosto, " ");
 			return(1);
 		}
@@ -1428,7 +1427,7 @@ int Level_Editor_Kartta_Lataa(char *filename)
 
 	Level_Editor_Kartta_Paivita();
 
-	//Level_Editor_Loki_Tallenna("Kartta päivitetty.\n");
+	//Level_Editor_Loki_Tallenna("Kartta pï¿½ivitetty.\n");
 	
 	
 	kartta_ladattu = true;
@@ -1795,7 +1794,7 @@ int Level_Editor_Tiedostot_Hae(void)
 	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.it", TIEDOSTO_MUS) == 2)
 		return 0;
 
-	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole vielä määritelty...
+	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole vielï¿½ mï¿½ï¿½ritelty...
 		if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "pk2.exe", 0) == 0)
 			Level_Editor_Tallenna_PK2_Hakemisto(tyohakemisto);
 					
@@ -1861,7 +1860,7 @@ int Level_Editor_Tiedostot_Hae(void)
 
 	_findclose( hFile );
 
-	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole vielä määritelty...
+	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole vielï¿½ mï¿½ï¿½ritelty...
 	{
 
 		if((hFile = _findfirst( "*.exe", &map_file )) != -1L )
@@ -3506,7 +3505,7 @@ int Level_Editor_Piirra_Kartta(void)
 	return 0;
 }
 
-/* Tässä editoidaan kartan tausta ja seina taulukoita */
+/* Tï¿½ssï¿½ editoidaan kartan tausta ja seina taulukoita */
 
 int Level_Editor_Edit_Kartta(void)
 {
@@ -3966,10 +3965,10 @@ int Level_Editor_Main(void)
 	if (window_closed)
 		return(0);
 
-	/* HAETAAN NÄPPÄIMISTÖN, HIIREN JA PELIOHJAINTEN TÄMÄNHETKISET TILAT */
+	/* HAETAAN Nï¿½PPï¿½IMISTï¿½N, HIIREN JA PELIOHJAINTEN Tï¿½Mï¿½NHETKISET TILAT */
 
-	// Näppäimistö 
-	if (!PisteInput_Hae_Nappaimet())		//Haetaan näppäinten tilat
+	// Nï¿½ppï¿½imistï¿½ 
+	if (!PisteInput_Hae_Nappaimet())		//Haetaan nï¿½ppï¿½inten tilat
 		DirectX_virhe = true;
 	
 	// Hiirulainen
@@ -4230,7 +4229,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 } 
 
-// Kaiken alku ja juuri: WinMain. Tästä se kaikki alkaa ja tämän sisällä peli pyörii.
+// Kaiken alku ja juuri: WinMain. Tï¿½stï¿½ se kaikki alkaa ja tï¿½mï¿½n sisï¿½llï¿½ peli pyï¿½rii.
 
 int WINAPI WinMain(	HINSTANCE hinstance,
 					HINSTANCE hprevinstance,

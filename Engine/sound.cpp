@@ -5,9 +5,9 @@ PisteEngine - PisteSound 0.1
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
-#include "PisteSound.h"
-#include "PisteSFX.h"
-#include "PisteLog.h"
+#include "sound.h"
+#include "sfx.h"
+#include "log.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -92,7 +92,7 @@ int PisteSound_SFX_Uusi(char *filename)
 	PisteLog_Kirjoita(filename);
 	PisteLog_Kirjoita("\n");
 
-	/* Etsitään löytyikö jo samasta tiedostosta ladattu ääni */
+	/* Etsitï¿½ï¿½n lï¿½ytyikï¿½ jo samasta tiedostosta ladattu ï¿½ï¿½ni */
 		
 	for (i=0;i<MAX_SFX;i++)
 		if (soundit[i] != NULL)

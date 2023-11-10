@@ -1,17 +1,17 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
-#include <windows.h> 
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <direct.h>
-#include <io.h>
-#include <fstream.h>
-#include <iostream.h>
+//#include <direct.h>
+//#include <io.h>
+//#include <fstream.h>
+//#include <iostream.h>
 #include <string.h>
-#include "PisteLog.h"
+#include "log.h"
 
 /* VARIABLES ---------------------------------------------------------------------------------*/
 

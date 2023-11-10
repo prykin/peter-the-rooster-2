@@ -6,16 +6,16 @@ PisteEngine - PisteInput 2.0
 Versio 2.0
 ----------
 
-		Kontrollit = näppäimistön, hiiren tai peliohjaimen luku yhdellä aliohjelmalla 
+		Kontrollit = nï¿½ppï¿½imistï¿½n, hiiren tai peliohjaimen luku yhdellï¿½ aliohjelmalla 
 		  
-		Lisätty vakiokontrollit (esimerkkejä: PI_KB_A, PI_KB_UP, PI_HIIRI_VASEN_NAPPI, PI_PELIOHJAIN1_NAPPI_1)
-		Mahdollistavat sen, että käyttjä voi valita itse kontrollit. Selkeyttää myös koodia.
+		Lisï¿½tty vakiokontrollit (esimerkkejï¿½: PI_KB_A, PI_KB_UP, PI_HIIRI_VASEN_NAPPI, PI_PELIOHJAIN1_NAPPI_1)
+		Mahdollistavat sen, ettï¿½ kï¿½yttjï¿½ voi valita itse kontrollit. Selkeyttï¿½ï¿½ myï¿½s koodia.
 
 UCHAR	PisteInput_Lue_Kontrolli();
-		Kertoo minkä kontrollin pelaaja on valinnut.
+		Kertoo minkï¿½ kontrollin pelaaja on valinnut.
 
-bool	PisteInput_Lue_Kontrolli(UCHAR kontrolli); // Palauttaa TRUE jos käyttäjä on aktivoinut kontrollin.
-		Kertoo onko pelaaja painanut kontrollia (hiiren nappi, peliohjaimen nappi tai näppäin) 
+bool	PisteInput_Lue_Kontrolli(UCHAR kontrolli); // Palauttaa TRUE jos kï¿½yttï¿½jï¿½ on aktivoinut kontrollin.
+		Kertoo onko pelaaja painanut kontrollia (hiiren nappi, peliohjaimen nappi tai nï¿½ppï¿½in) 
 
 char   *PisteInput_Lue_Kontrollin_Nimi(UCHAR kontrolli); 
 		Palauttaa kontrollin nimen. Esim. 'arrow left'
@@ -24,8 +24,8 @@ char   *PisteInput_Lue_Kontrollin_Nimi(UCHAR kontrolli);
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
-#include "PisteInput.h"
-#include "PisteLog.h"
+#include "input.h"
+#include "log.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -118,7 +118,7 @@ bool PisteInput_Alusta_Ohjain(int index)
 
 	DIPROPRANGE joy_axis_range;
 
-	//Määritellään x-akseli
+	//Mï¿½ï¿½ritellï¿½ï¿½n x-akseli
 	
 	joy_axis_range.lMin = -PI_OHJAIN_XY;
 	joy_axis_range.lMax =  PI_OHJAIN_XY;
@@ -128,7 +128,7 @@ bool PisteInput_Alusta_Ohjain(int index)
 	joy_axis_range.diph.dwHow = DIPH_BYOFFSET;
 	PI_joysticks[index].lpdijoy->SetProperty(DIPROP_RANGE, &joy_axis_range.diph);
 
-	//Määritellään y-akseli
+	//Mï¿½ï¿½ritellï¿½ï¿½n y-akseli
 
 	joy_axis_range.lMin = -PI_OHJAIN_XY;
 	joy_axis_range.lMax =  PI_OHJAIN_XY;
@@ -206,7 +206,7 @@ bool PisteInput_Alusta_Ohjaimet()
 
 	DIPROPRANGE joy_axis_range;
 
-	//Määritellään x-akseli
+	//Mï¿½ï¿½ritellï¿½ï¿½n x-akseli
 	
 	joy_axis_range.lMin = -PI_OHJAIN_XY;
 	joy_axis_range.lMax =  PI_OHJAIN_XY;
@@ -216,7 +216,7 @@ bool PisteInput_Alusta_Ohjaimet()
 	joy_axis_range.diph.dwHow = DIPH_BYOFFSET;
 	PI_lpdijoy->SetProperty(DIPROP_RANGE, &joy_axis_range.diph);
 
-	//Määritellään y-akseli
+	//Mï¿½ï¿½ritellï¿½ï¿½n y-akseli
 
 	joy_axis_range.lMin = -PI_OHJAIN_XY;
 	joy_axis_range.lMax =  PI_OHJAIN_XY;
@@ -317,7 +317,7 @@ int PisteInput_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app)
 			return PI_VIRHE;
 		}
 
-		/* Näppäimistön asennus */
+		/* Nï¿½ppï¿½imistï¿½n asennus */
 
 		if (!PisteInput_Alusta_Keyboard())
 			return PI_VIRHE;
@@ -497,16 +497,16 @@ char PisteInput_Lue_Nappaimisto(void)
 {
 	if (DIKEYDOWN(PI_keyboard_state, DIK_RSHIFT))
 	{
-		if (DIKEYDOWN(PI_keyboard_state, DIK_A)) return('ä');
+		if (DIKEYDOWN(PI_keyboard_state, DIK_A)) return('ï¿½');
 		if (DIKEYDOWN(PI_keyboard_state, DIK_1)) return('!');
 		if (DIKEYDOWN(PI_keyboard_state, DIK_ADD)) return('?');
-		if (DIKEYDOWN(PI_keyboard_state, DIK_O)) return('ö');
+		if (DIKEYDOWN(PI_keyboard_state, DIK_O)) return('ï¿½');
 	}
 	
 	if (DIKEYDOWN(PI_keyboard_state, DIK_RMENU))
 	{
-		if (DIKEYDOWN(PI_keyboard_state, DIK_O)) return('å');
-		if (DIKEYDOWN(PI_keyboard_state, DIK_A)) return('ä');
+		if (DIKEYDOWN(PI_keyboard_state, DIK_O)) return('ï¿½');
+		if (DIKEYDOWN(PI_keyboard_state, DIK_A)) return('ï¿½');
 	}
 
 	if (DIKEYDOWN(PI_keyboard_state, DIK_A)) return('a');

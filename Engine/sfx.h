@@ -1,8 +1,9 @@
 #ifndef P_SFX
 #define P_SFX
 
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteSound.h"
-#include <io.h>
+#include "sound.h"
+//#include <io.h>
+
 class PisteSFX
 {
 	private:

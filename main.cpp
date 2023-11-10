@@ -5,25 +5,25 @@ Muutoshistoria:
 v1.2
 
 - episodiruudun jakaminen useaan osaan: 10 episodia per ruutu
-- Musiikin lataus myös episodihakemistosta.
-- Kartan musiikin lataus myös episodihakemistosta
+- Musiikin lataus myï¿½s episodihakemistosta.
+- Kartan musiikin lataus myï¿½s episodihakemistosta
 - Spritejen lataus episodihakemistosta
 - Lumiefekti
-- episodit aakkosjärjestyksessä
+- episodit aakkosjï¿½rjestyksessï¿½
 - Esineiden swappaaminen tabista
-- Pistelaskuruudussa laskennan skippaus ENTER:llä
+- Pistelaskuruudussa laskennan skippaus ENTER:llï¿½
 - Max spriteja 800
-- Fonttien lataus erillisestä tiedostosta, joka on määritelty kielitiedostossa
+- Fonttien lataus erillisestï¿½ tiedostosta, joka on mï¿½ï¿½ritelty kielitiedostossa
 - Datan luku kartan ulkopuolelta -bugi korjattu
 - Optimoidut spriterutiinit.
-- Lokin kirjoitus lisäys
+- Lokin kirjoitus lisï¿½ys
 - Scrollbar kielivalinnoissa
-- menujen selaus näppäimistöllä ja gamepadilla
-- Lisätty spriteille tekoälyjä
+- menujen selaus nï¿½ppï¿½imistï¿½llï¿½ ja gamepadilla
+- Lisï¿½tty spriteille tekoï¿½lyjï¿½
 - Staattinen alue, jolla spritet aktiivisia (-320 -> +320 : -240 -> +240)
 - Pisteidenlaskentabugi fixattu
-- näkymättömyysbonus
-- uudelleen ilmestyvät spritet
+- nï¿½kymï¿½ttï¿½myysbonus
+- uudelleen ilmestyvï¿½t spritet
 - nuolispritet
 - alkup. infojen korvaus infosign.txt -tiedostotsta
 
@@ -32,36 +32,37 @@ v1.2
 
 /* PRE DEFINITIONS ----------------------------------------------------------------------------*/
 
-#define WIN32_LEAN_AND_MEAN  
-#define INITGUID
-//#define NDEBUG
+//#define WIN32_LEAN_AND_MEAN
+//#define INITGUID
+////#define NDEBUG
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-#include <tchar.h>
-#include <windows.h>   
-#include <windowsx.h> 
-#include <fstream.h>
-#include <mmsystem.h>
+//#include <tchar.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <fstream.h>
+//#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <direct.h>
-#include <io.h>
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteInput.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteDraw.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteWait.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteSound.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteLog.h"
-#include "D:\Visual Studio\MyProjects\PisteLanguage\PisteLanguage.h"
-#include "PK2Map.h"
-#include "PK2Sprite.h"
-#include "resource.h"
-#include "D:\C\midas\include\midasdll.h"
+//#include <direct.h>
+//#include <io.h>
+#include "Engine/input.h"
+#include "Engine/draw.h"
+#include "Engine/wait.h"
+#include "Engine/sound.h"
+#include "Engine/log.h"
+#include "Language/language.h"
+#include "map.h"
+#include "sprites.h"
+//#include "midasdll.h" // TODO: midas library
+
+#include "old_headers.h"
 
 
-/* TYYPPIMÄÄRITTELYT ---------------------------------------------------------------------------*/
+/* TYYPPIMï¿½ï¿½RITTELYT ---------------------------------------------------------------------------*/
 
 typedef unsigned short USHORT;
 typedef unsigned short WORD; 
@@ -230,7 +231,7 @@ struct PK2EPISODIPISTEET
 {
 	// parhaat pisteet kullekin jaksolle episodissa..
 	DWORD pisteet[EPISODI_MAX_JAKSOJA];
-	// eniten pisteitä keränneet pelaajat kussakin jaksossa episodissa..
+	// eniten pisteitï¿½ kerï¿½nneet pelaajat kussakin jaksossa episodissa..
 	char top_pelaajat[EPISODI_MAX_JAKSOJA][20];
 	// parhaat ajat kullekin jaksolle episodissa..
 	DWORD ajat[EPISODI_MAX_JAKSOJA];
@@ -241,7 +242,7 @@ struct PK2EPISODIPISTEET
 	char  episodin_top_pelaaja[20];
 };
 
-/* MÄÄRITTELYT --------------------------------------------------------------------------------*/
+/* Mï¿½ï¿½RITTELYT --------------------------------------------------------------------------------*/
 
 #define WINDOW_CLASS_NAME "WINCLASS1"
 #define	GAME_NAME		  "PEKKA KANA 2 (v1.2)"
@@ -266,14 +267,14 @@ bool RAJAA_KARTANPIIRTOALUE = true;
 
 /* GLOBAALIT MUUTTUJAT ---------------------------------------------------------------------------*/
 
-HWND      ikkunan_kahva			= NULL; // pääikkunan kahva
+HWND      ikkunan_kahva			= NULL; // pï¿½ï¿½ikkunan kahva
 HINSTANCE hinstance_app			= NULL; // hinstance?
 HDC       global_dc				= NULL; // global dc?
 
 bool ikkuna_aktiivinen		= true;		// onko ikkuna aktiivinen vai minimoitu?
 
-bool PK2_virhe				= false;// jos tämä muuttuu todeksi niin ohjelma lopetetaan
-char PK2_virhe_viesti[2]	= " ";  // ei vielä (kunnolla) käytössä
+bool PK2_virhe				= false;// jos tï¿½mï¿½ muuttuu todeksi niin ohjelma lopetetaan
+char PK2_virhe_viesti[2]	= " ";  // ei vielï¿½ (kunnolla) kï¿½ytï¿½ssï¿½
 
 bool window_closed				= false;// onko ikkuna kiinni
 bool lopeta_peli = false;
@@ -421,12 +422,12 @@ char pelaajan_nimi[20] = " ";
 
 bool nimiedit = false;
 
-// PALIKOIHIN LIITTYVÄT AJASTIMET
+// PALIKOIHIN LIITTYVï¿½T AJASTIMET
 
 int kytkin1 = 0, kytkin2 = 0, kytkin3 = 0;
 int palikka_animaatio = 0;
 
-// ÄÄNIEFEKTIT
+// ï¿½ï¿½NIEFEKTIT
 
 int kytkin_aani,
 	hyppy_aani,
@@ -439,7 +440,7 @@ int kytkin_aani,
 	pistelaskuri_aani;
 
 
-int sprite_aanet[50]; // spritejen käyttämät äänibufferit
+int sprite_aanet[50]; // spritejen kï¿½yttï¿½mï¿½t ï¿½ï¿½nibufferit
 
 int aanenvoimakkuus = 90;
 
@@ -983,7 +984,7 @@ bool PK_Lataa_Kieli(char *tiedosto)
 	txt_intro_translation		= tekstit->Hae_Indeksi("intro translation");
 	txt_intro_translator		= tekstit->Hae_Indeksi("intro translator");	
 
-	// Päävalikko
+	// Pï¿½ï¿½valikko
 	txt_mainmenu_new_game		= tekstit->Hae_Indeksi("main menu new game");
 	txt_mainmenu_continue		= tekstit->Hae_Indeksi("main menu continue");
 	txt_mainmenu_load_game		= tekstit->Hae_Indeksi("main menu load game");
@@ -1788,7 +1789,7 @@ int PK_Palikka_Laske_Palikat(void)
 				palikka.alas		= PALIKKA_TAUSTA;
 			}
 
-			// Läpikäveltävä lattia
+			// Lï¿½pikï¿½veltï¿½vï¿½ lattia
 
 			if (i == PALIKKA_ESTO_ALAS)
 			{
@@ -1799,7 +1800,7 @@ int PK_Palikka_Laske_Palikat(void)
 				palikka.ala -= 27;
 			}
 
-			// Mäet
+			// Mï¿½et
 
 			if (i > 49 && i < 60)
 			{
@@ -2186,7 +2187,7 @@ int PK_Piirra_Lapinakyva_Objekti2(int lahde_buffer, DWORD lahde_x, DWORD lahde_y
 					if (color1 > 31)
 						color1 = 31;
 
-					//color1 = varitaulu31[color1]; // asettaa värin arvoon 31 jos suurempi kuin 31
+					//color1 = varitaulu31[color1]; // asettaa vï¿½rin arvoon 31 jos suurempi kuin 31
 					//color1 += vari;
 
 					buffer_kohde[px+kohde_kursori] = color1+vari;
@@ -2262,7 +2263,7 @@ int PK_Piirra_Lapinakyva_Objekti3(int lahde_buffer, DWORD lahde_x, DWORD lahde_y
 					color1 =  pros_taulu[color1][pros];//(color1*pros)/100;
 					//color1 += varitaulu_harmaa[color2];//color2 % 32
 					color1 += color2 % 32;
-					color1 =  varitaulu31[color1]+vari; // asettaa värin arvoon 31 jos suurempi kuin 31
+					color1 =  varitaulu31[color1]+vari; // asettaa vï¿½rin arvoon 31 jos suurempi kuin 31
 
 					buffer_kohde[px+kohde_kursori] = color1;
 				}
@@ -3671,7 +3672,7 @@ void PK_Palikka_Este(PK2PALIKKA &palikka)
 		palikka.yla += (int)sin_table[degree%360];
 	}
 
-	// Läpikäveltävä lattia
+	// Lï¿½pikï¿½veltï¿½vï¿½ lattia
 
 	if (palikka.koodi == PALIKKA_ESTO_ALAS)
 	{
@@ -3682,7 +3683,7 @@ void PK_Palikka_Este(PK2PALIKKA &palikka)
 		palikka.ala -= 27;
 	}
 
-	// Mäet
+	// Mï¿½et
 
 	if (palikka.koodi > 49 && palikka.koodi < 60)
 	{
@@ -3765,14 +3766,14 @@ void PK_Palikka_Este(PK2PALIKKA &palikka)
 	{
 		palikka.oikea += kytkin3_x/2;
 		palikka.vasen += kytkin3_x/2;
-		palikka.koodi = PALIKKA_HISSI_HORI; // samat idea sivusuuntaan työnnössä
+		palikka.koodi = PALIKKA_HISSI_HORI; // samat idea sivusuuntaan tyï¿½nnï¿½ssï¿½
 	}
 
 	if (palikka.koodi == PALIKKA_KYTKIN3_VASEMMALLE)
 	{
 		palikka.oikea -= kytkin3_x/2;
 		palikka.vasen -= kytkin3_x/2;
-		palikka.koodi = PALIKKA_HISSI_HORI; // samat idea sivusuuntaan työnnössä
+		palikka.koodi = PALIKKA_HISSI_HORI; // samat idea sivusuuntaan tyï¿½nnï¿½ssï¿½
 	}
 
 	if (palikka.koodi == PALIKKA_KYTKIN3)
@@ -3982,7 +3983,7 @@ int PK_Sprite_Lisaa_Ammus(PK2Sprite_Prototyyppi &proto, int pelaaja, double x, d
 						else
 							spritet[i].a = -spritet[i].tyyppi->max_nopeus;
 					}
-					else // tai jos kyseessä on vihollinen
+					else // tai jos kyseessï¿½ on vihollinen
 					{
 						if (!spritet[emo].flip_x)
 							spritet[i].a = 1 + rand()%(int)spritet[i].tyyppi->max_nopeus;
@@ -4248,15 +4249,15 @@ void PK_Tutki_Seina(PK2Sprite &sprite,
 					bool	&alas)
 {
 
-	// tarkistetaan onko palikka vasen tai oikea seinä.
+	// tarkistetaan onko palikka vasen tai oikea seinï¿½.
 	if (sprite_yla < palikka.ala && sprite_ala-1 > palikka.yla)
 	{
 		if (sprite_oikea+sprite_a-1 > palikka.vasen && sprite_vasen+sprite_a < palikka.oikea)
 		{
-			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisään.
+			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisï¿½ï¿½n.
 			if (sprite_oikea+sprite_a < palikka.oikea)
 			{
-				// Onko palikka seinä?
+				// Onko palikka seinï¿½?
 				if (palikka.oikealle == PALIKKA_SEINA)
 				{
 					oikealle = false;
@@ -4367,7 +4368,7 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 	{
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinän tausta vesitausta                            */
+		/* Tutkitaan onko seinï¿½n tausta vesitausta                            */
 		/**********************************************************************/
 		if (palikka.vesi)
 		{
@@ -4375,7 +4376,7 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 		}
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä tuliansa, kytkin ylhäällä ja sprite valmis    */
+		/* Tutkitaan onko seinï¿½ tuliansa, kytkin ylhï¿½ï¿½llï¿½ ja sprite valmis    */
 		/**********************************************************************/		
 		if (palikka.koodi == PALIKKA_TULI && kytkin1 == 0 && sprite.isku == 0)
 		{
@@ -4384,13 +4385,13 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 		}
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä piilopaikka                                   */
+		/* Tutkitaan onko seinï¿½ piilopaikka                                   */
 		/**********************************************************************/
 		if (palikka.koodi == PALIKKA_PIILO)
 			sprite.piilossa = true;
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä exit                                          */
+		/* Tutkitaan onko seinï¿½ exit                                          */
 		/**********************************************************************/
 		if (palikka.koodi == PALIKKA_LOPETUS && sprite.pelaaja != 0)
 		{
@@ -4419,7 +4420,7 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 	if (sprite_vasen <= palikka.oikea-4 && sprite_oikea >= palikka.vasen+4 && sprite_yla <= palikka.ala && sprite_ala >= palikka.yla+16)
 	{
 		/**********************************************************************/
-		/* Tutkitaan onko seinä tuliansa, kytkin ylhäällä ja sprite valmis    */
+		/* Tutkitaan onko seinï¿½ tuliansa, kytkin ylhï¿½ï¿½llï¿½ ja sprite valmis    */
 		/**********************************************************************/		
 		if (palikka.koodi == PALIKKA_TULI && kytkin1 == 0 && sprite.isku == 0)
 		{
@@ -4428,7 +4429,7 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 		}
 	}
 
-	/* Tutkitaan onko kyseessä seinä joka blokkaa alaspäin menevät*/
+	/* Tutkitaan onko kyseessï¿½ seinï¿½ joka blokkaa alaspï¿½in menevï¿½t*/
 	if ((palikka.koodi<80 || palikka.koodi>139) && palikka.koodi != PALIKKA_ESTO_ALAS && palikka.koodi < 150)
 	{
 		mask_index = (int)(sprite_x+sprite_a) - palikka.vasen;
@@ -4451,7 +4452,7 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 	if (sprite_vasen <= palikka.oikea+2 && sprite_oikea >= palikka.vasen-2 && sprite_yla <= palikka.ala && sprite_ala >= palikka.yla)
 	{
 		/**********************************************************************/
-		/* Tutkitaan onko sprite avain ja seinä lukko                         */
+		/* Tutkitaan onko sprite avain ja seinï¿½ lukko                         */
 		/**********************************************************************/ 
 		if (palikka.koodi == PALIKKA_LUKKO && sprite.tyyppi->avain)
 		{
@@ -4494,15 +4495,15 @@ void PK_Tutki_Seina(PK2Sprite &sprite, PK2PALIKKA &palikka)
 		}	
 	}
 
-	// tarkistetaan onko palikka vasen tai oikea seinä.
+	// tarkistetaan onko palikka vasen tai oikea seinï¿½.
 	if (sprite_yla < palikka.ala && sprite_ala-1 > palikka.yla)
 	{
 		if (sprite_oikea+sprite_a-1 > palikka.vasen && sprite_vasen+sprite_a < palikka.oikea)
 		{
-			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisään.
+			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisï¿½ï¿½n.
 			if (sprite_oikea+sprite_a < palikka.oikea)
 			{
-				// Onko palikka seinä?
+				// Onko palikka seinï¿½?
 				if (palikka.oikealle == PALIKKA_SEINA)
 				{
 					oikealle = false;
@@ -4637,7 +4638,7 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 	{
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinän tausta vesitausta                            */
+		/* Tutkitaan onko seinï¿½n tausta vesitausta                            */
 		/**********************************************************************/
 		if (palikka.vesi)
 		{
@@ -4645,7 +4646,7 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 		}
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä tuliansa, kytkin ylhäällä ja sprite valmis    */
+		/* Tutkitaan onko seinï¿½ tuliansa, kytkin ylhï¿½ï¿½llï¿½ ja sprite valmis    */
 		/**********************************************************************/		
 /*		if (palikka.koodi == PALIKKA_TULI && kytkin1 == 0 && sprite.isku == 0)
 		{
@@ -4654,13 +4655,13 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 		}
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä piilopaikka                                   */
+		/* Tutkitaan onko seinï¿½ piilopaikka                                   */
 		/**********************************************************************/
 		if (palikka.koodi == PALIKKA_PIILO)
 			sprite.piilossa = true;
 		
 		/**********************************************************************/
-		/* Tutkitaan onko seinä exit                                          */
+		/* Tutkitaan onko seinï¿½ exit                                          */
 		/**********************************************************************/
 		if (palikka.koodi == PALIKKA_LOPETUS && sprite.pelaaja != 0)
 		{
@@ -4683,7 +4684,7 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 	if (sprite_vasen <= palikka.oikea-4 && sprite_oikea >= palikka.vasen+4 && sprite_yla <= palikka.ala && sprite_ala >= palikka.yla+16)
 	{
 		/**********************************************************************/
-		/* Tutkitaan onko seinä tuliansa, kytkin ylhäällä ja sprite valmis    */
+		/* Tutkitaan onko seinï¿½ tuliansa, kytkin ylhï¿½ï¿½llï¿½ ja sprite valmis    */
 		/**********************************************************************/		
 		if (palikka.koodi == PALIKKA_TULI && kytkin1 == 0 && sprite.isku == 0)
 		{
@@ -4714,7 +4715,7 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 	if (sprite_vasen <= palikka.oikea+2 && sprite_oikea >= palikka.vasen-2 && sprite_yla <= palikka.ala && sprite_ala >= palikka.yla)
 	{
 		/**********************************************************************/
-		/* Tutkitaan onko sprite avain ja seinä lukko                         */
+		/* Tutkitaan onko sprite avain ja seinï¿½ lukko                         */
 		/**********************************************************************/ 
 		if (palikka.koodi == PALIKKA_LUKKO && sprite.tyyppi->avain)
 		{
@@ -4757,15 +4758,15 @@ void PK_Tutki_Seina_Debug(PK2Sprite &sprite,
 		}	
 	}
 
-	// tarkistetaan onko palikka vasen tai oikea seinä.
+	// tarkistetaan onko palikka vasen tai oikea seinï¿½.
 	if (sprite_yla < palikka.ala && sprite_ala-1 > palikka.yla)
 	{
 		if (sprite_oikea+sprite_a-1 > palikka.vasen && sprite_vasen+sprite_a < palikka.oikea)
 		{
-			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisään.
+			// Tutkitaan onko sprite menossa oikeanpuoleisen palikan sisï¿½ï¿½n.
 			if (sprite_oikea+sprite_a < palikka.oikea)
 			{
-				// Onko palikka seinä?
+				// Onko palikka seinï¿½?
 				if (palikka.oikealle == PALIKKA_SEINA)
 				{
 					oikealle = false;
@@ -4997,12 +4998,12 @@ int PK_Sprite_Liikuta(int i)
 
 	vedessa = sprite.vedessa;
 
-	sprite.kyykky = false;//sprite.piilossa;	//spriteä ei oletusarvoisesti kyykytetä
+	sprite.kyykky = false;//sprite.piilossa;	//spriteï¿½ ei oletusarvoisesti kyykytetï¿½
 
 	sprite.reuna_vasemmalla = false;
 	sprite.reuna_oikealla = false;
 
-	// Siirretään varsinaiset muuttujat apumuuttujiin.
+	// Siirretï¿½ï¿½n varsinaiset muuttujat apumuuttujiin.
 
 	sprite_vasen = sprite_x-sprite_leveys/2;
 	sprite_oikea = sprite_x+sprite_leveys/2;
@@ -5011,11 +5012,11 @@ int PK_Sprite_Liikuta(int i)
 
 	max_nopeus = (UCHAR)sprite.tyyppi->max_nopeus;
 
-	/* Pistetään vauhtia tainnutettuihin spriteihin */
+	/* Pistetï¿½ï¿½n vauhtia tainnutettuihin spriteihin */
 	if (sprite.energia < 1/* && sprite.tyyppi->max_nopeus == 0*/)
 		max_nopeus = 3;
 
-	// Lasketaan spriten jäljellä olevaa hyökkäystä
+	// Lasketaan spriten jï¿½ljellï¿½ olevaa hyï¿½kkï¿½ystï¿½
 
 	if (sprite.hyokkays1 > 0)
 		sprite.hyokkays1--;
@@ -5023,7 +5024,7 @@ int PK_Sprite_Liikuta(int i)
 	if (sprite.hyokkays2 > 0)
 		sprite.hyokkays2--;
 
-	if (sprite.lataus > 0)	// aika kahden ampumisen (munimisen) välillä
+	if (sprite.lataus > 0)	// aika kahden ampumisen (munimisen) vï¿½lillï¿½
 		sprite.lataus --;
 
 	if (sprite.muutos_ajastin > 0)	// aika muutokseen
@@ -5039,15 +5040,15 @@ int PK_Sprite_Liikuta(int i)
 
 	if (sprite.pelaaja != 0 && sprite.energia > 0)
 	{
-		/* KÄVELY */
+		/* Kï¿½VELY */
 		if (PisteInput_Lue_Kontrolli(kontrolli_juoksu))
 			lisavauhti = false;		
 
-		/* HYÖKKÄYS 1 */
+		/* HYï¿½KKï¿½YS 1 */
 		if (PisteInput_Lue_Kontrolli(kontrolli_hyokkays1) && sprite.lataus == 0 && sprite.ammus1 != -1) {
 			sprite.hyokkays1 = sprite.tyyppi->hyokkays1_aika;  
 		}
-		/* HYÖKKÄYS 2 */
+		/* HYï¿½KKï¿½YS 2 */
 		else {
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyokkays2) && sprite.lataus == 0 && sprite.ammus2 != -1)
 				sprite.hyokkays2 = sprite.tyyppi->hyokkays2_aika;
@@ -5104,12 +5105,12 @@ int PK_Sprite_Liikuta(int i)
 			sprite.flip_x = true;
 		}
 			
-		if (sprite.kyykky)	// kyykyssä vauhti hiljenee
+		if (sprite.kyykky)	// kyykyssï¿½ vauhti hiljenee
 			a_lisays /= 10;
 
 		sprite_a += a_lisays;
 
-		/* HYPPÄÄMINEN */
+		/* HYPPï¿½ï¿½MINEN */
 		if (sprite.tyyppi->paino > 0)
 		{
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy))
@@ -5134,7 +5135,7 @@ int PK_Sprite_Liikuta(int i)
 					sprite.hyppy_ajastin = 55; 
 			}
 
-			/* tippuminen hiljaa alaspäin */
+			/* tippuminen hiljaa alaspï¿½in */
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy) && sprite.hyppy_ajastin >= 150/*90+20*/ &&
 				sprite.tyyppi->liitokyky)
 				hidastus = true;
@@ -5144,7 +5145,7 @@ int PK_Sprite_Liikuta(int i)
 				sprite_b /= 4;//3
 			}*/
 		}
-		/* LIIKKUMINEN YLÖS JA ALAS */
+		/* LIIKKUMINEN YLï¿½S JA ALAS */
 		else // jos pelaaja-spriten paino on 0 - esim. lintuna
 		{
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy))
@@ -5160,7 +5161,7 @@ int PK_Sprite_Liikuta(int i)
 			sprite.hyppy_ajastin = 0;
 		}
 
-		/* Tekoälyt, jotka koskevat myös pelaajaa */
+		/* Tekoï¿½lyt, jotka koskevat myï¿½s pelaajaa */
 		for (int ai=0;ai < SPRITE_MAX_AI;ai++)
 			switch (sprite.tyyppi->AI[ai])
 			{
@@ -5185,7 +5186,7 @@ int PK_Sprite_Liikuta(int i)
 			default:			break;
 			}
 
-		/* Ei käy päinsä, että pelaaja on jokin muu kuin pelihahmo */
+		/* Ei kï¿½y pï¿½insï¿½, ettï¿½ pelaaja on jokin muu kuin pelihahmo */
 		if (sprite.tyyppi->tyyppi != TYYPPI_PELIHAHMO)
 			sprite.energia = 0;	
 	}
@@ -5196,7 +5197,7 @@ int PK_Sprite_Liikuta(int i)
 
 	bool hyppy_maximissa = sprite.hyppy_ajastin >= 90;
 	
-	// Jos ollaan hypätty / ilmassa:
+	// Jos ollaan hypï¿½tty / ilmassa:
 	if (sprite.hyppy_ajastin > 0)
 	{
 		if (sprite.hyppy_ajastin < 50-sprite.tyyppi->max_hyppy)
@@ -5245,7 +5246,7 @@ int PK_Sprite_Liikuta(int i)
 	}
 
 	/*****************************************************************************************/
-	/* Oletuksena sprite ei ole vedessä eikä piilossa                                        */
+	/* Oletuksena sprite ei ole vedessï¿½ eikï¿½ piilossa                                        */
 	/*****************************************************************************************/
 
 	sprite.vedessa  = false;
@@ -5268,7 +5269,7 @@ int PK_Sprite_Liikuta(int i)
 		sprite_a = -max_nopeus;		
 
 	/*****************************************************************************************/
-	/* Törmäykset palikoihin                                                                 */
+	/* Tï¿½rmï¿½ykset palikoihin                                                                 */
 	/*****************************************************************************************/
 
 	int palikat_x_lkm,
@@ -5305,7 +5306,7 @@ int PK_Sprite_Liikuta(int i)
 			}
 /**/
 		/*****************************************************************************************/
-		/* Käydään läpi spriten ympärillä olevat palikat                                         */
+		/* Kï¿½ydï¿½ï¿½n lï¿½pi spriten ympï¿½rillï¿½ olevat palikat                                         */
 		/*****************************************************************************************/
 
 		palikat_lkm = palikat_y_lkm*palikat_x_lkm;
@@ -5361,7 +5362,7 @@ int PK_Sprite_Liikuta(int i)
 			PK_Partikkeli_Uusi(PARTIKKELI_KIPINA,sprite_x-4,sprite_y,0,-0.5-rand()%2,rand()%30+30,0,32);
 	}
 
-	if (vedessa != sprite.vedessa) // spriten joutuu veteen tai tulee pois vedestä
+	if (vedessa != sprite.vedessa) // spriten joutuu veteen tai tulee pois vedestï¿½
 	{
 		PK_Tehoste_Loiskahdus((int)sprite_x,(int)sprite_y,32); 
 	}
@@ -5377,11 +5378,11 @@ int PK_Sprite_Liikuta(int i)
 		sprite.paino = 1;	
 
 	/*****************************************************************************************/
-	/* Spriten törmäys toisiin spriteihin                                                    */
+	/* Spriten tï¿½rmï¿½ys toisiin spriteihin                                                    */
 	/*****************************************************************************************/
 
 	int tuhoutuminen;
-	double sprite2_yla; // kyykistymiseen liittyvä
+	double sprite2_yla; // kyykistymiseen liittyvï¿½
 	PK2PALIKKA spritepalikka;
 
 	PK2Sprite *sprite2;
@@ -5448,7 +5449,7 @@ int PK_Sprite_Liikuta(int i)
 				sprite_y/*yla*/ <= sprite2->y + sprite2->tyyppi->korkeus/2 &&
 				sprite_y/*ala*/ >= sprite2->y - sprite2->tyyppi->korkeus/2 + sprite2_yla)
 			{
-				// samanmerkkiset spritet vaihtavat suuntaa törmätessään
+				// samanmerkkiset spritet vaihtavat suuntaa tï¿½rmï¿½tessï¿½ï¿½n
 				if (sprite.tyyppi->indeksi == sprite2->tyyppi->indeksi &&
 					sprite2->energia > 0/* && sprite.pelaaja == 0*/)
 				{
@@ -5503,7 +5504,7 @@ int PK_Sprite_Liikuta(int i)
 						sprite2->saatu_vahinko < 1)
 					{
 					
-						// Tippuuko toinen sprite päälle?
+						// Tippuuko toinen sprite pï¿½ï¿½lle?
 
 						if (sprite2->b > 2 && sprite2->paino >= 0.5 &&
 							sprite2->y < sprite_y && !sprite.tyyppi->este &&
@@ -5523,7 +5524,7 @@ int PK_Sprite_Liikuta(int i)
 							sprite2->saatu_vahinko_tyyppi = sprite.tyyppi->vahinko_tyyppi;
 							sprite.hyokkays1 = sprite.tyyppi->hyokkays1_aika;
 			
-							// Ammukset hajoavat törmäyksestä
+							// Ammukset hajoavat tï¿½rmï¿½yksestï¿½
 							
 							if (sprite2->tyyppi->tyyppi == TYYPPI_AMMUS)
 							{
@@ -5540,7 +5541,7 @@ int PK_Sprite_Liikuta(int i)
 					}
 				}
 				
-				// lisätään spriten painoon sitä koskettavan toisen spriten paino
+				// lisï¿½tï¿½ï¿½n spriten painoon sitï¿½ koskettavan toisen spriten paino
 				if (sprite.paino > 0)
 					sprite.kytkinpaino += spritet[sprite_index].tyyppi->paino;
 
@@ -5549,10 +5550,10 @@ int PK_Sprite_Liikuta(int i)
 	}
 
 	/*****************************************************************************************/
-	/* Jos sprite on kärsinyt vahinkoa                                                       */
+	/* Jos sprite on kï¿½rsinyt vahinkoa                                                       */
 	/*****************************************************************************************/
 
-	// jos näkymätön, ei saa damagea kuin tulesta.
+	// jos nï¿½kymï¿½tï¿½n, ei saa damagea kuin tulesta.
 	if (nakymattomyys > 0 && sprite.saatu_vahinko != 0 && sprite.saatu_vahinko_tyyppi != VAHINKO_TULI &&
 		i == pelaaja_index) {
 		sprite.saatu_vahinko = 0;
@@ -5779,7 +5780,7 @@ int PK_Sprite_Liikuta(int i)
 	//sprite.kyykky   = false;
 	
 	/*****************************************************************************************/
-	/* Tekoälyt                                                                              */
+	/* Tekoï¿½lyt                                                                              */
 	/*****************************************************************************************/
 
 	if (sprite.pelaaja == 0)
@@ -6000,7 +6001,7 @@ int PK_Sprite_Liikuta(int i)
 		
 
 	/*****************************************************************************************/
-	/* Ei päästetä spriteä ulos pelialueelta                                                 */
+	/* Ei pï¿½ï¿½stetï¿½ spriteï¿½ ulos pelialueelta                                                 */
 	/*****************************************************************************************/
 
 	if (sprite.x < 0)
@@ -6031,25 +6032,25 @@ int PK_Sprite_Liikuta(int i)
 
 
 	/*****************************************************************************************/
-	/* Hyökkäykset 1 ja 2                                                                    */
+	/* Hyï¿½kkï¿½ykset 1 ja 2                                                                    */
 	/*****************************************************************************************/
 
-	// sprite on valmis hyökkäykseen ja ei ole kyykyssä
+	// sprite on valmis hyï¿½kkï¿½ykseen ja ei ole kyykyssï¿½
 	if (sprite.lataus == 0 && !sprite.kyykky)
 	{
-		// hyökkäysaika on "tapissa" mikä tarkoittaa sitä, että aloitetaan hyökkäys
+		// hyï¿½kkï¿½ysaika on "tapissa" mikï¿½ tarkoittaa sitï¿½, ettï¿½ aloitetaan hyï¿½kkï¿½ys
 		if (sprite.hyokkays1 == sprite.tyyppi->hyokkays1_aika)
 		{
-			// määrätään palautumisaika, jonka jälkeen sprite voi hyökätä uudestaan
+			// mï¿½ï¿½rï¿½tï¿½ï¿½n palautumisaika, jonka jï¿½lkeen sprite voi hyï¿½kï¿½tï¿½ uudestaan
 			sprite.lataus = sprite.tyyppi->latausaika;
 
-			// jos spritelle ei ole määritelty omaa latausaikaa ...
+			// jos spritelle ei ole mï¿½ï¿½ritelty omaa latausaikaa ...
 			if (sprite.ammus1 > -1 && sprite.tyyppi->latausaika == 0)
 			// ... ja ammukseen on, otetaan latausaika ammuksesta	
 				if (protot[sprite.ammus1].tulitauko > 0)
 					sprite.lataus = protot[sprite.ammus1].tulitauko;
 			
-			// soitetaan hyökkäysääni
+			// soitetaan hyï¿½kkï¿½ysï¿½ï¿½ni
 			PK_Soita_Aani(sprite.tyyppi->aanet[AANI_HYOKKAYS1],100, (int)sprite_x, (int)sprite_y, 
 						  sprite.tyyppi->aani_frq, sprite.tyyppi->random_frq);
 			
@@ -6063,7 +6064,7 @@ int PK_Sprite_Liikuta(int i)
 			}
 		}
 
-		// Sama kuin hyökkäys 1:ssä
+		// Sama kuin hyï¿½kkï¿½ys 1:ssï¿½
 		if (sprite.hyokkays2 == sprite.tyyppi->hyokkays2_aika)
 		{
 			sprite.lataus = sprite.tyyppi->latausaika;
@@ -6087,7 +6088,7 @@ int PK_Sprite_Liikuta(int i)
 		}
 	}
 
-	// Random äänet
+	// Random ï¿½ï¿½net
 	if (sprite.tyyppi->aanet[AANI_RANDOM] != -1 && rand()%200 == 1 && sprite.energia > 0)
 		PK_Soita_Aani(sprite.tyyppi->aanet[AANI_RANDOM],80,(int)sprite_x, (int)sprite_y, 
 					  sprite.tyyppi->aani_frq, sprite.tyyppi->random_frq);
@@ -6276,12 +6277,12 @@ int PK_Sprite_Liikuta2(int i)
 
 	vedessa = sprite.vedessa;
 
-	sprite.kyykky = false;//sprite.piilossa;	//spriteä ei oletusarvoisesti kyykytetä
+	sprite.kyykky = false;//sprite.piilossa;	//spriteï¿½ ei oletusarvoisesti kyykytetï¿½
 
 	sprite.reuna_vasemmalla = false;
 	sprite.reuna_oikealla = false;
 
-	// Siirretään varsinaiset muuttujat apumuuttujiin.
+	// Siirretï¿½ï¿½n varsinaiset muuttujat apumuuttujiin.
 
 	sprite_vasen = sprite_x-sprite_leveys/2;
 	sprite_oikea = sprite_x+sprite_leveys/2;
@@ -6290,11 +6291,11 @@ int PK_Sprite_Liikuta2(int i)
 
 	max_nopeus = (UCHAR)sprite.tyyppi->max_nopeus;
 
-	/* Pistetään vauhtia tainnutettuihin spriteihin */
+	/* Pistetï¿½ï¿½n vauhtia tainnutettuihin spriteihin */
 	if (sprite.energia < 1/* && sprite.tyyppi->max_nopeus == 0*/)
 		max_nopeus = 3;
 
-	// Lasketaan spriten jäljellä olevaa hyökkäystä
+	// Lasketaan spriten jï¿½ljellï¿½ olevaa hyï¿½kkï¿½ystï¿½
 
 	if (sprite.hyokkays1 > 0)
 		sprite.hyokkays1--;
@@ -6302,7 +6303,7 @@ int PK_Sprite_Liikuta2(int i)
 	if (sprite.hyokkays2 > 0)
 		sprite.hyokkays2--;
 
-	if (sprite.lataus > 0)	// aika kahden ampumisen (munimisen) välillä
+	if (sprite.lataus > 0)	// aika kahden ampumisen (munimisen) vï¿½lillï¿½
 		sprite.lataus --;
 
 	/*****************************************************************************************/
@@ -6315,15 +6316,15 @@ int PK_Sprite_Liikuta2(int i)
 
 	if (sprite.pelaaja != 0 && sprite.energia > 0)
 	{
-		/* KÄVELY */
+		/* Kï¿½VELY */
 		if (PisteInput_Lue_Kontrolli(kontrolli_juoksu))
 			lisavauhti = false;		
 
-		/* HYÖKKÄYS 1 */
+		/* HYï¿½KKï¿½YS 1 */
 		if (PisteInput_Lue_Kontrolli(kontrolli_hyokkays1) && sprite.lataus == 0 && sprite.ammus1 != -1)
 			sprite.hyokkays1 = sprite.tyyppi->hyokkays1_aika;  
 
-		/* HYÖKKÄYS 2 */
+		/* HYï¿½KKï¿½YS 2 */
 		if (PisteInput_Lue_Kontrolli(kontrolli_hyokkays2) && sprite.lataus == 0 && sprite.ammus2 != -1)
 			sprite.hyokkays2 = sprite.tyyppi->hyokkays2_aika;
 
@@ -6378,12 +6379,12 @@ int PK_Sprite_Liikuta2(int i)
 			sprite.flip_x = true;
 		}
 			
-		if (sprite.kyykky)	// kyykyssä vauhti hiljenee
+		if (sprite.kyykky)	// kyykyssï¿½ vauhti hiljenee
 			a_lisays /= 10;
 
 		sprite_a += a_lisays;
 
-		/* HYPPÄÄMINEN */
+		/* HYPPï¿½ï¿½MINEN */
 		if (sprite.tyyppi->paino > 0)
 		{
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy))
@@ -6404,7 +6405,7 @@ int PK_Sprite_Liikuta2(int i)
 					sprite.hyppy_ajastin = sprite.tyyppi->max_hyppy/2;// /2
 			}
 
-			/* tippuminen hiljaa alaspäin */
+			/* tippuminen hiljaa alaspï¿½in */
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy) && sprite.hyppy_ajastin > sprite.tyyppi->max_hyppy*2+20 &&
 				sprite.tyyppi->liitokyky)
 				hidastus = true;
@@ -6414,7 +6415,7 @@ int PK_Sprite_Liikuta2(int i)
 				sprite_b /= 4;//3
 			}
 		}
-		/* LIIKKUMINEN YLÖS JA ALAS */
+		/* LIIKKUMINEN YLï¿½S JA ALAS */
 		else // jos pelaaja-spriten paino on 0 - esim. lintuna
 		{
 			if (PisteInput_Lue_Kontrolli(kontrolli_hyppy))
@@ -6430,7 +6431,7 @@ int PK_Sprite_Liikuta2(int i)
 			sprite.hyppy_ajastin = 0;
 		}
 
-		/* Tekoälyt, jotka koskevat myös pelaajaa */
+		/* Tekoï¿½lyt, jotka koskevat myï¿½s pelaajaa */
 		for (int ai=0;ai < SPRITE_MAX_AI;ai++)
 			switch (sprite.tyyppi->AI[ai])
 			{
@@ -6450,7 +6451,7 @@ int PK_Sprite_Liikuta2(int i)
 			default:			break;
 			}
 
-		/* Ei käy päinsä, että pelaaja on jokin muu kuin pelihahmo */
+		/* Ei kï¿½y pï¿½insï¿½, ettï¿½ pelaaja on jokin muu kuin pelihahmo */
 		if (sprite.tyyppi->tyyppi != TYYPPI_PELIHAHMO)
 			sprite.energia = 0;	
 	}
@@ -6461,7 +6462,7 @@ int PK_Sprite_Liikuta2(int i)
 /*  vanha hyppy
 	bool hyppy_maximissa = sprite.hyppy_ajastin >= sprite.tyyppi->max_hyppy*2;
 
-	// Jos ollaan hypätty / ilmassa:
+	// Jos ollaan hypï¿½tty / ilmassa:
 	if (sprite.hyppy_ajastin > 0)
 	{
 		if (!hyppy_maximissa)
@@ -6480,7 +6481,7 @@ int PK_Sprite_Liikuta2(int i)
 */
 	bool hyppy_maximissa = sprite.hyppy_ajastin >= 45;
 
-	// Jos ollaan hypätty / ilmassa:
+	// Jos ollaan hypï¿½tty / ilmassa:
 	if (sprite.hyppy_ajastin > 0)
 	{
 		if (!hyppy_maximissa)
@@ -6512,7 +6513,7 @@ int PK_Sprite_Liikuta2(int i)
 		sprite_b += sprite.paino + sprite_b/1.25;
 
 	/*****************************************************************************************/
-	/* Oletuksena sprite ei ole vedessä eikä piilossa                                        */
+	/* Oletuksena sprite ei ole vedessï¿½ eikï¿½ piilossa                                        */
 	/*****************************************************************************************/
 
 	sprite.vedessa  = false;
@@ -6535,7 +6536,7 @@ int PK_Sprite_Liikuta2(int i)
 		sprite_a = -max_nopeus;		
 
 	/*****************************************************************************************/
-	/* Törmäykset palikoihin                                                                 */
+	/* Tï¿½rmï¿½ykset palikoihin                                                                 */
 	/*****************************************************************************************/
 
 	int palikat_x_lkm,
@@ -6572,7 +6573,7 @@ int PK_Sprite_Liikuta2(int i)
 			}
 /**/
 		/*****************************************************************************************/
-		/* Käydään läpi spriten ympärillä olevat palikat                                         */
+		/* Kï¿½ydï¿½ï¿½n lï¿½pi spriten ympï¿½rillï¿½ olevat palikat                                         */
 		/*****************************************************************************************/
 
 		palikat_lkm = palikat_y_lkm*palikat_x_lkm;
@@ -6631,7 +6632,7 @@ int PK_Sprite_Liikuta2(int i)
 			PK_Partikkeli_Uusi(PARTIKKELI_KIPINA,sprite_x-4,sprite_y,0,-0.5-rand()%2,rand()%30+30,0,32);
 	}
 
-	if (vedessa != sprite.vedessa) // spriten joutuu veteen tai tulee pois vedestä
+	if (vedessa != sprite.vedessa) // spriten joutuu veteen tai tulee pois vedestï¿½
 	{
 		PK_Tehoste_Loiskahdus((int)sprite_x,(int)sprite_y,32); 
 	}
@@ -6647,11 +6648,11 @@ int PK_Sprite_Liikuta2(int i)
 		sprite.paino = 1;	
 
 	/*****************************************************************************************/
-	/* Spriten törmäys toisiin spriteihin                                                    */
+	/* Spriten tï¿½rmï¿½ys toisiin spriteihin                                                    */
 	/*****************************************************************************************/
 
 	int tuhoutuminen;
-	double sprite2_yla; // kyykistymiseen liittyvä
+	double sprite2_yla; // kyykistymiseen liittyvï¿½
 	PK2PALIKKA spritepalikka;
 
 	PK2Sprite *sprite2;
@@ -6718,7 +6719,7 @@ int PK_Sprite_Liikuta2(int i)
 				sprite_y/*yla*/ <= sprite2->y + sprite2->tyyppi->korkeus/2 &&
 				sprite_y/*ala*/ >= sprite2->y - sprite2->tyyppi->korkeus/2 + sprite2_yla)
 			{
-				// samanmerkkiset spritet vaihtavat suuntaa törmätessään
+				// samanmerkkiset spritet vaihtavat suuntaa tï¿½rmï¿½tessï¿½ï¿½n
 				if (sprite.tyyppi->indeksi == sprite2->tyyppi->indeksi &&
 					sprite2->energia > 0 && sprite.pelaaja == 0)
 				{
@@ -6752,7 +6753,7 @@ int PK_Sprite_Liikuta2(int i)
 						sprite2->saatu_vahinko < 1)
 					{
 					
-						// Tippuuko toinen sprite päälle?
+						// Tippuuko toinen sprite pï¿½ï¿½lle?
 
 						if (sprite2->b > 2 && sprite2->paino >= 0.5 &&
 							sprite2->y < sprite_y && !sprite.tyyppi->este &&
@@ -6772,7 +6773,7 @@ int PK_Sprite_Liikuta2(int i)
 							sprite2->saatu_vahinko_tyyppi = sprite.tyyppi->vahinko_tyyppi;
 							sprite.hyokkays1 = sprite.tyyppi->hyokkays1_aika;
 			
-							// Ammukset hajoavat törmäyksestä
+							// Ammukset hajoavat tï¿½rmï¿½yksestï¿½
 							
 							if (sprite2->tyyppi->tyyppi == TYYPPI_AMMUS)
 							{
@@ -6789,7 +6790,7 @@ int PK_Sprite_Liikuta2(int i)
 					}
 				}
 				
-				// lisätään spriten painoon sitä koskettavan toisen spriten paino
+				// lisï¿½tï¿½ï¿½n spriten painoon sitï¿½ koskettavan toisen spriten paino
 				if (sprite.paino > 0)
 					sprite.kytkinpaino += spritet[sprite_index].tyyppi->paino;
 
@@ -6798,7 +6799,7 @@ int PK_Sprite_Liikuta2(int i)
 	}
 
 	/*****************************************************************************************/
-	/* Jos sprite on kärsinyt vahinkoa                                                       */
+	/* Jos sprite on kï¿½rsinyt vahinkoa                                                       */
 	/*****************************************************************************************/
 
 	if (sprite.saatu_vahinko != 0 && sprite.energia > 0 && sprite.tyyppi->tuhoutuminen != TUHOUTUMINEN_EI_TUHOUDU)
@@ -7015,7 +7016,7 @@ int PK_Sprite_Liikuta2(int i)
 	//sprite.kyykky   = false;
 	
 	/*****************************************************************************************/
-	/* Tekoälyt                                                                              */
+	/* Tekoï¿½lyt                                                                              */
 	/*****************************************************************************************/
 
 	if (sprite.pelaaja == 0)
@@ -7208,7 +7209,7 @@ int PK_Sprite_Liikuta2(int i)
 		
 
 	/*****************************************************************************************/
-	/* Ei päästetä spriteä ulos pelialueelta                                                 */
+	/* Ei pï¿½ï¿½stetï¿½ spriteï¿½ ulos pelialueelta                                                 */
 	/*****************************************************************************************/
 
 	if (sprite.x < 0)
@@ -7239,25 +7240,25 @@ int PK_Sprite_Liikuta2(int i)
 
 
 	/*****************************************************************************************/
-	/* Hyökkäykset 1 ja 2                                                                    */
+	/* Hyï¿½kkï¿½ykset 1 ja 2                                                                    */
 	/*****************************************************************************************/
 
-	// sprite on valmis hyökkäykseen ja ei ole kyykyssä
+	// sprite on valmis hyï¿½kkï¿½ykseen ja ei ole kyykyssï¿½
 	if (sprite.lataus == 0 && !sprite.kyykky)
 	{
-		// hyökkäysaika on "tapissa" mikä tarkoittaa sitä, että aloitetaan hyökkäys
+		// hyï¿½kkï¿½ysaika on "tapissa" mikï¿½ tarkoittaa sitï¿½, ettï¿½ aloitetaan hyï¿½kkï¿½ys
 		if (sprite.hyokkays1 == sprite.tyyppi->hyokkays1_aika)
 		{
-			// määrätään palautumisaika, jonka jälkeen sprite voi hyökätä uudestaan
+			// mï¿½ï¿½rï¿½tï¿½ï¿½n palautumisaika, jonka jï¿½lkeen sprite voi hyï¿½kï¿½tï¿½ uudestaan
 			sprite.lataus = sprite.tyyppi->latausaika;
 
-			// jos spritelle ei ole määritelty omaa latausaikaa ...
+			// jos spritelle ei ole mï¿½ï¿½ritelty omaa latausaikaa ...
 			if (sprite.ammus1 > -1 && sprite.tyyppi->latausaika == 0)
 			// ... ja ammukseen on, otetaan latausaika ammuksesta	
 				if (protot[sprite.ammus1].tulitauko > 0)
 					sprite.lataus = protot[sprite.ammus1].tulitauko;
 			
-			// soitetaan hyökkäysääni
+			// soitetaan hyï¿½kkï¿½ysï¿½ï¿½ni
 			PK_Soita_Aani(sprite.tyyppi->aanet[AANI_HYOKKAYS1],100, (int)sprite_x, (int)sprite_y, 
 						  sprite.tyyppi->aani_frq, sprite.tyyppi->random_frq);
 			
@@ -7271,7 +7272,7 @@ int PK_Sprite_Liikuta2(int i)
 			}
 		}
 
-		// Sama kuin hyökkäys 1:ssä
+		// Sama kuin hyï¿½kkï¿½ys 1:ssï¿½
 		if (sprite.hyokkays2 == sprite.tyyppi->hyokkays2_aika)
 		{
 			sprite.lataus = sprite.tyyppi->latausaika;
@@ -7295,7 +7296,7 @@ int PK_Sprite_Liikuta2(int i)
 		}
 	}
 
-	// Random äänet
+	// Random ï¿½ï¿½net
 	if (sprite.tyyppi->aanet[AANI_RANDOM] != -1 && rand()%200 == 1 && sprite.energia > 0)
 		PK_Soita_Aani(sprite.tyyppi->aanet[AANI_RANDOM],80,(int)sprite_x, (int)sprite_y, 
 					  sprite.tyyppi->aani_frq, sprite.tyyppi->random_frq);
@@ -7463,7 +7464,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 
 	max_nopeus = (int)sprite.tyyppi->max_nopeus;
 
-	// Siirretään varsinaiset muuttujat apumuuttujiin.
+	// Siirretï¿½ï¿½n varsinaiset muuttujat apumuuttujiin.
 
 	sprite_vasen = sprite_x-sprite_leveys/2;
 	sprite_oikea = sprite_x+sprite_leveys/2;
@@ -7480,7 +7481,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 	if (sprite.muutos_ajastin > 0)	// aika muutokseen
 		sprite.muutos_ajastin --;
 
-	// Hyppyyn liittyvät seikat
+	// Hyppyyn liittyvï¿½t seikat
 
 	if (kytkin_tarina + jaristys > 0 && sprite.hyppy_ajastin == 0)
 		sprite.hyppy_ajastin = sprite.tyyppi->max_hyppy / 2;
@@ -7496,7 +7497,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 
 
 
-	if (sprite.paino != 0)	// jos bonuksella on paino, tutkitaan ympäristö
+	if (sprite.paino != 0)	// jos bonuksella on paino, tutkitaan ympï¿½ristï¿½
 	{
 		// o
 		//
@@ -7575,10 +7576,10 @@ int PK_Sprite_Liikuta_Bonus(int i)
 						!(sprite_index == pelaaja_index && sprite.tyyppi->tuhoutuminen != TUHOUTUMINEN_EI_TUHOUDU))
 						sprite_a += spritet[sprite_index].a*(rand()%4);
 
-					// lisätään spriten painoon sitä koskettavan toisen spriten paino
+					// lisï¿½tï¿½ï¿½n spriten painoon sitï¿½ koskettavan toisen spriten paino
 					sprite.kytkinpaino += spritet[sprite_index].tyyppi->paino;
 
-					// samanmerkkiset spritet vaihtavat suuntaa törmätessään
+					// samanmerkkiset spritet vaihtavat suuntaa tï¿½rmï¿½tessï¿½ï¿½n
 					if (sprite.tyyppi->indeksi == spritet[sprite_index].tyyppi->indeksi &&
 						spritet[sprite_index].energia > 0)
 					{
@@ -7603,7 +7604,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 			}
 		}
 
-		// Tarkistetaan ettei mennä mihinkään suuntaan liian kovaa.
+		// Tarkistetaan ettei mennï¿½ mihinkï¿½ï¿½n suuntaan liian kovaa.
 
 		if (sprite_b > 4)
 			sprite_b = 4;
@@ -7637,7 +7638,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 					palikat[x+y*palikat_x_lkm] = PK_Palikka_Tutki(kartta_vasen+x-1,kartta_yla+y-1);
 				}
 
-			// Tutkitaan törmääkö palikkaan
+			// Tutkitaan tï¿½rmï¿½ï¿½kï¿½ palikkaan
 
 			for (y=0;y<palikat_y_lkm;y++)
 				for (x=0;x<palikat_x_lkm;x++)
@@ -7740,7 +7741,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 		sprite.alas = alas;
 		sprite.ylos = ylos;
 	}
-	else	// jos spriten paino on nolla, tehdään spritestä "kelluva"
+	else	// jos spriten paino on nolla, tehdï¿½ï¿½n spritestï¿½ "kelluva"
 	{
 		sprite.y = sprite.alku_y + cos_table[int(degree+(sprite.alku_x+sprite.alku_y))%360] / 3.0;
 		sprite_y = sprite.y;
@@ -7872,7 +7873,7 @@ int PK_Sprite_Liikuta_Bonus(int i)
 		}
 	}
 	
-	/* Ei käy päinsä, että pelaaja on bonusesine */
+	/* Ei kï¿½y pï¿½insï¿½, ettï¿½ pelaaja on bonusesine */
 	if (sprite.pelaaja != 0)
 		sprite.energia = 0;
 
@@ -7903,7 +7904,7 @@ int PK_Alusta_Tilat()
 	if (pelin_seuraava_tila != pelin_tila)
 	{
 		
-		// IHAN ENSIMMÄINEN PERUSALUSTUS
+		// IHAN ENSIMMï¿½INEN PERUSALUSTUS
 		
 		if (pelin_seuraava_tila == TILA_PERUSALUSTUS)
 		{
@@ -8220,7 +8221,7 @@ int PK_Alusta_Tilat()
 				else
 				{
 					PisteLog_Kirjoita("  - Starting a new game \n");
-					PK_Jaksot_Alusta();	// jos ladataan peli, asetetaan läpäistyarvot jaksoille aikaisemmin
+					PK_Jaksot_Alusta();	// jos ladataan peli, asetetaan lï¿½pï¿½istyarvot jaksoille aikaisemmin
 					PK_Jaksot_Hae();
 				}
 
@@ -8402,7 +8403,7 @@ int PK_Alusta_Tilat()
 			jakso_uusi_ennatysaika = false;
 			episodi_uusi_ennatys = false;
 
-			// Lasketaan pelaajan kokonaispisteet etukäteen
+			// Lasketaan pelaajan kokonaispisteet etukï¿½teen
 			DWORD temp_pisteet = 0;
 			temp_pisteet += jakso_pisteet;
 			temp_pisteet += aika*5;
@@ -8430,13 +8431,13 @@ int PK_Alusta_Tilat()
 			char pisteet_tiedosto[_MAX_PATH] = "scores.dat";
 			int vertailun_tulos;
 			
-			/* Tutkitaan onko pelaajarikkonut kentän piste- tai nopeusennätyksen */
+			/* Tutkitaan onko pelaajarikkonut kentï¿½n piste- tai nopeusennï¿½tyksen */
 			vertailun_tulos = PK_Episodipisteet_Vertaa(jakso_indeksi_nyt,temp_pisteet,kartta->aika-aika,false);
 			if (vertailun_tulos > 0) {
 				PK_Episodipisteet_Tallenna(pisteet_tiedosto);
 			}
 			
-			/* Tutkitaan onko pelaaja rikkonut episodin piste-ennätyksen */
+			/* Tutkitaan onko pelaaja rikkonut episodin piste-ennï¿½tyksen */
 			vertailun_tulos = PK_Episodipisteet_Vertaa(0,pisteet,0,true);
 			if (vertailun_tulos > 0)
 				PK_Episodipisteet_Tallenna(pisteet_tiedosto);
@@ -8639,7 +8640,7 @@ int PK_Spritet(void)
 
 	for (i=0;i<MAX_SPRITEJA;i++)
 	{
-		// Onko sprite lähellä tapahtumien keskipistettä? Jos on, niin aktivoidaan.
+		// Onko sprite lï¿½hellï¿½ tapahtumien keskipistettï¿½? Jos on, niin aktivoidaan.
 		if (spritet[i].x < kamera_x+640+320 &&//KARTANPIIRTO_LEVEYS+KARTANPIIRTO_LEVEYS/2 && 
 			spritet[i].x > kamera_x-320 &&//KARTANPIIRTO_LEVEYS/2 &&
 			spritet[i].y < kamera_y+480+240 &&//KARTANPIIRTO_KORKEUS+KARTANPIIRTO_KORKEUS/2 && 
@@ -8677,12 +8678,12 @@ int PK_Spritet_Piirra_Taustat()
 	for (int in=0;in<MAX_SPRITEJA;in++)
 	{	
 		i = taustaspritet[in]; 
-		// Onko sprite näkyvä
+		// Onko sprite nï¿½kyvï¿½
 		if (spritet[i].tyyppi != NULL && i != -1)
 		{
 			if (!spritet[i].piilota && spritet[i].tyyppi->tyyppi == TYYPPI_TAUSTA)
 			{
-				//Tarkistetaanko onko sprite tai osa siitä kuvassa
+				//Tarkistetaanko onko sprite tai osa siitï¿½ kuvassa
 
 				alku_x = spritet[i].alku_x;
 				alku_y = spritet[i].alku_y;
@@ -8735,7 +8736,7 @@ int PK_Spritet_Piirra_Taustat()
 				spritet[i].x = alku_x-xl;
 				spritet[i].y = alku_y-yl;
 				
-				//Tarkistetaanko onko sprite tai osa siitä kuvassa
+				//Tarkistetaanko onko sprite tai osa siitï¿½ kuvassa
 				if (spritet[i].x - spritet[i].tyyppi->leveys/2  < kamera_x+RUUDUN_LEVEYS && 
 					spritet[i].x + spritet[i].tyyppi->leveys/2  > kamera_x &&
 					spritet[i].y - spritet[i].tyyppi->korkeus/2 < kamera_y+RUUDUN_KORKEUS && 
@@ -8770,10 +8771,10 @@ int PK_Spritet_Piirra()
 	
 	for (int i=0;i<MAX_SPRITEJA;i++)
 	{	
-		// Onko sprite näkyvä
+		// Onko sprite nï¿½kyvï¿½
 		if (!spritet[i].piilota && spritet[i].tyyppi->tyyppi != TYYPPI_TAUSTA)
 		{
-			//Tarkistetaanko onko sprite tai osa siitä kuvassa
+			//Tarkistetaanko onko sprite tai osa siitï¿½ kuvassa
 			if (spritet[i].x - spritet[i].tyyppi->leveys/2  < kamera_x+RUUDUN_LEVEYS && 
 				spritet[i].x + spritet[i].tyyppi->leveys/2  > kamera_x &&
 				spritet[i].y - spritet[i].tyyppi->korkeus/2 < kamera_y+RUUDUN_KORKEUS && 
@@ -9099,7 +9100,7 @@ int PK_Piirra_Alapaneeli()
 	int x, y;
 
 	//////////////
-	// piirrä aika
+	// piirrï¿½ aika
 	//////////////
 	if (aika > 0)
 	{
@@ -9128,7 +9129,7 @@ int PK_Piirra_Alapaneeli()
 	}
 	
 	/////////////////
-	// piirrä avaimet
+	// piirrï¿½ avaimet
 	/////////////////
 	if (avaimia > 0)
 	{
@@ -9142,7 +9143,7 @@ int PK_Piirra_Alapaneeli()
 	}
 	
 	/////////////////
-	// piirrä esineet
+	// piirrï¿½ esineet
 	/////////////////
 	PK_Esineet_Piirra();
 
@@ -9283,7 +9284,7 @@ int PK_Piirra_Peli(void)
 */
 	/*
 	//////////////
-	// piirrä aika
+	// piirrï¿½ aika
 	//////////////
 	int min = aika/60, 
 		sek = aika%60; 
@@ -9299,14 +9300,14 @@ int PK_Piirra_Peli(void)
 	vali += PisteDraw_Font_Kirjoita(fontti2,luku,PD_TAUSTABUFFER,272+vali,RUUDUN_KORKEUS-20);
 	
 	/////////////////
-	// piirrä avaimet
+	// piirrï¿½ avaimet
 	/////////////////
 	vali = PisteDraw_Font_Kirjoita(fontti2,"keys ",PD_TAUSTABUFFER,450,RUUDUN_KORKEUS-20);
 	itoa(avaimia,luku,10);
 	PisteDraw_Font_Kirjoita(fontti2,luku,PD_TAUSTABUFFER,450+vali,RUUDUN_KORKEUS-20);
 	
 	/////////////////
-	// piirrä esineet
+	// piirrï¿½ esineet
 	/////////////////
 	PK_Esineet_Piirra();
 	*/
@@ -9314,7 +9315,7 @@ int PK_Piirra_Peli(void)
 		PK_Piirra_Info();
 	
 	///////////////////
-	// piirrä framerate
+	// piirrï¿½ framerate
 	///////////////////
 	if (fps_nayta)
 	{
@@ -9324,13 +9325,13 @@ int PK_Piirra_Peli(void)
 	}
 	
 	///////////////////
-	// piirrä pause
+	// piirrï¿½ pause
 	///////////////////
 	if (pause)
 		PisteDraw_Font_Kirjoita(fontti2,tekstit->Hae_Teksti(txt_game_paused),PD_TAUSTABUFFER,KARTANPIIRTO_LEVEYS/2-82,KARTANPIIRTO_KORKEUS/2-9);
 	
 	////////////////////////
-	// piirrä jakso läpäisty
+	// piirrï¿½ jakso lï¿½pï¿½isty
 	////////////////////////
 	if (jakso_lapaisty)
 	{
@@ -10446,7 +10447,7 @@ int PK_Piirra_Kartta()
 		{
 			tyyppi = 0;							//0 harmaa
 			if (jaksot[i].jarjestys == jakso)
-				tyyppi = 1;						//1 vihreä
+				tyyppi = 1;						//1 vihreï¿½
 			if (jaksot[i].jarjestys > jakso)
 				tyyppi = 2;						//2 oranssi
 			if (jaksot[i].lapaisty)
@@ -10770,7 +10771,7 @@ int PK_Piirra_Intro()
 		PK_Piirra_Intro_Teksti(tekstit->Hae_Teksti(txt_intro_tested_by),fontti1, 120, 230, testaajat_alku, testaajat_loppu);
 		PK_Piirra_Intro_Teksti("antti suuronen",			fontti1, 120, 250, testaajat_alku+10, testaajat_loppu+10);
 		PK_Piirra_Intro_Teksti("toni hurskainen",			fontti1, 120, 260, testaajat_alku+20, testaajat_loppu+20);
-		PK_Piirra_Intro_Teksti("juho rytkönen",				fontti1, 120, 270, testaajat_alku+30, testaajat_loppu+30);
+		PK_Piirra_Intro_Teksti("juho rytkï¿½nen",				fontti1, 120, 270, testaajat_alku+30, testaajat_loppu+30);
 		PK_Piirra_Intro_Teksti("annukka korja",				fontti1, 120, 280, testaajat_alku+40, testaajat_loppu+40);
 		PK_Piirra_Intro_Teksti(tekstit->Hae_Teksti(txt_intro_thanks_to),fontti1, 120, 300, testaajat_alku+70, testaajat_loppu+70);
 		PK_Piirra_Intro_Teksti("oskari raunio",				fontti1, 120, 310, testaajat_alku+70, testaajat_loppu+70);
@@ -10915,7 +10916,7 @@ int PK_Piirra_Loppu()
 		PK_Piirra_Intro_Teksti(tekstit->Hae_Teksti(txt_intro_tested_by),fontti1, 120, 230, testaajat_alku, testaajat_loppu);
 		PK_Piirra_Intro_Teksti("antti suuronen",			fontti1, 120, 250, testaajat_alku+10, testaajat_loppu+10);
 		PK_Piirra_Intro_Teksti("toni hurskainen",			fontti1, 120, 260, testaajat_alku+20, testaajat_loppu+20);
-		PK_Piirra_Intro_Teksti("juho rytkönen",				fontti1, 120, 270, testaajat_alku+30, testaajat_loppu+30);
+		PK_Piirra_Intro_Teksti("juho rytkï¿½nen",				fontti1, 120, 270, testaajat_alku+30, testaajat_loppu+30);
 		PK_Piirra_Intro_Teksti("annukka korja",				fontti1, 120, 280, testaajat_alku+40, testaajat_loppu+40);
 		PK_Piirra_Intro_Teksti(tekstit->Hae_Teksti(txt_intro_thanks_to),fontti1, 120, 300, testaajat_alku+70, testaajat_loppu+70);
 		PK_Piirra_Intro_Teksti("oskari raunio",				fontti1, 120, 310, testaajat_alku+70, testaajat_loppu+70);
@@ -11105,7 +11106,7 @@ int PK_Main_Pistelasku(void)
 	{
 		/*tarkistetaan oliko viimeinen jakso*/
 		
-		if (jakso_indeksi_nyt == EPISODI_MAX_JAKSOJA-1) { // ihan niin kuin joku tekisi näin monta jaksoa...
+		if (jakso_indeksi_nyt == EPISODI_MAX_JAKSOJA-1) { // ihan niin kuin joku tekisi nï¿½in monta jaksoa...
 			pelin_seuraava_tila = TILA_LOPPU;
 		}
 		else if (jaksot[jakso_indeksi_nyt+1].jarjestys == -1)
@@ -11549,7 +11550,7 @@ int PK_Main_Loppu(void)
 	degree = 1 + degree % 360;
 
 	loppulaskuri++;
-	introlaskuri = loppulaskuri; // introtekstejä varten
+	introlaskuri = loppulaskuri; // introtekstejï¿½ varten
 
 	if (siirry_lopusta_menuun && PisteDraw_Fade_Paletti_Valmis())
 	{
@@ -11579,10 +11580,10 @@ int PK_Main(void)
 	if (window_closed)
 		return(0);
 
-	/* HAETAAN NÄPPÄIMISTÖN, HIIREN JA PELIOHJAINTEN TÄMÄNHETKISET TILAT */
+	/* HAETAAN Nï¿½PPï¿½IMISTï¿½N, HIIREN JA PELIOHJAINTEN Tï¿½Mï¿½NHETKISET TILAT */
 
-	// Näppäimistö 
-	if (!PisteInput_Hae_Nappaimet())		//Haetaan näppäinten tilat
+	// Nï¿½ppï¿½imistï¿½ 
+	if (!PisteInput_Hae_Nappaimet())		//Haetaan nï¿½ppï¿½inten tilat
 		PK2_virhe = true;
 	
 	// Hiirulainen
@@ -11605,7 +11606,7 @@ int PK_Main(void)
 	default				: lopeta_peli = true;break;
 	}
 
-	// MUSIIKIN ÄÄNENSÄÄTÖ
+	// MUSIIKIN ï¿½ï¿½NENSï¿½ï¿½Tï¿½
 
 	bool saada = false;
 
@@ -11767,7 +11768,7 @@ int PK_Quit(void) {
 	PisteLog_Kirjoita("    - Deleting game texts. \n");
 	delete tekstit;
 
-	// Jos on ilmennyt virhe, niin näytetään tekstiboksi.
+	// Jos on ilmennyt virhe, niin nï¿½ytetï¿½ï¿½n tekstiboksi.
 
 	if (PK2_virhe)
 	{
@@ -12121,7 +12122,7 @@ int PK_SetupIkkuna(HWND &hwnd, HINSTANCE &hinstance, int &ncmdshow)
 	wc.lpszMenuName = NULL;											
 	wc.lpszClassName= "SetupWindow";								
 
-	if (!RegisterClassEx(&wc))		// rekisteröidään ikkuna
+	if (!RegisterClassEx(&wc))		// rekisterï¿½idï¿½ï¿½n ikkuna
 		return 1;
 
 	if (!(hSetupIkkuna = CreateWindowEx(WS_EX_LEFT,
@@ -12386,7 +12387,7 @@ int PK_SetupIkkuna(HWND &hwnd, HINSTANCE &hinstance, int &ncmdshow)
 }
 
 
-// Kaiken alku ja juuri: WinMain. Tästä se kaikki alkaa ja tämän sisällä peli pyörii.
+// Kaiken alku ja juuri: WinMain. Tï¿½stï¿½ se kaikki alkaa ja tï¿½mï¿½n sisï¿½llï¿½ peli pyï¿½rii.
 
 int WINAPI WinMain(	HINSTANCE hinstance,
 					HINSTANCE hprevinstance,

@@ -6,8 +6,8 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
 #define DIRECTINPUT_VERSION 0x0700
-#include "D:\DXSDK\Include\dinput.h" // MUISTA KORJATA POLKU OIKEIN!!!!
-#include <windows.h> 
+//#include "dinput.h" // TODO: DDRAW
+//#include <windows.h>
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -140,37 +140,37 @@
 
 int		PisteInput_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app);
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Hiiri();		// Päivittää hiiren tiedot (onko liikuteltu, mitä nappeja paineltu...)
+bool	PisteInput_Hae_Hiiri();		// Pï¿½ivittï¿½ï¿½ hiiren tiedot (onko liikuteltu, mitï¿½ nappeja paineltu...)
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Nappaimet();	// Päivittää näppäimistön tiedot.
+bool	PisteInput_Hae_Nappaimet();	// Pï¿½ivittï¿½ï¿½ nï¿½ppï¿½imistï¿½n tiedot.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Ohjaimet();	// Päivittää peliohjainten tiedot.
+bool	PisteInput_Hae_Ohjaimet();	// Pï¿½ivittï¿½ï¿½ peliohjainten tiedot.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hiiri_Oikea();	// Onko hiiren oikeaa korvaa painettu? true = kyllä
+bool	PisteInput_Hiiri_Oikea();	// Onko hiiren oikeaa korvaa painettu? true = kyllï¿½
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hiiri_Vasen();	// Onko hiiren vasenta korvaa painettu? true = kyllä
+bool	PisteInput_Hiiri_Vasen();	// Onko hiiren vasenta korvaa painettu? true = kyllï¿½
 //-----------------------------------------------------------------------------------------------------------
 int		PisteInput_Hiiri_X(int x);	// Kertoo paljonko hiiren kursorin on liikkunut vaakatasossa.
-									// Jos haluat saada vastauksena hiiren tämän hetkisen x-kordinaatin,
-									// anna x:n arvoksi hiiren edellinen x -kordinaatti. Jos haluat pelkän
+									// Jos haluat saada vastauksena hiiren tï¿½mï¿½n hetkisen x-kordinaatin,
+									// anna x:n arvoksi hiiren edellinen x -kordinaatti. Jos haluat pelkï¿½n
 									// muutoksen, anna x:n arvoksi 0.
 //-----------------------------------------------------------------------------------------------------------
 int		PisteInput_Hiiri_Y(int y);	// Kertoo paljonko hiiren kursorin on liikkunut pystytasossa.
 									// Katso PisteInput_Hiiri_X(int x) selitys. Toimii samanlailla.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Keydown(int key);// Kertoo onko kyseltyä näppäintä painettu näppäimistöstä.
-									// key = DirectInput vakio. Esim. A -näppäin on DIK_A. DirectInput
-									// vakiot on listattu tämän headerin loppussa.
+bool	PisteInput_Keydown(int key);// Kertoo onko kyseltyï¿½ nï¿½ppï¿½intï¿½ painettu nï¿½ppï¿½imistï¿½stï¿½.
+									// key = DirectInput vakio. Esim. A -nï¿½ppï¿½in on DIK_A. DirectInput
+									// vakiot on listattu tï¿½mï¿½n headerin loppussa.
 //-----------------------------------------------------------------------------------------------------------
 int		PisteInput_Lopeta();		// Suljetaan PI.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Lue_Kontrolli(UCHAR kontrolli); // Palauttaa TRUE jos käyttäjä on aktivoinut kontrollin.
+bool	PisteInput_Lue_Kontrolli(UCHAR kontrolli); // Palauttaa TRUE jos kï¿½yttï¿½jï¿½ on aktivoinut kontrollin.
 //-----------------------------------------------------------------------------------------------------------
-UCHAR	PisteInput_Lue_Kontrolli(); // Palauttaa sen kontrollin, joka syötettiin viimeksi.
+UCHAR	PisteInput_Lue_Kontrolli(); // Palauttaa sen kontrollin, joka syï¿½tettiin viimeksi.
 //-----------------------------------------------------------------------------------------------------------
 char   *PisteInput_Lue_Kontrollin_Nimi(UCHAR kontrolli); // Palauttaa kontrollin nimen. Esim. 'arrow left'
 //-----------------------------------------------------------------------------------------------------------
-char	PisteInput_Lue_Nappaimisto(void); // Palauttaa sen merkin, joka syötettiin näppäimistöltä viimeksi.
+char	PisteInput_Lue_Nappaimisto(void); // Palauttaa sen merkin, joka syï¿½tettiin nï¿½ppï¿½imistï¿½ltï¿½ viimeksi.
 //-----------------------------------------------------------------------------------------------------------
 bool	PisteInput_Ohjain_Nappi(int ohjain, int index);	
 									// true, jos valitun ohjaimen valittua nappia on
@@ -184,22 +184,22 @@ int		PisteInput_Ohjain_X(int ohjain);	// Kertoo onko ohjainta painettu vasemmall
 											// on oikealle.
 											// ohjain = indeksi peliohjaimeen 1 tai 2
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Ohjain_Y(int ohjain);	// Kertoo onko ohjainta painettu ylös tai alas.
-											// Pienempi kuin nolla on ylös, suurempi kuin nolla
+int		PisteInput_Ohjain_Y(int ohjain);	// Kertoo onko ohjainta painettu ylï¿½s tai alas.
+											// Pienempi kuin nolla on ylï¿½s, suurempi kuin nolla
 											// on alas.
 											// ohjain = indeksi peliohjaimeen 1 tai 2 
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Onko_Hiiri();			// true jos järjestelmästä löytyy hiiri
+bool	PisteInput_Onko_Hiiri();			// true jos jï¿½rjestelmï¿½stï¿½ lï¿½ytyy hiiri
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Onko_Ohjain(int ohjain); // true jos järjestelmästä löytyy peliohjain.
+bool	PisteInput_Onko_Ohjain(int ohjain); // true jos jï¿½rjestelmï¿½stï¿½ lï¿½ytyy peliohjain.
 											// ohjain = indeksi peliohjaimeen 1 tai 2
 //-----------------------------------------------------------------------------------------------------------
 
 #endif
 
-/* Lista DirectInputin:n näppäin koodeista:
+/* Lista DirectInputin:n nï¿½ppï¿½in koodeista:
 	
-	Näppäin					Koodi
+	Nï¿½ppï¿½in					Koodi
 	-------					----------
 
 	ESC						DIK_ESCAPE
@@ -208,14 +208,14 @@ bool	PisteInput_Onko_Ohjain(int ohjain); // true jos järjestelmästä löytyy pelio
 	OIKEA CTRL				DIK_RCONTROL 
 	VASEN SHIFT				DIK_LSHIFT 
 	OIKEA SHIFT				DIK_RSHIFT
-	VÄLILYÖNTI				DIK_SPACE 
+	Vï¿½LILYï¿½NTI				DIK_SPACE 
 	VASEN ALT				DIK_LALT
 	OIKEA ALT				DIK_RALT
 
   
 	OIKEA					DIK_RIGHT
 	VASEN					DIK_LEFT
-	YLÖS					DIK_UP
+	YLï¿½S					DIK_UP
 	ALAS					DIK_DOWN
 
 

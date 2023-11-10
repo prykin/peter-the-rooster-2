@@ -8,17 +8,17 @@ Muutokset:
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
-#include <windows.h> 
-#include "PisteFont.h"
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+#include "font.h"
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <direct.h>
-#include <io.h>
-#include <fstream.h>
-#include <iostream.h>
+//#include <direct.h>
+//#include <io.h>
+//#include <fstream.h>
+//#include <iostream.h>
 #include <string.h>
 /* DEFINES -----------------------------------------------------------------------------------*/
 
@@ -331,9 +331,9 @@ int PisteFont::Init_fonts(void)
 	font_table[(UCHAR)'X'] = font_index[23];
 	font_table[(UCHAR)'Y'] = font_index[24];
 	font_table[(UCHAR)'Z'] = font_index[25];
-	font_table[(UCHAR)toupper('å')] = font_index[26];
-	font_table[(UCHAR)toupper('ä')] = font_index[27];
-	font_table[(UCHAR)toupper('ö')] = font_index[28];
+	font_table[(UCHAR)toupper('ï¿½')] = font_index[26];
+	font_table[(UCHAR)toupper('ï¿½')] = font_index[27];
+	font_table[(UCHAR)toupper('ï¿½')] = font_index[28];
 	font_table[(UCHAR)'0'] = font_index[29];
 	font_table[(UCHAR)'1'] = font_index[30];
 	font_table[(UCHAR)'2'] = font_index[31];

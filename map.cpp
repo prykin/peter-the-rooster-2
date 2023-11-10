@@ -1,15 +1,17 @@
-#include <windows.h>   
-#include <windowsx.h> 
-#include <mmsystem.h>
+//#include <windows.h>
+//#include <windowsx.h>
+//#include <mmsystem.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <io.h>
-#include <fstream.h>
-#include <iostream.h>
+//#include <io.h>
+//#include <fstream.h>
+//#include <iostream.h>
 
-#include "PK2Map.h"
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteDraw.h"
+#include "map.h"
+#include "Engine/draw.h"
+
+#include "old_headers.h"
 
 double *kartta_cos_table;
 double *kartta_sin_table;
@@ -331,7 +333,7 @@ RECT PK2Kartta::LaskeTallennusAlue(UCHAR *lahde, UCHAR *&kohde)
 	kartan_leveys = kartan_oikea - kartan_vasen;
 	kartan_korkeus = kartan_ala - kartan_yla;
 
-	// onko kartta tyhjä?
+	// onko kartta tyhjï¿½?
 	if (kartan_leveys < 0 || kartan_korkeus < 0) {
 		kartan_vasen = kartan_yla = 0;
 		kartan_ala = kartan_oikea = 1;	
@@ -394,7 +396,7 @@ RECT PK2Kartta::LaskeTallennusAlue(UCHAR *alue)
 		}
 	}
 
-	// onko kartta tyhjä?
+	// onko kartta tyhjï¿½?
 	if (kartan_oikea < kartan_vasen || kartan_ala < kartan_yla) {
 		kartan_vasen = 0;
 		kartan_yla	 = 0;
@@ -546,7 +548,7 @@ int PK2Kartta::Tallenna(char *filename)
 		}
 	}
 
-	// seinät
+	// seinï¿½t
 	alue = LaskeTallennusAlue(this->seinat); 
 	leveys = alue.right - alue.left;
 	korkeus = alue.bottom - alue.top;
@@ -1453,7 +1455,7 @@ void PK2Kartta::Animoi_Vesiputous(void)
 		for (y=416;y<448;y++)
 			temp[x-32+(y-416)*32] = buffer[x+y*leveys];
 
-	color2 = (temp[0]/32)*32;	// mahdollistaa eriväriset vesiputoukset
+	color2 = (temp[0]/32)*32;	// mahdollistaa erivï¿½riset vesiputoukset
 
 	for (x=32;x<64;x++)
 	{

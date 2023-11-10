@@ -1,8 +1,8 @@
 #ifndef P_FONT
 #define P_FONT
 
-#include "D:\Visual Studio\MyProjects\PisteEngine\PisteDraw.h"
-#include "D:\Visual Studio\MyProjects\PisteLanguage\PisteLanguage.h"
+#include "draw.h"
+#include "../Language/language.h"
 
 class PisteFont
 {

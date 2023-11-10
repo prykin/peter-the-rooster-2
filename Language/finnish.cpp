@@ -2,18 +2,18 @@
 #define INITGUID
 
 #include <string.h>
-#include <istream.h>
+//#include <istream.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream.h>
-#include "PisteLanguage.h"
+//#include <iostream.h>
+#include "language.h"
 
 int main()
 {
 	PisteLanguage *kieli = new PisteLanguage();
 
 	if (!kieli->Lue_Tiedosto("suomi.lng"))
-		cout<<"tiedoston luku epäonnistui!\n";
+		cout<<"tiedoston luku epï¿½onnistui!\n";
 	else
 		cout<<"tiedoston luku onnistui!\n";
 
