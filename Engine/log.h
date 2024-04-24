@@ -3,8 +3,8 @@
 
 /* PROTOTYPES --------------------------------------------------------------------------------*/
 
-void PisteLog_Salli_Kirjoitus();
+void PisteLog_EnableWriting();
 
-int  PisteLog_Kirjoita(char *viesti);
+int PisteLog_Write(char *message);
 
 #endif

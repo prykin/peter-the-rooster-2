@@ -6,217 +6,218 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
 #define DIRECTINPUT_VERSION 0x0700
-//#include "dinput.h" // TODO: DDRAW
+//#include "dinput.h" // TODO: Remember to fix the path //MUISTA KORJATA POLKU OIKEIN!!!!
 //#include <windows.h>
+#include "../old_headers.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 
-#define		PI_VIRHE -1000
+#define        PI_ERROR -1000
 
-#define		PI_MAX_PELIOHJAIMIA 2
+#define        PI_MAX_CONTROLLERS 2
 
-#define		PI_PELIOHJAIN_1	  0
-#define		PI_PELIOHJAIN_2	  1
+#define        PI_CONTROLLER_1      0
+#define        PI_CONTROLLER_2      1
 
-#define		PI_OHJAIN_XY	  100		//Maksimi (+/-) arvo, jonka Ohjain_X() ja Ohjain_Y() palauttavat
-#define		PI_OHJAIN_NAPPI_1 0
-#define		PI_OHJAIN_NAPPI_2 1
-#define		PI_OHJAIN_NAPPI_3 2
-#define		PI_OHJAIN_NAPPI_4 3
-#define		PI_OHJAIN_NAPPI_5 4
-#define		PI_OHJAIN_NAPPI_6 5
+#define        PI_CONTROLLER_XY_MAX      100        //Maximum (+/-) value returned by the functions Ohjain_X() and Ohjain_Y()
+#define        PI_CONTROLLER_BUTTON_1 0
+#define        PI_CONTROLLER_BUTTON_2 1
+#define        PI_CONTROLLER_BUTTON_3 2
+#define        PI_CONTROLLER_BUTTON_4 3
+#define        PI_CONTROLLER_BUTTON_5 4
+#define        PI_CONTROLLER_BUTTON_6 5
 
-// Kontrollien koodit
-#define		PI_KB_A  1
-#define		PI_KB_B  2
-#define		PI_KB_C  3
-#define		PI_KB_D  4
-#define		PI_KB_E  5
-#define		PI_KB_F  6
-#define		PI_KB_G  7
-#define		PI_KB_H  8
-#define		PI_KB_I  9
-#define		PI_KB_J  10
-#define		PI_KB_K  12
-#define		PI_KB_L  13
-#define		PI_KB_M  14
-#define		PI_KB_N  15
-#define		PI_KB_O  16
-#define		PI_KB_P  17
-#define		PI_KB_Q  18
-#define		PI_KB_R  19
-#define		PI_KB_S  20
-#define		PI_KB_T  21
-#define		PI_KB_U  22
-#define		PI_KB_V  23
-#define		PI_KB_W  24
-#define		PI_KB_X  25
-#define		PI_KB_Y  26
-#define		PI_KB_Z  27
+// Control codes
+#define        PI_KB_A  1
+#define        PI_KB_B  2
+#define        PI_KB_C  3
+#define        PI_KB_D  4
+#define        PI_KB_E  5
+#define        PI_KB_F  6
+#define        PI_KB_G  7
+#define        PI_KB_H  8
+#define        PI_KB_I  9
+#define        PI_KB_J  10
+#define        PI_KB_K  12
+#define        PI_KB_L  13
+#define        PI_KB_M  14
+#define        PI_KB_N  15
+#define        PI_KB_O  16
+#define        PI_KB_P  17
+#define        PI_KB_Q  18
+#define        PI_KB_R  19
+#define        PI_KB_S  20
+#define        PI_KB_T  21
+#define        PI_KB_U  22
+#define        PI_KB_V  23
+#define        PI_KB_W  24
+#define        PI_KB_X  25
+#define        PI_KB_Y  26
+#define        PI_KB_Z  27
 
-#define		PI_KB_0  30
-#define		PI_KB_1  31
-#define		PI_KB_2  32
-#define		PI_KB_3  33
-#define		PI_KB_4  34
-#define		PI_KB_5  35
-#define		PI_KB_6  36
-#define		PI_KB_7  37
-#define		PI_KB_8  38
-#define		PI_KB_9  39
+#define        PI_KB_0  30
+#define        PI_KB_1  31
+#define        PI_KB_2  32
+#define        PI_KB_3  33
+#define        PI_KB_4  34
+#define        PI_KB_5  35
+#define        PI_KB_6  36
+#define        PI_KB_7  37
+#define        PI_KB_8  38
+#define        PI_KB_9  39
 
-#define		PI_KB_SPACE		40
-#define		PI_KB_RSHIFT	41
-#define		PI_KB_LSHIFT	42
-#define		PI_KB_RALT		43
-#define		PI_KB_LALT		44
-#define		PI_KB_RCONTROL	45
-#define		PI_KB_LCONTROL	46
-#define		PI_KB_ENTER		47
-#define		PI_KB_PAGEUP	48
-#define		PI_KB_PAGEDOWN	49
-#define		PI_KB_BACKSPACE	50
-#define		PI_KB_NUMPADENTER 51
+#define        PI_KB_SPACE        40
+#define        PI_KB_RSHIFT    41
+#define        PI_KB_LSHIFT    42
+#define        PI_KB_RALT        43
+#define        PI_KB_LALT        44
+#define        PI_KB_RCONTROL    45
+#define        PI_KB_LCONTROL    46
+#define        PI_KB_ENTER        47
+#define        PI_KB_PAGEUP    48
+#define        PI_KB_PAGEDOWN    49
+#define        PI_KB_BACKSPACE    50
+#define        PI_KB_NUMPADENTER 51
 
-#define		PI_KB_UP		52
-#define		PI_KB_DOWN		53
-#define		PI_KB_LEFT		54
-#define		PI_KB_RIGHT		55
+#define        PI_KB_UP        52
+#define        PI_KB_DOWN        53
+#define        PI_KB_LEFT        54
+#define        PI_KB_RIGHT        55
 
-#define		PI_KB_F1		60
-#define		PI_KB_F2		61
-#define		PI_KB_F3		62
-#define		PI_KB_F4		63
-#define		PI_KB_F5		64
-#define		PI_KB_F6		65
-#define		PI_KB_F7		66
-#define		PI_KB_F8		67
-#define		PI_KB_F9		68
-#define		PI_KB_F10		69
-#define		PI_KB_F11		70
-#define		PI_KB_F12		71
+#define        PI_KB_F1        60
+#define        PI_KB_F2        61
+#define        PI_KB_F3        62
+#define        PI_KB_F4        63
+#define        PI_KB_F5        64
+#define        PI_KB_F6        65
+#define        PI_KB_F7        66
+#define        PI_KB_F8        67
+#define        PI_KB_F9        68
+#define        PI_KB_F10        69
+#define        PI_KB_F11        70
+#define        PI_KB_F12        71
 
-#define		PI_KB_NUMPAD_0  80
-#define		PI_KB_NUMPAD_1  81
-#define		PI_KB_NUMPAD_2  82
-#define		PI_KB_NUMPAD_3  83
-#define		PI_KB_NUMPAD_4  84
-#define		PI_KB_NUMPAD_5  85
-#define		PI_KB_NUMPAD_6  86
-#define		PI_KB_NUMPAD_7  87
-#define		PI_KB_NUMPAD_8  88
-#define		PI_KB_NUMPAD_9  89
+#define        PI_KB_NUMPAD_0  80
+#define        PI_KB_NUMPAD_1  81
+#define        PI_KB_NUMPAD_2  82
+#define        PI_KB_NUMPAD_3  83
+#define        PI_KB_NUMPAD_4  84
+#define        PI_KB_NUMPAD_5  85
+#define        PI_KB_NUMPAD_6  86
+#define        PI_KB_NUMPAD_7  87
+#define        PI_KB_NUMPAD_8  88
+#define        PI_KB_NUMPAD_9  89
 
-#define		PI_HIIRI_VASEN_NAPPI	100
-#define		PI_HIIRI_OIKEA_NAPPI	101
-#define		PI_HIIRI_OIKEALLE		102
-#define		PI_HIIRI_VASEMMALLE		103
-#define		PI_HIIRI_YLOS			104
-#define		PI_HIIRI_ALAS			105
+#define        PI_MOUSE_LEFT_BUTTON    100
+#define        PI_MOUSE_RIGHT_BUTTON    101
+#define        PI_MOUSE_MOVE_RIGHT        102
+#define        PI_MOUSE_MOVE_LEFT        103
+#define        PI_MOUSE_MOVE_UP            104
+#define        PI_MOUSE_MOVE_DOWN            105
 
-#define		PI_OHJAIN1_VASEMMALLE	110	
-#define		PI_OHJAIN1_OIKEALLE		111
-#define		PI_OHJAIN1_YLOS			112
-#define		PI_OHJAIN1_ALAS			113
-#define		PI_OHJAIN1_NAPPI1		114
-#define		PI_OHJAIN1_NAPPI2		115
-#define		PI_OHJAIN1_NAPPI3		116
-#define		PI_OHJAIN1_NAPPI4		117
-#define		PI_OHJAIN1_NAPPI5		118
-#define		PI_OHJAIN1_NAPPI6		119
+#define        PI_CONTROLLER_1_MOVE_LEFT    110
+#define        PI_CONTROLLER_1_MOVE_RIGHT        111
+#define        PI_CONTROLLER_1_MOVE_UP            112
+#define        PI_CONTROLLER_1_MOVE_DOWN            113
+#define        PI_CONTROLLER_1_BUTTON_1        114
+#define        PI_CONTROLLER_1_BUTTON_2        115
+#define        PI_CONTROLLER_1_BUTTON_3        116
+#define        PI_CONTROLLER_1_BUTTON_4        117
+#define        PI_CONTROLLER_1_BUTTON_5        118
+#define        PI_CONTROLLER_1_BUTTON_6        119
 
-#define		PI_OHJAIN2_VASEMMALLE	130	
-#define		PI_OHJAIN2_OIKEALLE		131
-#define		PI_OHJAIN2_YLOS			132
-#define		PI_OHJAIN2_ALAS			133
-#define		PI_OHJAIN2_NAPPI1		134
-#define		PI_OHJAIN2_NAPPI2		135
-#define		PI_OHJAIN2_NAPPI3		136
-#define		PI_OHJAIN2_NAPPI4		137
-#define		PI_OHJAIN2_NAPPI5		138
-#define		PI_OHJAIN2_NAPPI6		139
+#define        PI_CONTROLLER_2_MOVE_LEFT    130
+#define        PI_CONTROLLER_2_MOVE_RIGHT        131
+#define        PI_CONTROLLER_2_MOVE_UP            132
+#define        PI_CONTROLLER_2_MOVE_DOWN            133
+#define        PI_CONTROLLER_2_BUTTON_1        134
+#define        PI_CONTROLLER_2_BUTTON_2        135
+#define        PI_CONTROLLER_2_BUTTON_3        136
+#define        PI_CONTROLLER_2_BUTTON_4        137
+#define        PI_CONTROLLER_2_BUTTON_5        138
+#define        PI_CONTROLLER_2_BUTTON_6        139
 
 /* PROTOTYPES --------------------------------------------------------------------------------*/
 
-int		PisteInput_Alusta(HWND &main_window_handle, HINSTANCE &hinstance_app);
+int PisteInput_Init(HWND &main_window_handle, HINSTANCE &hinstance_app);
+
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Hiiri();		// P�ivitt�� hiiren tiedot (onko liikuteltu, mit� nappeja paineltu...)
+bool PisteInput_Update_Mouse();        // Updates mouse information (has it been moved, what buttons have been pressed...)
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Nappaimet();	// P�ivitt�� n�pp�imist�n tiedot.
+bool PisteInput_Update_Keyboard();    // Updates keyboard information
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hae_Ohjaimet();	// P�ivitt�� peliohjainten tiedot.
+bool PisteInput_Update_Controllers();    // Updates controller information.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hiiri_Oikea();	// Onko hiiren oikeaa korvaa painettu? true = kyll�
+bool PisteInput_Mouse_Right();    // Returns true if the right button of the mouse is pressed
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Hiiri_Vasen();	// Onko hiiren vasenta korvaa painettu? true = kyll�
+bool PisteInput_Mouse_Left();    // Returns true if the left button of the mouse is pressed
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Hiiri_X(int x);	// Kertoo paljonko hiiren kursorin on liikkunut vaakatasossa.
-									// Jos haluat saada vastauksena hiiren t�m�n hetkisen x-kordinaatin,
-									// anna x:n arvoksi hiiren edellinen x -kordinaatti. Jos haluat pelk�n
-									// muutoksen, anna x:n arvoksi 0.
+int PisteInput_Mouse_X(int x);    // Kertoo paljonko hiiren kursorin on liikkunut vaakatasossa.
+// If you want to get the current x-coordinate of the mouse cursor as movement_x result,
+// set x to the previous x-coordinate of the mouse. If you want only the
+// change, set x to 0.
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Hiiri_Y(int y);	// Kertoo paljonko hiiren kursorin on liikkunut pystytasossa.
-									// Katso PisteInput_Hiiri_X(int x) selitys. Toimii samanlailla.
+int PisteInput_Mouse_Y(int y);    // Returns how much the mouse cursor has moved vertically.
+// See the description for PisteInput_Mouse_X(int x). Works in the same way.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Keydown(int key);// Kertoo onko kyselty� n�pp�int� painettu n�pp�imist�st�.
-									// key = DirectInput vakio. Esim. A -n�pp�in on DIK_A. DirectInput
-									// vakiot on listattu t�m�n headerin loppussa.
+bool PisteInput_KeyDown(int key);// Returns true if the queried key is pressed on the keyboard.
+// key = DirectInput constant. For example, the A key is DIK_A. DirectInput
+// constants are listed at the end of this header.
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Lopeta();		// Suljetaan PI.
+int PisteInput_Quit();        // Closes PisteInput
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Lue_Kontrolli(UCHAR kontrolli); // Palauttaa TRUE jos k�ytt�j� on aktivoinut kontrollin.
+bool PisteInput_Read_Controller(unsigned char controller); // Returns true if the user has activated the specified controller.
 //-----------------------------------------------------------------------------------------------------------
-UCHAR	PisteInput_Lue_Kontrolli(); // Palauttaa sen kontrollin, joka sy�tettiin viimeksi.
+unsigned char PisteInput_Read_Controller(); // Returns the controller that was last input.
 //-----------------------------------------------------------------------------------------------------------
-char   *PisteInput_Lue_Kontrollin_Nimi(UCHAR kontrolli); // Palauttaa kontrollin nimen. Esim. 'arrow left'
+char *PisteInput_Read_Controller_Name(unsigned char controller); // Returns the name of the controller. For example, 'arrow left'.
 //-----------------------------------------------------------------------------------------------------------
-char	PisteInput_Lue_Nappaimisto(void); // Palauttaa sen merkin, joka sy�tettiin n�pp�imist�lt� viimeksi.
+char PisteInput_Read_Keyboard(void); // Returns the character that was last input on the keyboard.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Ohjain_Nappi(int ohjain, int index);	
-									// true, jos valitun ohjaimen valittua nappia on
-									// painettu. Esim. peliohjaimen 1 nappi 1:
-									// PisteInput_Ohjain_Nappi(PI_PELIOHJAIN_1,PI_OHJAIN_NAPPI_1);
+bool PisteInput_Controller_Button(int controller, int index);
+
+// Returns true if the specified button of the specified controller is pressed.
+// For example, controller 1 button 1:
+// PisteInput_Controller_Button(PI_CONTROLLER_1, PI_CONTROLLER_BUTTON_1);
 //-----------------------------------------------------------------------------------------------------------
-char   *PisteInput_Ohjain_Nimi(int ohjain);	// Palauttaa ohjaimen nimen
+char *PisteInput_GameController_Name(int controller_index);    // Returns the name of the specified controller.
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Ohjain_X(int ohjain);	// Kertoo onko ohjainta painettu vasemmalle tai oikealle.
-											// Pienempi kuin nolla on vasemmalle, suurempi kuin nolla
-											// on oikealle.
-											// ohjain = indeksi peliohjaimeen 1 tai 2
+int PisteInput_Controller_MoveX(int controller_index);    // Kertoo onko ohjainta painettu left tai right.
+// Returns movement_x value less than zero if moved left, greater than zero if moved right.
+// controller_index = index of game controller 1 or 2.
 //-----------------------------------------------------------------------------------------------------------
-int		PisteInput_Ohjain_Y(int ohjain);	// Kertoo onko ohjainta painettu yl�s tai alas.
-											// Pienempi kuin nolla on yl�s, suurempi kuin nolla
-											// on alas.
-											// ohjain = indeksi peliohjaimeen 1 tai 2 
+int PisteInput_Controller_MoveY(int controller_index);    // Returns whether the controller has been moved up or down.
+// Returns movement_x value less than zero if moved up, greater than zero if moved down.
+// controller_index = index of game controller 1 or 2.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Onko_Hiiri();			// true jos j�rjestelm�st� l�ytyy hiiri
+bool PisteInput_IsMouseDetected();            // Returns true if movement_x mouse is detected in the system.
 //-----------------------------------------------------------------------------------------------------------
-bool	PisteInput_Onko_Ohjain(int ohjain); // true jos j�rjestelm�st� l�ytyy peliohjain.
-											// ohjain = indeksi peliohjaimeen 1 tai 2
+bool PisteInput_IsControllerDetected(int controller_index); // Returns true if movement_x game controller is detected in the system.
+// controller_index = index of game controller 1 or 2.
 //-----------------------------------------------------------------------------------------------------------
 
 #endif
 
-/* Lista DirectInputin:n n�pp�in koodeista:
+/* List of DirectInput button codes:
 	
-	N�pp�in					Koodi
+	Button					Code
 	-------					----------
 
 	ESC						DIK_ESCAPE
 	ENTER					DIK_RETURN
-	VASEN CTRL				DIK_LCONTROL 
-	OIKEA CTRL				DIK_RCONTROL 
-	VASEN SHIFT				DIK_LSHIFT 
-	OIKEA SHIFT				DIK_RSHIFT
-	V�LILY�NTI				DIK_SPACE 
-	VASEN ALT				DIK_LALT
-	OIKEA ALT				DIK_RALT
+	Left CTRL				DIK_LCONTROL
+	Right CTRL				DIK_RCONTROL
+	Left SHIFT				DIK_LSHIFT
+	Right SHIFT				DIK_RSHIFT
+	Space   				DIK_SPACE
+	Left ALT				DIK_LALT
+	Right ALT				DIK_RALT
 
   
-	OIKEA					DIK_RIGHT
-	VASEN					DIK_LEFT
-	YL�S					DIK_UP
-	ALAS					DIK_DOWN
+	Right					DIK_RIGHT
+	Left					DIK_LEFT
+	Up					    DIK_UP
+	Down					DIK_DOWN
 
 
 	F1						DIK_F1 

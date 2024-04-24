@@ -136,7 +136,7 @@ public:
 
 	unsigned long	sound_frq;			// Default frequency of sound effects 
 							// (default 22050)
-	bool		random_frq;			// true = Play sound effects in random frequency
+	bool		random_frequency;			// true = Play sound effects in random frequency
 							// related to default frequency
 	
 	// If sprite is an obstacle
@@ -383,13 +383,13 @@ This is a help structure used to describe a sequence of frames. Maximum amount o
 
 A sequence might look like this: 3,4,5,6,0,0,0,0,0,0 	(= Rooster sprite's walking animation)
 
-First frame is 1, second is 2 etc. Zero marks the end of sequence if the sequence is shorter 
+First frame is 1, second is 2 etc. Zero marks the end of sequence if the sequence is shorter
 than 10 frames.
 
 struct PK2SPRITE_ANIMATION {
-	UCHAR		sequence[10];	// sequence of frames
-	UCHAR		frames;		// number of frames
-	bool		loops;		// true if animation loops
+UCHAR		sequence[10];	// sequence of frames
+UCHAR		frames;		// number of frames
+bool		loops;		// true if animation loops
 };
 
 -------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /* PRE DEFINITIONS ----------------------------------------------------------------------------*/
 
-#define WIN32_LEAN_AND_MEAN  
-#define INITGUID 
+#define WIN32_LEAN_AND_MEAN
+#define INITGUID
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
@@ -16,154 +16,133 @@
 //#include <fstream.h>
 //#include <iostream.h>
 #include <string.h>
-#include "../Engine/input.h"
-#include "../Engine/draw.h"
-#include "../Engine/sound.h"
-#include "../Engine/wait.h"
-#include "../map.h"
-#include "../sprites.h"
+#include "editor.h"
 
-/* TYYPPIM��RITTELYT ---------------------------------------------------------------------------*/
-
-typedef unsigned short USHORT;
-typedef unsigned short WORD; 
-typedef unsigned long  DWORD;
-typedef unsigned char  UCHAR;
-typedef unsigned char  BYTE;
-
-
-struct TOOL_LIST
-{
-	bool		nakyva;
-	int			x,y,
-				valinta;
+struct TOOL_LIST {
+    bool nakyva;
+    int x, y, valinta;
 };
 
-struct MENU
-{
-	char		otsikko[30];
-	int			x;
-	int			y;
-	int			leveys;
-	int			korkeus;
-	bool		piilota;
-	int			pika;
-	TOOL_LIST	lista;
+struct MENU {
+    char otsikko[30];
+    int x;
+    int y;
+    int leveys;
+    int korkeus;
+    bool piilota;
+    int pika;
+    TOOL_LIST lista;
 };
 
-struct TIEDOSTO
-{
-	char		nimi[_MAX_PATH];
-	UCHAR		tyyppi;
+struct TIEDOSTO {
+    char nimi[_MAX_PATH];
+    unsigned char tyyppi;
 };
 
-struct LEIKEPOYTA
-{
-	UCHAR	taustat[PK2KARTTA_KARTTA_KOKO];
-	UCHAR	seinat[PK2KARTTA_KARTTA_KOKO];
-	UCHAR	spritet[PK2KARTTA_KARTTA_KOKO];
-	RECT	alue;
+struct LEIKEPOYTA {
+    unsigned char taustat[MAP_SIZE];
+    unsigned char seinat[MAP_SIZE];
+    unsigned char spritet[MAP_SIZE];
+    RECT alue;
 };
 
-struct LOKIMERKINTA
-{
-	char	teksti[200];
-	UCHAR	tyyppi;
+struct LOKIMERKINTA {
+    char teksti[200];
+    unsigned char tyyppi;
 };
 
 /* M��RITTELYT --------------------------------------------------------------------------------*/
 
 #define WINDOW_CLASS_NAME "WINCLASS1"
-#define	GAME_NAME		  "PK2 LEVEL EDITOR"
+#define    GAME_NAME          "PK2 LEVEL EDITOR"
 
-#define TAUSTAKUVA_EI		0
-#define TAUSTAKUVA_METSA	1
+#define TAUSTAKUVA_EI        0
+#define TAUSTAKUVA_METSA    1
 
-#define MUSIIKKI_EI			0
+#define MUSIIKKI_EI            0
 
-const int RUUDUN_LEVEYS			= 1024;//1024;	
-const int RUUDUN_KORKEUS		= 768;//768;	
-const int SCREEN_BPP			= 8;	
-const int MAX_COLORS_PALETTE	= 256;	
+const int SCREEN_WIDTH = 1024;//1024;
+const int SCREEN_HEIGHT = 768;//768;
+const int SCREEN_BPP = 8;
+const int MAX_COLORS_PALETTE = 256;
 
-const UCHAR MENU_EI				= 100;
-const UCHAR	MENU_KARTTA			= 0;
-const UCHAR	MENU_PALIKAT		= 1;
-const UCHAR	MENU_INFO			= 2;
-const UCHAR	MENU_SPRITET		= 3;
-const UCHAR	MENU_TIEDOSTOT		= 4;
-const UCHAR	MENU_SAVE			= 5;
-const UCHAR	MENU_HELP			= 6;
-const UCHAR	MENU_EXIT			= 7;
-const UCHAR	MENU_TOOLS			= 8;
-const UCHAR	MENU_LOKI			= 9;
+const unsigned char MENU_EI = 100;
+const unsigned char MENU_KARTTA = 0;
+const unsigned char MENU_PALIKAT = 1;
+const unsigned char MENU_INFO = 2;
+const unsigned char MENU_SPRITET = 3;
+const unsigned char MENU_TIEDOSTOT = 4;
+const unsigned char MENU_SAVE = 5;
+const unsigned char MENU_HELP = 6;
+const unsigned char MENU_EXIT = 7;
+const unsigned char MENU_TOOLS = 8;
+const unsigned char MENU_LOKI = 9;
 
-const UCHAR MAX_MENUJA			= 10;
+const unsigned char MAX_MENUJA = 10;
 
-const UCHAR EDIT_KARTTA			= 0;
-const UCHAR EDIT_MENU			= 1;
-const UCHAR EDIT_SPRITE			= 2;
+const unsigned char EDIT_KARTTA = 0;
+const unsigned char EDIT_MENU = 1;
+const unsigned char EDIT_SPRITE = 2;
 
-const int MAX_DIR_TIEDOSTOJA	= 1000;
+const int MAX_DIR_TIEDOSTOJA = 1000;
 
-const int TIEDOSTO_DIR			= 1;
-const int TIEDOSTO_MAP			= 2;
-const int TIEDOSTO_BMP			= 3;
-const int TIEDOSTO_SPR			= 4;
-const int TIEDOSTO_MUS			= 5;
+const int TIEDOSTO_DIR = 1;
+const int TIEDOSTO_MAP = 2;
+const int TIEDOSTO_BMP = 3;
+const int TIEDOSTO_SPR = 4;
+const int TIEDOSTO_MUS = 5;
 
-const int EDIT_KERROS_TAUSTA	= 0;
-const int EDIT_KERROS_SEINAT	= 1;
+const int EDIT_KERROS_TAUSTA = 0;
+const int EDIT_KERROS_SEINAT = 1;
 const int EDIT_KERROS_VAIN_SEINAT = 2;
 
-const int MAX_SPRITEJA			= 600;
+const int MAX_SPRITES = 600;
 
-const int KENTTA_FILE		= 1;
-const int KENTTA_NIMI		= 2;
-const int KENTTA_TEKIJA		= 3;
-const int KENTTA_MUSIIKKI	= 4;
+const int KENTTA_FILE = 1;
+const int KENTTA_NIMI = 2;
+const int KENTTA_TEKIJA = 3;
+const int KENTTA_MUSIIKKI = 4;
 
-const int MAX_LOKIMERKINTOJA	= 55;
-const UCHAR LOKI_INFO			= 1;
-const UCHAR LOKI_VIRHE			= 2;
+const int MAX_LOKIMERKINTOJA = 55;
+const unsigned char LOKI_INFO = 1;
+const unsigned char LOKI_VIRHE = 2;
 
-struct ASETUKSET
-{
-	char		tyohakemisto[_MAX_PATH];
-	char		epd_hakemisto[_MAX_PATH];
-	char		editor_hakemisto[_MAX_PATH];
-	char		bg_hakemisto[_MAX_PATH];
-	char		tile_hakemisto[_MAX_PATH];
-	char		karttatiedosto[_MAX_PATH];
-	MENU		menut[MAX_MENUJA];
-	int			kartta_x;
-	int			kartta_y;
+struct ASETUKSET {
+    char tyohakemisto[_MAX_PATH];
+    char epd_hakemisto[_MAX_PATH];
+    char editor_hakemisto[_MAX_PATH];
+    char bg_hakemisto[_MAX_PATH];
+    char tile_hakemisto[_MAX_PATH];
+    char karttatiedosto[_MAX_PATH];
+    MENU menut[MAX_MENUJA];
+    int kartta_x;
+    int kartta_y;
 };
 
 /* GLOBAALIT MUUTTUJAT ---------------------------------------------------------------------------*/
 
-HWND      ikkunan_kahva			= NULL; // p��ikkunan kahva
-HINSTANCE hinstance_app			= NULL; // hinstance?
-HDC       global_dc				= NULL; // global dc?
+HWND window_handle = NULL; // p��ikkunan kahva
+HINSTANCE hinstance_app = NULL; // hinstance?
+HDC global_dc = NULL; // global dc?
 
-bool DirectX_virhe				= false;// jos t�m� muuttuu todeksi niin ohjelma lopetetaan
-char virheviesti[60];		
+bool DirectX_virhe = false;// jos t�m� muuttuu todeksi niin ohjelma lopetetaan
+char virheviesti[60];
 
-bool window_closed				= false;// onko ikkuna kiinni
+bool window_closed = false;// onko ikkuna kiinni
 
 double cos_table[360];
 double sin_table[360];
 int degree = 0;
 
-UCHAR edit_tila = EDIT_KARTTA;
-UCHAR aktiivinen_menu = MENU_EI;
+unsigned char edit_tila = EDIT_KARTTA;
+unsigned char aktiivinen_menu = MENU_EI;
 
 bool liikuta_ikkunaa = false;
 
 bool editoi_tekstia = false;
 
-char viesti[60];
-char tyohakemisto[_MAX_PATH];
+char message[60];
+char working_directory[_MAX_PATH];
 char pk2_hakemisto[_MAX_PATH] = " ";
 char epd_hakemisto[_MAX_PATH] = " ";
 char editor_hakemisto[_MAX_PATH] = "";
@@ -173,28 +152,28 @@ TIEDOSTO tiedostot[MAX_DIR_TIEDOSTOJA];
 
 char karttatiedosto[_MAX_PATH];
 
-DWORD tiedostoja = 0;
+unsigned long tiedostoja = 0;
 
 bool nayta_hakemistot = true;
 
-PK2Kartta *kartta, *undo;
+PK2Map *map, *undo;
 bool varmistettu = false;
 
-RECT kartta_kohde = {0,0,0,0};
-int	 kartta_kohde_status = 0;
-RECT kartta_lahde = {0,0,0,0};
+RECT kartta_kohde = {0, 0, 0, 0};
+int kartta_kohde_status = 0;
+RECT kartta_lahde = {0, 0, 0, 0};
 
 // KUVABUFFERIT
-int  kuva_editori;
-int  kuva_kartta;
+int kuva_editori;
+int kuva_kartta;
 
 // FONTIT
-int fontti1;
-int fontti2;
+int font1;
+int font2;
 
 // KONTROLLIT
-int hiiri_x = 10;
-int hiiri_y = 10;
+int mouse_x = 10;
+int mouse_y = 10;
 int key_delay = 0;
 
 // MENUT
@@ -216,22 +195,22 @@ int focussprite = 255;
 
 bool kartta_ladattu = false;
 
-int palikka_animaatio = 0;
+int block_animation = 0;
 
 bool animaatio_paalla = true;
 
 LEIKEPOYTA leikepoyta;
 bool aseta_leikepoyta_alue = false;
-RECT leikepoyta_alue = {0,0,0,0};
+RECT leikepoyta_alue = {0, 0, 0, 0};
 TOOL_LIST leikepoyta_lista;
 
-PK2Sprite_Prototyyppi protot[MAX_PROTOTYYPPEJA];
-int seuraava_vapaa_proto = 0;
+PK2Sprite_Prototype prototypes[MAX_PROTOTYPES];
+int next_free_proto = 0;
 //int vakio_spriteja = 0;
-//PK2Sprite spritet[MAX_SPRITEJA];
+//PK2Sprite sprites[MAX_SPRITES];
 int spriteja = 0;
 
-int proto_valittu = MAX_PROTOTYYPPEJA;
+int proto_valittu = MAX_PROTOTYPES;
 
 // TEKSTINK�SITTELY
 int editKenttaId = 0;
@@ -246,20 +225,26 @@ LOKIMERKINTA loki[MAX_LOKIMERKINTOJA];
 
 bool kirjoita_loki = false;
 
-UCHAR karttavarit[150];
+unsigned char karttavarit[150];
 
 // ASETUKSET
 
-ASETUKSET asetukset;
+ASETUKSET settings;
 
 /* PROTOT ---------------------------------------------------------------------------------------*/
 
 int Level_Editor_Loki_Tallenna(char *viesti);
-int Level_Editor_Piirra_Nelio(int vasen, int yla, int oikea, int ala, UCHAR color);
+
+int Level_Editor_Piirra_Nelio(int vasen, int yla, int oikea, int ala, unsigned char color);
+
 int Level_Editor_Kartta_Paivita(void);
+
 void Level_Editor_Laske_TileVarit();
+
 void Level_Editor_Aseta_Palikat(char *filename);
+
 int Level_Editor_Kartta_Oletusasetukset();
+
 int Level_Editor_Kartta_Lataa(char *filename);
 
 
@@ -271,639 +256,605 @@ bool piirto_aloitettu = false;
 /* ALUSTUKSET ---------------------------------------------------------------*/
 
 
-void Level_Editor_Loki_Alusta()
-{
-	for (int i=0;i<MAX_LOKIMERKINTOJA;i++)
-	{
-		loki[i].tyyppi = 0;
-		strcpy(loki[i].teksti," ");
-	}
+void Level_Editor_Loki_Alusta() {
+    for (int i = 0; i < MAX_LOKIMERKINTOJA; i++) {
+        loki[i].tyyppi = 0;
+        strcpy(loki[i].teksti, " ");
+    }
 }
 
-void Level_Editor_Loki_Kirjaa(char *teksti, UCHAR tyyppi)
-{
-	strcpy(viesti,teksti);
-	
-	for (int i=0;i<MAX_LOKIMERKINTOJA-1;i++)
-	{
-		strcpy(loki[i].teksti,loki[i+1].teksti);
-		loki[i].tyyppi = loki[i+1].tyyppi;
+void Level_Editor_Loki_Kirjaa(char *teksti, unsigned char tyyppi) {
+    strcpy(message, teksti);
 
-	}
-	loki[MAX_LOKIMERKINTOJA-1].tyyppi = tyyppi;
-	strcpy(loki[MAX_LOKIMERKINTOJA-1].teksti,teksti);
+    for (int i = 0; i < MAX_LOKIMERKINTOJA - 1; i++) {
+        strcpy(loki[i].teksti, loki[i + 1].teksti);
+        loki[i].tyyppi = loki[i + 1].tyyppi;
+
+    }
+    loki[MAX_LOKIMERKINTOJA - 1].tyyppi = tyyppi;
+    strcpy(loki[MAX_LOKIMERKINTOJA - 1].teksti, teksti);
 }
 
-int Level_Editor_Asetukset_Lataa(void)
-{
-	int i;
+int Level_Editor_Asetukset_Lataa(void) {
+    int i;
 
-	char	tiedostonimi[_MAX_PATH];
+    char tiedostonimi[_MAX_PATH];
 
-	strcpy(tiedostonimi,editor_hakemisto);
-	strcat(tiedostonimi,"//settings.dat");
+    strcpy(tiedostonimi, editor_hakemisto);
+    strcat(tiedostonimi, "//settings.dat");
 
-	Level_Editor_Loki_Kirjaa("loading settings...", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("loading settings...", LOKI_INFO);
 
-	ifstream *tiedosto = new ifstream(tiedostonimi, ios::in | ios::nocreate);
+    ifstream *tiedosto = new ifstream(tiedostonimi, ios::in);
 
-	if (tiedosto->fail())
-	{
-		delete (tiedosto);
-		Level_Editor_Loki_Kirjaa("no settings saved.", LOKI_INFO);
-		return 1;
-	}
-	
-	tiedosto->read((char *)&asetukset,sizeof(asetukset));
-		
-	if (tiedosto->fail())
-	{
-		delete (tiedosto);
-		strcpy(viesti,"could not read settings.dat");
-		Level_Editor_Loki_Kirjaa("loading settings failed.", LOKI_VIRHE);
-		return 1;
-	}
+    if (tiedosto->fail()) {
+        delete (tiedosto);
+        Level_Editor_Loki_Kirjaa("no settings saved.", LOKI_INFO);
+        return 1;
+    }
 
-	delete (tiedosto);
+    tiedosto->read((char *) &settings, sizeof(settings));
 
-	strcpy(bg_hakemisto,asetukset.bg_hakemisto);
-	strcpy(epd_hakemisto,asetukset.epd_hakemisto);
-	strcpy(karttatiedosto,asetukset.karttatiedosto);
-	strcpy(tile_hakemisto,asetukset.tile_hakemisto);
-	strcpy(tyohakemisto,asetukset.tyohakemisto);
+    if (tiedosto->fail()) {
+        delete (tiedosto);
+        strcpy(message, "could not read settings.dat");
+        Level_Editor_Loki_Kirjaa("loading settings failed.", LOKI_VIRHE);
+        return 1;
+    }
 
-	for (i=0;i<MAX_MENUJA;i++) {
-		menut[i].x = asetukset.menut[i].x;
-		menut[i].y = asetukset.menut[i].y;
-		menut[i].piilota = asetukset.menut[i].piilota;
-	}	
+    delete (tiedosto);
 
-	kartta_x = asetukset.kartta_x;
-	kartta_y = asetukset.kartta_y;
+    strcpy(bg_hakemisto, settings.bg_hakemisto);
+    strcpy(epd_hakemisto, settings.epd_hakemisto);
+    strcpy(karttatiedosto, settings.karttatiedosto);
+    strcpy(tile_hakemisto, settings.tile_hakemisto);
+    strcpy(working_directory, settings.tyohakemisto);
 
-	if (_chdir(tyohakemisto) == 0)
-		_getcwd(tyohakemisto, _MAX_PATH );	
+    for (i = 0; i < MAX_MENUJA; i++) {
+        menut[i].x = settings.menut[i].x;
+        menut[i].y = settings.menut[i].y;
+        menut[i].piilota = settings.menut[i].piilota;
+    }
 
-	Level_Editor_Kartta_Lataa(karttatiedosto);
+    kartta_x = settings.kartta_x;
+    kartta_y = settings.kartta_y;
 
-	hiiri_x = 250;
-	hiiri_y = 250;
+    if (_chdir(working_directory) == 0)
+        _getcwd(working_directory, _MAX_PATH);
 
-	return 0;
+    Level_Editor_Kartta_Lataa(karttatiedosto);
+
+    mouse_x = 250;
+    mouse_y = 250;
+
+    return 0;
 }
 
-void Level_Editor_Asetukset_Tallenna(void)
-{
-	int i;
-	
-	Level_Editor_Loki_Kirjaa("saving settings", LOKI_INFO);
+void Level_Editor_Asetukset_Tallenna(void) {
+    int i;
 
-	strcpy(asetukset.bg_hakemisto,bg_hakemisto);
-	strcpy(asetukset.editor_hakemisto,bg_hakemisto);
-	strcpy(asetukset.epd_hakemisto,epd_hakemisto);
-	strcpy(asetukset.karttatiedosto,karttatiedosto);
-	strcpy(asetukset.tile_hakemisto,tile_hakemisto);
-	strcpy(asetukset.tyohakemisto,tyohakemisto);
+    Level_Editor_Loki_Kirjaa("saving settings", LOKI_INFO);
 
-	for (i=0;i<MAX_MENUJA;i++) {
-		asetukset.menut[i].x = menut[i].x;
-		asetukset.menut[i].y = menut[i].y;
-		asetukset.menut[i].piilota = menut[i].piilota;
-	}
+    strcpy(settings.bg_hakemisto, bg_hakemisto);
+    strcpy(settings.editor_hakemisto, bg_hakemisto);
+    strcpy(settings.epd_hakemisto, epd_hakemisto);
+    strcpy(settings.karttatiedosto, karttatiedosto);
+    strcpy(settings.tile_hakemisto, tile_hakemisto);
+    strcpy(settings.tyohakemisto, working_directory);
 
-	asetukset.menut[MENU_EXIT].piilota = true;
+    for (i = 0; i < MAX_MENUJA; i++) {
+        settings.menut[i].x = menut[i].x;
+        settings.menut[i].y = menut[i].y;
+        settings.menut[i].piilota = menut[i].piilota;
+    }
 
-	asetukset.kartta_x = kartta_x;
-	asetukset.kartta_y = kartta_y;
+    settings.menut[MENU_EXIT].piilota = true;
 
-	char	tiedostonimi[_MAX_PATH];
+    settings.kartta_x = kartta_x;
+    settings.kartta_y = kartta_y;
 
-	strcpy(tiedostonimi,editor_hakemisto);
-	strcat(tiedostonimi,"//settings.dat");
+    char tiedostonimi[_MAX_PATH];
 
-	ofstream *tiedosto = new ofstream(tiedostonimi, ios::binary);
-	tiedosto->write ((char *)&asetukset, sizeof (asetukset));
-	
-	delete (tiedosto);
+    strcpy(tiedostonimi, editor_hakemisto);
+    strcat(tiedostonimi, "//settings.dat");
+
+    ofstream *tiedosto = new ofstream(tiedostonimi, ios::binary);
+    tiedosto->write((char *) &settings, sizeof(settings));
+
+    delete (tiedosto);
 }
 
 // LEIKEP�YT� ///////////////////////////////////////////////
 
-void Level_Editor_Leikepoyta_Alusta(void)
-{
-	memset(leikepoyta.seinat, 0,sizeof(leikepoyta.seinat));
-	memset(leikepoyta.taustat,0,sizeof(leikepoyta.taustat));
-	memset(leikepoyta.spritet,0,sizeof(leikepoyta.spritet));
+void Level_Editor_Leikepoyta_Alusta(void) {
+    memset(leikepoyta.seinat, 0, sizeof(leikepoyta.seinat));
+    memset(leikepoyta.taustat, 0, sizeof(leikepoyta.taustat));
+    memset(leikepoyta.spritet, 0, sizeof(leikepoyta.spritet));
 
-	leikepoyta.alue.left	= 0;
-	leikepoyta.alue.right	= 0;
-	leikepoyta.alue.top		= 0;
-	leikepoyta.alue.bottom	= 0;
+    leikepoyta.alue.left = 0;
+    leikepoyta.alue.right = 0;
+    leikepoyta.alue.top = 0;
+    leikepoyta.alue.bottom = 0;
 }
 
-void Level_Editor_Leikepoyta_Kopioi(RECT alue)
-{
-	Level_Editor_Leikepoyta_Alusta();
+void Level_Editor_Leikepoyta_Kopioi(RECT alue) {
+    Level_Editor_Leikepoyta_Alusta();
 
-	if (alue.right > PK2KARTTA_KARTTA_LEVEYS)
-		alue.right = PK2KARTTA_KARTTA_LEVEYS;
-	
-	if (alue.left < 0)
-		alue.left = 0;
+    if (alue.right > MAP_WIDTH)
+        alue.right = MAP_WIDTH;
 
-	if (alue.bottom > PK2KARTTA_KARTTA_KORKEUS)
-		alue.bottom = PK2KARTTA_KARTTA_KORKEUS;
+    if (alue.left < 0)
+        alue.left = 0;
 
-	if (alue.top < 0)
-		alue.top = 0;	
+    if (alue.bottom > MAP_HEIGHT)
+        alue.bottom = MAP_HEIGHT;
 
-	leikepoyta.alue.left = 0;
-	leikepoyta.alue.top = 0;
-	leikepoyta.alue.right = alue.right - alue.left;
-	leikepoyta.alue.bottom = alue.bottom - alue.top;
+    if (alue.top < 0)
+        alue.top = 0;
 
-	for (int x=alue.left;x<alue.right;x++)
-		for (int y=alue.top;y<alue.bottom;y++)
-		{
-			leikepoyta.taustat[x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS];
-			leikepoyta.seinat[ x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->seinat[ x+y*PK2KARTTA_KARTTA_LEVEYS];
-			leikepoyta.spritet[x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS];
-		}
-	
-	Level_Editor_Kartta_Paivita();
+    leikepoyta.alue.left = 0;
+    leikepoyta.alue.top = 0;
+    leikepoyta.alue.right = alue.right - alue.left;
+    leikepoyta.alue.bottom = alue.bottom - alue.top;
+
+    for (int x = alue.left; x < alue.right; x++)
+        for (int y = alue.top; y < alue.bottom; y++) {
+            leikepoyta.taustat[x - alue.left + (y - alue.top) * MAP_WIDTH] = map->backgrounds[x + y *
+                                                                                                  MAP_WIDTH];
+            leikepoyta.seinat[x - alue.left + (y - alue.top) * MAP_WIDTH] = map->walls[x + y *
+                                                                                           MAP_WIDTH];
+            leikepoyta.spritet[x - alue.left + (y - alue.top) * MAP_WIDTH] = map->sprites[x + y *
+                                                                                              MAP_WIDTH];
+        }
+
+    Level_Editor_Kartta_Paivita();
 }
 
-void Level_Editor_Leikepoyta_Liita(RECT alue)
-{
-	//alue.left = x;
-	//alue.top  = y;
-	//alue.right = x + leikepoyta.alue.right;
-	//alue.bottom = y + leikepoyta.alue.bottom;
-	//Level_Editor_Leikepoyta_Alusta();
+void Level_Editor_Leikepoyta_Liita(RECT alue) {
+    //alue.left = x;
+    //alue.top  = y;
+    //alue.right = x + leikepoyta.alue.right;
+    //alue.bottom = y + leikepoyta.alue.bottom;
+    //Level_Editor_Leikepoyta_Alusta();
 
-	if (alue.right > PK2KARTTA_KARTTA_LEVEYS)
-		alue.right = PK2KARTTA_KARTTA_LEVEYS;
-	
-	if (alue.left < 0)
-		alue.left = 0;
+    if (alue.right > MAP_WIDTH)
+        alue.right = MAP_WIDTH;
 
-	if (alue.bottom > PK2KARTTA_KARTTA_KORKEUS)
-		alue.bottom = PK2KARTTA_KARTTA_KORKEUS;
+    if (alue.left < 0)
+        alue.left = 0;
 
-	if (alue.top < 0)
-		alue.top = 0;
+    if (alue.bottom > MAP_HEIGHT)
+        alue.bottom = MAP_HEIGHT;
 
-	int lp_leveys  = leikepoyta.alue.right - leikepoyta.alue.left,
-		lp_korkeus = leikepoyta.alue.bottom - leikepoyta.alue.top;
+    if (alue.top < 0)
+        alue.top = 0;
 
-	if (lp_leveys > 0 && lp_korkeus > 0)
-	{
-		for (int x=alue.left;x<alue.right;x++)
-			for (int y=alue.top;y<alue.bottom;y++)
-			{
-				//kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS] = leikepoyta.spritet[(x-alue.left)%lp_leveys +((y-alue.top)%lp_korkeus)*PK2KARTTA_KARTTA_LEVEYS];
-				if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT)
-					kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS] = leikepoyta.taustat[(x-alue.left)%lp_leveys +((y-alue.top)%lp_korkeus)*PK2KARTTA_KARTTA_LEVEYS];
-				if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-					kartta->seinat[ x+y*PK2KARTTA_KARTTA_LEVEYS] = leikepoyta.seinat[ (x-alue.left)%lp_leveys +((y-alue.top)%lp_korkeus)*PK2KARTTA_KARTTA_LEVEYS];
-			}	
-	}
+    int lp_leveys = leikepoyta.alue.right - leikepoyta.alue.left, lp_korkeus =
+            leikepoyta.alue.bottom - leikepoyta.alue.top;
 
-	Level_Editor_Kartta_Paivita();
+    if (lp_leveys > 0 && lp_korkeus > 0) {
+        for (int x = alue.left; x < alue.right; x++)
+            for (int y = alue.top; y < alue.bottom; y++) {
+                //map->sprites[x+y*MAP_WIDTH] = leikepoyta.sprites[(x-alue.left)%lp_leveys +((y-alue.top)%lp_korkeus)*MAP_WIDTH];
+                if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT)
+                    map->backgrounds[x + y * MAP_WIDTH] = leikepoyta.taustat[(x - alue.left) % lp_leveys +
+                                                                             ((y - alue.top) % lp_korkeus) *
+                                                                             MAP_WIDTH];
+                if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
+                    map->walls[x + y * MAP_WIDTH] = leikepoyta.seinat[(x - alue.left) % lp_leveys +
+                                                                      ((y - alue.top) % lp_korkeus) *
+                                                                      MAP_WIDTH];
+            }
+    }
+
+    Level_Editor_Kartta_Paivita();
 }
 
-void Level_Editor_Leikepoyta_Liita_Koko(RECT alue)
-{
+void Level_Editor_Leikepoyta_Liita_Koko(RECT alue) {
 
-	alue.right  = alue.left + leikepoyta.alue.right  - leikepoyta.alue.left;
-	alue.bottom = alue.top  + leikepoyta.alue.bottom - leikepoyta.alue.top;
+    alue.right = alue.left + leikepoyta.alue.right - leikepoyta.alue.left;
+    alue.bottom = alue.top + leikepoyta.alue.bottom - leikepoyta.alue.top;
 
-	if (alue.right > PK2KARTTA_KARTTA_LEVEYS)
-		alue.right = PK2KARTTA_KARTTA_LEVEYS;
-	
-	if (alue.left < 0)
-		alue.left = 0;
+    if (alue.right > MAP_WIDTH)
+        alue.right = MAP_WIDTH;
 
-	if (alue.bottom > PK2KARTTA_KARTTA_KORKEUS)
-		alue.bottom = PK2KARTTA_KARTTA_KORKEUS;
+    if (alue.left < 0)
+        alue.left = 0;
 
-	if (alue.top < 0)
-		alue.top = 0;
+    if (alue.bottom > MAP_HEIGHT)
+        alue.bottom = MAP_HEIGHT;
 
-	int lp_leveys  = leikepoyta.alue.right - leikepoyta.alue.left,
-		lp_korkeus = leikepoyta.alue.bottom - leikepoyta.alue.top;
+    if (alue.top < 0)
+        alue.top = 0;
 
-	if (lp_leveys > 0 && lp_korkeus > 0)
-	{
-		for (int x=alue.left;x<alue.right;x++)
-			for (int y=alue.top;y<alue.bottom;y++)
-			{
-				//kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS]     = leikepoyta.spritet[(x-alue.left) +(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS];
-				if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT)
-					kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS] = leikepoyta.taustat[(x-alue.left) +(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS];
-				if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-					kartta->seinat[ x+y*PK2KARTTA_KARTTA_LEVEYS] = leikepoyta.seinat[ (x-alue.left) +(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS];
-			}	
-	}
+    int lp_leveys = leikepoyta.alue.right - leikepoyta.alue.left, lp_korkeus =
+            leikepoyta.alue.bottom - leikepoyta.alue.top;
 
-	Level_Editor_Kartta_Paivita();
+    if (lp_leveys > 0 && lp_korkeus > 0) {
+        for (int x = alue.left; x < alue.right; x++)
+            for (int y = alue.top; y < alue.bottom; y++) {
+                //map->sprites[x+y*MAP_WIDTH]     = leikepoyta.sprites[(x-alue.left) +(y-alue.top)*MAP_WIDTH];
+                if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT)
+                    map->backgrounds[x + y * MAP_WIDTH] = leikepoyta.taustat[(x - alue.left) +
+                                                                             (y - alue.top) *
+                                                                             MAP_WIDTH];
+                if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
+                    map->walls[x + y * MAP_WIDTH] = leikepoyta.seinat[(x - alue.left) + (y - alue.top) *
+                                                                                        MAP_WIDTH];
+            }
+    }
+
+    Level_Editor_Kartta_Paivita();
 }
 
-void Level_Editor_Leikepoyta_Leikkaa(RECT alue)
-{
-	Level_Editor_Leikepoyta_Alusta();
+void Level_Editor_Leikepoyta_Leikkaa(RECT alue) {
+    Level_Editor_Leikepoyta_Alusta();
 
-	if (alue.right > PK2KARTTA_KARTTA_LEVEYS)
-		alue.right = PK2KARTTA_KARTTA_LEVEYS;
-	
-	if (alue.left < 0)
-		alue.left = 0;
+    if (alue.right > MAP_WIDTH)
+        alue.right = MAP_WIDTH;
 
-	if (alue.bottom > PK2KARTTA_KARTTA_KORKEUS)
-		alue.bottom = PK2KARTTA_KARTTA_KORKEUS;
+    if (alue.left < 0)
+        alue.left = 0;
 
-	if (alue.top < 0)
-		alue.top = 0;	
+    if (alue.bottom > MAP_HEIGHT)
+        alue.bottom = MAP_HEIGHT;
 
-	leikepoyta.alue.left = 0;
-	leikepoyta.alue.top = 0;
-	leikepoyta.alue.right = alue.right - alue.left;
-	leikepoyta.alue.bottom = alue.bottom - alue.top;
+    if (alue.top < 0)
+        alue.top = 0;
 
-	for (int x=alue.left;x<alue.right;x++)
-		for (int y=alue.top;y<alue.bottom;y++)
-		{
-			if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT)
-			{
-				leikepoyta.taustat[x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS];
-				kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-			}
-			if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-			{
-				leikepoyta.seinat[ x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->seinat[ x+y*PK2KARTTA_KARTTA_LEVEYS];
-				kartta->seinat[ x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-			}
-			
-			//leikepoyta.spritet[x-alue.left+(y-alue.top)*PK2KARTTA_KARTTA_LEVEYS] = kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS];
-			//kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-		}
+    leikepoyta.alue.left = 0;
+    leikepoyta.alue.top = 0;
+    leikepoyta.alue.right = alue.right - alue.left;
+    leikepoyta.alue.bottom = alue.bottom - alue.top;
 
-	Level_Editor_Kartta_Paivita();
+    for (int x = alue.left; x < alue.right; x++)
+        for (int y = alue.top; y < alue.bottom; y++) {
+            if (edit_kerros == EDIT_KERROS_TAUSTA || edit_kerros == EDIT_KERROS_SEINAT) {
+                leikepoyta.taustat[x - alue.left + (y - alue.top) * MAP_WIDTH] = map->backgrounds[x + y *
+                                                                                                      MAP_WIDTH];
+                map->backgrounds[x + y * MAP_WIDTH] = 255;
+            }
+            if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT) {
+                leikepoyta.seinat[x - alue.left + (y - alue.top) * MAP_WIDTH] = map->walls[x + y *
+                                                                                               MAP_WIDTH];
+                map->walls[x + y * MAP_WIDTH] = 255;
+            }
+
+            //leikepoyta.sprites[x-alue.left+(y-alue.top)*MAP_WIDTH] = map->sprites[x+y*MAP_WIDTH];
+            //map->sprites[x+y*MAP_WIDTH] = 255;
+        }
+
+    Level_Editor_Kartta_Paivita();
 }
 
-void Level_Editor_Leikepoyta_Piirra()
-{
-	//Level_Editor_Piirra_Nelio(leikepoyta.alue.left *32-kartta_x,leikepoyta.alue.top   *32-kartta_y,
-	//						  leikepoyta.alue.right*32-kartta_x,leikepoyta.alue.bottom*32-kartta_y,28);
-	
+void Level_Editor_Leikepoyta_Piirra() {
+    //Level_Editor_Piirra_Nelio(leikepoyta.alue.left *32-kartta_x,leikepoyta.alue.top   *32-kartta_y,
+    //						  leikepoyta.alue.right*32-kartta_x,leikepoyta.alue.bottom*32-kartta_y,28);
+
 //	Level_Editor_Piirra_Nelio((leikepoyta_alue.left-kartta_x) *32,(leikepoyta_alue.top-kartta_y)  *32,
 //							  (leikepoyta_alue.right-kartta_x)*32,(leikepoyta_alue.bottom-kartta_y)*32,224);
 
-	Level_Editor_Piirra_Nelio((leikepoyta_alue.left-kartta_x) *32-1,(leikepoyta_alue.top-kartta_y)  *32-1,
-							  (leikepoyta_alue.right-kartta_x)*32+1,(leikepoyta_alue.bottom-kartta_y)*32+1,0);
+    Level_Editor_Piirra_Nelio((leikepoyta_alue.left - kartta_x) * 32 - 1, (leikepoyta_alue.top - kartta_y) * 32 - 1,
+                              (leikepoyta_alue.right - kartta_x) * 32 + 1, (leikepoyta_alue.bottom - kartta_y) * 32 + 1,
+                              0);
 
-	Level_Editor_Piirra_Nelio((leikepoyta_alue.left-kartta_x) *32,(leikepoyta_alue.top-kartta_y)  *32,
-							  (leikepoyta_alue.right-kartta_x)*32,(leikepoyta_alue.bottom-kartta_y)*32,31);
+    Level_Editor_Piirra_Nelio((leikepoyta_alue.left - kartta_x) * 32, (leikepoyta_alue.top - kartta_y) * 32,
+                              (leikepoyta_alue.right - kartta_x) * 32, (leikepoyta_alue.bottom - kartta_y) * 32, 31);
 
-	Level_Editor_Piirra_Nelio((leikepoyta_alue.left-kartta_x) *32+1,(leikepoyta_alue.top-kartta_y)  *32+1,
-							  (leikepoyta_alue.right-kartta_x)*32-1,(leikepoyta_alue.bottom-kartta_y)*32-1,0);
+    Level_Editor_Piirra_Nelio((leikepoyta_alue.left - kartta_x) * 32 + 1, (leikepoyta_alue.top - kartta_y) * 32 + 1,
+                              (leikepoyta_alue.right - kartta_x) * 32 - 1, (leikepoyta_alue.bottom - kartta_y) * 32 - 1,
+                              0);
 }
 
 
 /*
 void Level_Editor_Prototyyppi_Poista(int proto)
 {
-	protot[proto].Uusi();
-	strcpy(kartta->protot[proto],"");
+	prototypes[proto].New();
+	strcpy(map->prototypes[proto],"");
 
-	for (DWORD x=0; x<PK2KARTTA_KARTTA_KOKO; x++)
+	for (unsigned long x=0; x<MAP_SIZE; x++)
 	{
-		if (kartta->spritet[x] == proto)
-			kartta->spritet[x] = 255;
+		if (map->sprites[x] == proto)
+			map->sprites[x] = 255;
 	}
 }
 */
 
-int Level_Editor_Aseta_Episodihakemisto()
-{
-	_getcwd(epd_hakemisto, _MAX_PATH );
-	//strcpy(epd_hakemisto, "1234");
-	//strcpy(viesti, "1234");
+int Level_Editor_Aseta_Episodihakemisto() {
+    _getcwd(epd_hakemisto, _MAX_PATH);
+    //strcpy(epd_hakemisto, "1234");
+    //strcpy(message, "1234");
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Lataa_PK2_Hakemisto(void)
-{
-	Level_Editor_Loki_Kirjaa("loading pk2le_dir.ini", LOKI_INFO);
-	
-	char hakemisto[_MAX_PATH];
-	ifstream *tiedosto = new ifstream("pk2le_dir.ini", ios::in | ios::nocreate);
-	
-	if (tiedosto->fail())
-	{
-		delete (tiedosto);
-		Level_Editor_Loki_Kirjaa("no pk2le_dir.ini found.", LOKI_VIRHE);
-		return 1;
-	}
-	
-	tiedosto->read(hakemisto, 255);
-		
-	if (tiedosto->fail())
-	{
-		delete (tiedosto);
-		strcpy(viesti,"could not read pk2_dir.ini");
-		Level_Editor_Loki_Kirjaa("loading pk2le_dir.ini failed.", LOKI_VIRHE);
-		return 1;
-	}
+int Level_Editor_Lataa_PK2_Hakemisto(void) {
+    Level_Editor_Loki_Kirjaa("loading pk2le_dir.ini", LOKI_INFO);
 
-	delete (tiedosto);
-	
-	strcpy(pk2_hakemisto, hakemisto);
+    char hakemisto[_MAX_PATH];
+    ifstream *tiedosto = new ifstream("pk2le_dir.ini", ios::in);
 
-	strcpy(PK2Kartta::pk2_hakemisto, hakemisto);
-	strcat(PK2Kartta::pk2_hakemisto, "\\");
+    if (tiedosto->fail()) {
+        delete (tiedosto);
+        Level_Editor_Loki_Kirjaa("no pk2le_dir.ini found.", LOKI_VIRHE);
+        return 1;
+    }
 
-	strcpy(bg_hakemisto, PK2Kartta::pk2_hakemisto);
-	strcat(bg_hakemisto, "\\gfx\\scenery\\");
+    tiedosto->read(hakemisto, 255);
 
-	strcpy(tile_hakemisto, PK2Kartta::pk2_hakemisto);
-	strcat(tile_hakemisto, "\\gfx\\tiles\\");
+    if (tiedosto->fail()) {
+        delete (tiedosto);
+        strcpy(message, "could not read pk2_dir.ini");
+        Level_Editor_Loki_Kirjaa("loading pk2le_dir.ini failed.", LOKI_VIRHE);
+        return 1;
+    }
 
-	if (_chdir(pk2_hakemisto) == 0)
-		_getcwd(tyohakemisto, _MAX_PATH );
+    delete (tiedosto);
 
-	return 0;
+    strcpy(pk2_hakemisto, hakemisto);
+
+    strcpy(PK2Map::pk2_directory, hakemisto);
+    strcat(PK2Map::pk2_directory, "\\");
+
+    strcpy(bg_hakemisto, PK2Map::pk2_directory);
+    strcat(bg_hakemisto, "\\gfx\\scenery\\");
+
+    strcpy(tile_hakemisto, PK2Map::pk2_directory);
+    strcat(tile_hakemisto, "\\gfx\\tiles\\");
+
+    if (_chdir(pk2_hakemisto) == 0)
+        _getcwd(working_directory, _MAX_PATH);
+
+    return 0;
 }
 
-int Level_Editor_Tallenna_PK2_Hakemisto(char *hakemisto)
-{
-	char tal[_MAX_DIR] = "";
-	strcpy(tal,editor_hakemisto);
-	strcat(tal,"//pk2le_dir.ini");
-	Level_Editor_Loki_Kirjaa("saving pk2le_dir.ini.", LOKI_INFO);
+int Level_Editor_Tallenna_PK2_Hakemisto(char *hakemisto) {
+    char* tal = new char[_MAX_DIR];
+    strcpy(tal, editor_hakemisto);
+    strcat(tal, "//pk2le_dir.ini");
+    Level_Editor_Loki_Kirjaa("saving pk2le_dir.ini.", LOKI_INFO);
 
-	if (strcmp(pk2_hakemisto," ")==0)
-	{
-		ofstream *tiedosto = new ofstream(tal, ios::out);
-		tiedosto->write(hakemisto, 255);
-		
-		tiedosto->close();
+    if (strcmp(pk2_hakemisto, " ") == 0) {
+        ofstream *tiedosto = new ofstream(tal, ios::out);
+        tiedosto->write(hakemisto, 255);
 
-		if (tiedosto->fail())
-		{
-			delete (tiedosto);
-			Level_Editor_Loki_Kirjaa("failed to save pk2_dir.ini.", LOKI_VIRHE);
-			return 1;
-		}
+        tiedosto->close();
 
-		delete (tiedosto);		
-		strcpy(pk2_hakemisto, hakemisto);
+        if (tiedosto->fail()) {
+            delete (tiedosto);
+            Level_Editor_Loki_Kirjaa("failed to save pk2_dir.ini.", LOKI_VIRHE);
+            return 1;
+        }
 
-		strcpy(PK2Kartta::pk2_hakemisto, hakemisto);
-		strcat(PK2Kartta::pk2_hakemisto, "\\");
+        delete (tiedosto);
+        strcpy(pk2_hakemisto, hakemisto);
 
-		strcpy(bg_hakemisto, PK2Kartta::pk2_hakemisto);
-		strcat(bg_hakemisto, "\\gfx\\scenery\\");
+        strcpy(PK2Map::pk2_directory, hakemisto);
+        strcat(PK2Map::pk2_directory, "\\");
 
-		strcpy(tile_hakemisto, PK2Kartta::pk2_hakemisto);
-		strcat(tile_hakemisto, "\\gfx\\tiles\\");
+        strcpy(bg_hakemisto, PK2Map::pk2_directory);
+        strcat(bg_hakemisto, "\\gfx\\scenery\\");
 
-		if (_chdir(pk2_hakemisto) == 0)
-			_getcwd(tyohakemisto, _MAX_PATH );		
-		
-		//Level_Editor_Lataa_PK2_Hakemisto();
-		strcpy(viesti,"pk2 directory found");
+        strcpy(tile_hakemisto, PK2Map::pk2_directory);
+        strcat(tile_hakemisto, "\\gfx\\tiles\\");
 
-		Level_Editor_Kartta_Oletusasetukset();
-		menut[MENU_PALIKAT].piilota = false;
-		menut[MENU_SPRITET].piilota = false;
-	}
+        if (_chdir(pk2_hakemisto) == 0)
+            _getcwd(working_directory, _MAX_PATH);
 
-	return 0;
+        //Level_Editor_Lataa_PK2_Hakemisto();
+        strcpy(message, "pk2 directory found");
+
+        Level_Editor_Kartta_Oletusasetukset();
+        menut[MENU_PALIKAT].piilota = false;
+        menut[MENU_SPRITET].piilota = false;
+    }
+
+    return 0;
 }
 
-void Level_Editor_Laske_Spritet(void)
-{
-	int proto;
+void Level_Editor_Laske_Spritet(void) {
+    int proto;
 
-	spriteja = 0;
+    spriteja = 0;
 
-	for (int x=0;x<PK2KARTTA_KARTTA_KOKO;x++)
-	{
-		proto = kartta->spritet[x];
-		if (proto != 255)
-			spriteja++;
-	}
-	
-	Level_Editor_Loki_Tallenna("Spritejen maara laskettu. \n");
+    for (int x = 0; x < MAP_SIZE; x++) {
+        proto = map->sprites[x];
+        if (proto != 255)
+            spriteja++;
+    }
+
+    Level_Editor_Loki_Tallenna("Spritejen maara laskettu. \n");
 }
 
-void Level_Editor_Prototyyppi_Poista(int proto)
-{
+void Level_Editor_Prototyyppi_Poista(int proto) {
 
-	if (strcmp(protot[proto].nimi,"")!=0)
-	{
-		Level_Editor_Loki_Tallenna("Poistetaan proto ");
-		Level_Editor_Loki_Tallenna(protot[proto].nimi);
-		Level_Editor_Loki_Tallenna("\n");
-	}
-	
-	protot[proto].Uusi();
-	strcpy(kartta->protot[proto],"");
+    if (strcmp(prototypes[proto].name, "") != 0) {
+        Level_Editor_Loki_Tallenna("Poistetaan proto ");
+        Level_Editor_Loki_Tallenna(prototypes[proto].name);
+        Level_Editor_Loki_Tallenna("\n");
+    }
 
-	if (seuraava_vapaa_proto > 0)
-		seuraava_vapaa_proto--;
+    prototypes[proto].New();
+    strcpy(map->protos[proto], "");
 
-	if (kartta->pelaaja_sprite > proto)
-		kartta->pelaaja_sprite--;
+    if (next_free_proto > 0)
+        next_free_proto--;
 
-	if (proto < MAX_PROTOTYYPPEJA-1)
-	{
-		for (int i=proto;i<MAX_PROTOTYYPPEJA;i++)
-		{
-			strcpy(kartta->protot[i],kartta->protot[i+1]);
-			protot[i].Kopioi(protot[i+1]);
-		}
+    if (map->player_sprite > proto)
+        map->player_sprite--;
 
-		strcpy(kartta->protot[MAX_PROTOTYYPPEJA-1],"");
-		protot[MAX_PROTOTYYPPEJA-1].Uusi();
+    if (proto < MAX_PROTOTYPES - 1) {
+        for (int i = proto; i < MAX_PROTOTYPES; i++) {
+            strcpy(map->protos[i], map->protos[i + 1]);
+            prototypes[i].Copy(prototypes[i + 1]);
+        }
 
-		for (DWORD x=0; x<PK2KARTTA_KARTTA_KOKO; x++)
-		{
-			if (kartta->spritet[x] == proto)
-				kartta->spritet[x] = 255;
+        strcpy(map->protos[MAX_PROTOTYPES - 1], "");
+        prototypes[MAX_PROTOTYPES - 1].New();
 
-			if (kartta->spritet[x] > proto && kartta->spritet[x] != 255)
-				kartta->spritet[x]--;
-		}
-	}
+        for (unsigned long x = 0; x < MAP_SIZE; x++) {
+            if (map->sprites[x] == proto)
+                map->sprites[x] = 255;
 
-	int i = MAX_PROTOTYYPPEJA-1;
-	while (strcmp(protot[i].nimi,"")==0 && i >= 0)
-		i--;
+            if (map->sprites[x] > proto && map->sprites[x] != 255)
+                map->sprites[x]--;
+        }
+    }
 
-	if (i!=-1)
-		seuraava_vapaa_proto = i+1;
+    int i = MAX_PROTOTYPES - 1;
+    while (strcmp(prototypes[i].name, "") == 0 && i >= 0)
+        i--;
+
+    if (i != -1)
+        next_free_proto = i + 1;
 }
 
-void Level_Editor_Prototyyppi_Poista_Tyhjat()
-{
-	Level_Editor_Loki_Kirjaa("deleting empty sprites.", LOKI_INFO);
-	for (int i=0; i<MAX_PROTOTYYPPEJA; i++)
-	{
-		if (strcmp(protot[i].nimi,"")==0)
-			Level_Editor_Prototyyppi_Poista(i);
-	}
+void Level_Editor_Prototyyppi_Poista_Tyhjat() {
+    Level_Editor_Loki_Kirjaa("deleting empty sprites.", LOKI_INFO);
+    for (int i = 0; i < MAX_PROTOTYPES; i++) {
+        if (strcmp(prototypes[i].name, "") == 0)
+            Level_Editor_Prototyyppi_Poista(i);
+    }
 }
 
-void Level_Editor_Prototyyppi_Tyhjenna()
-{
-	Level_Editor_Loki_Kirjaa("deleting all sprites.", LOKI_INFO);
-	//Level_Editor_Loki_Tallenna("Tyhjennetaan kaikki prototyypit.\n");
+void Level_Editor_Prototyyppi_Tyhjenna() {
+    Level_Editor_Loki_Kirjaa("deleting all sprites.", LOKI_INFO);
+    //Level_Editor_Loki_Tallenna("Tyhjennetaan kaikki prototyypit.\n");
 
-	for (int i=0; i<MAX_PROTOTYYPPEJA; i++)
-	{
-		Level_Editor_Loki_Tallenna("Poistetaan proto ");
-		Level_Editor_Loki_Tallenna(protot[i].nimi);
-		Level_Editor_Loki_Tallenna("\n");
-		//Level_Editor_Prototyyppi_Poista(i);
-		protot[i].Uusi();
-		strcpy(kartta->protot[i],"");
-	}
+    for (int i = 0; i < MAX_PROTOTYPES; i++) {
+        Level_Editor_Loki_Tallenna("Poistetaan proto ");
+        Level_Editor_Loki_Tallenna(prototypes[i].name);
+        Level_Editor_Loki_Tallenna("\n");
+        //Level_Editor_Prototyyppi_Poista(i);
+        prototypes[i].New();
+        strcpy(map->protos[i], "");
+    }
 
-	seuraava_vapaa_proto = 0;
+    next_free_proto = 0;
 }
 
-int Level_Editor_Prototyyppi_Laske_Lkm(int proto) 
-{
-	int lkm = 0;
+int Level_Editor_Prototyyppi_Laske_Lkm(int proto) {
+    int lkm = 0;
 
-	for (DWORD x=0; x<PK2KARTTA_KARTTA_KOKO; x++) {
-		
-		if (kartta->spritet[x] == proto)
-			lkm++;
-	}
+    for (unsigned long x = 0; x < MAP_SIZE; x++) {
 
-	return lkm;
+        if (map->sprites[x] == proto)
+            lkm++;
+    }
+
+    return lkm;
 }
 
-void Level_Editor_Prototyyppi_Poista_Turhat()
-{
-	int i = 0;
+void Level_Editor_Prototyyppi_Poista_Turhat() {
+    int i = 0;
 
-	Level_Editor_Loki_Kirjaa("deleting unused sprites:", LOKI_INFO);
-	//Level_Editor_Loki_Tallenna("Tyhjennetaan kaikki prototyypit.\n");
+    Level_Editor_Loki_Kirjaa("deleting unused sprites:", LOKI_INFO);
+    //Level_Editor_Loki_Tallenna("Tyhjennetaan kaikki prototyypit.\n");
 
-	//for (int i=0; i<MAX_PROTOTYYPPEJA; i++)	{
-	while(i < MAX_PROTOTYYPPEJA) {
-		if (strcmp(protot[i].nimi,"")!=0) {
-			if (Level_Editor_Prototyyppi_Laske_Lkm(i) == 0 && i != kartta->pelaaja_sprite) {
-				Level_Editor_Loki_Tallenna("Poistetaan proto ");
-				Level_Editor_Loki_Tallenna(protot[i].nimi);
-				Level_Editor_Loki_Tallenna("\n");
-				Level_Editor_Loki_Kirjaa(protot[i].nimi, LOKI_INFO);
-				Level_Editor_Prototyyppi_Poista(i);
-			}
-			else
-				i++;
-		}
-		else
-			i++;
-	}
+    //for (int i=0; i<MAX_PROTOTYPES; i++)	{
+    while (i < MAX_PROTOTYPES) {
+        if (strcmp(prototypes[i].name, "") != 0) {
+            if (Level_Editor_Prototyyppi_Laske_Lkm(i) == 0 && i != map->player_sprite) {
+                Level_Editor_Loki_Tallenna("Poistetaan proto ");
+                Level_Editor_Loki_Tallenna(prototypes[i].name);
+                Level_Editor_Loki_Tallenna("\n");
+                Level_Editor_Loki_Kirjaa(prototypes[i].name, LOKI_INFO);
+                Level_Editor_Prototyyppi_Poista(i);
+            } else
+                i++;
+        } else
+            i++;
+    }
 
-	seuraava_vapaa_proto = 0;
+    next_free_proto = 0;
 }
 /*
-int PK_Prototyyppi_Lataa_VakioSprite(char *polku, char *tiedosto)
+int PK_Prototyyppi_Lataa_VakioSprite(char *polku, char *file)
 {
-	if (seuraava_vapaa_proto < MAX_PROTOTYYPPEJA)
+	if (next_free_proto < MAX_PROTOTYPES)
 	{
-		if (protot[seuraava_vapaa_proto].Lataa(polku, tiedosto) == 1)
+		if (prototypes[next_free_proto].Load(polku, file) == 1)
 			return 1;
 	}
 	else
 		return 1;
 
-	seuraava_vapaa_proto++;
+	next_free_proto++;
 	vakio_spriteja++;
 
 	return 0;
 }
 */
-// Ladataan kartan mukana tulevat spritet
-int Level_Editor_Prototyyppi_Lataa_Vanha(char *polku, char *tiedosto)
-{
-	char msg[200];
-	strcpy(msg,"loading sprite: ");
-	strcat(msg,tiedosto);
-	Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
-		
-	//Level_Editor_Loki_Kirjaa("loading sprite.", LOKI_INFO);
-	Level_Editor_Loki_Tallenna("Ladataan vanha prototyyppi ");
-	Level_Editor_Loki_Tallenna(tiedosto);	
-	Level_Editor_Loki_Tallenna("\n");	
-	
-	char tiedostopolku[255];
+// Ladataan kartan mukana tulevat sprites
+int Level_Editor_Prototyyppi_Lataa_Vanha(char *polku, char *tiedosto) {
+    char msg[200];
+    strcpy(msg, "loading sprite: ");
+    strcat(msg, tiedosto);
+    Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
 
-	strcpy(tiedostopolku,polku);
-	strcat(tiedostopolku,"\\");	
+    //Level_Editor_Loki_Kirjaa("loading sprite.", LOKI_INFO);
+    Level_Editor_Loki_Tallenna("Ladataan vanha prototyyppi ");
+    Level_Editor_Loki_Tallenna(tiedosto);
+    Level_Editor_Loki_Tallenna("\n");
 
-	
-	if (seuraava_vapaa_proto < MAX_PROTOTYYPPEJA)
-	{
-		if (protot[seuraava_vapaa_proto].Lataa(tiedostopolku, tiedosto) == 1)
-		{
-			strcpy(viesti,"could not load sprite ");
-			strcat(viesti,tiedosto);
-			Level_Editor_Loki_Kirjaa(viesti, LOKI_VIRHE);
+    char tiedostopolku[255];
 
-			protot[seuraava_vapaa_proto].Uusi();
-			strcpy(protot[seuraava_vapaa_proto].nimi,"loading error!");
-			strcpy(protot[seuraava_vapaa_proto].tiedosto,tiedosto);
-			protot[seuraava_vapaa_proto].korkeus = 10;
-			protot[seuraava_vapaa_proto].leveys  = 10;
-			protot[seuraava_vapaa_proto].kuva_frame_leveys = 10;
-			protot[seuraava_vapaa_proto].kuva_frame_korkeus = 10;
+    strcpy(tiedostopolku, polku);
+    strcat(tiedostopolku, "\\");
 
-			seuraava_vapaa_proto++;
 
-			return 1;
-		}
-	}
-	else
-		return 1;
+    if (next_free_proto < MAX_PROTOTYPES) {
+        if (prototypes[next_free_proto].Load(tiedostopolku, tiedosto) == 1) {
+            strcpy(message, "could not load sprite ");
+            strcat(message, tiedosto);
+            Level_Editor_Loki_Kirjaa(message, LOKI_VIRHE);
 
-	seuraava_vapaa_proto++;
+            prototypes[next_free_proto].New();
+            strcpy(prototypes[next_free_proto].name, "loading error!");
+            strcpy(prototypes[next_free_proto].file, tiedosto);
+            prototypes[next_free_proto].height = 10;
+            prototypes[next_free_proto].width = 10;
+            prototypes[next_free_proto].frame_width = 10;
+            prototypes[next_free_proto].frame_height = 10;
 
-	return 0;
+            next_free_proto++;
+
+            return 1;
+        }
+    } else
+        return 1;
+
+    next_free_proto++;
+
+    return 0;
 }
 /*
 // Tarvitaan jotta my�s yhteysspritet tulisi lis�tty� kertan tietoihin
-int Level_Editor_Prototyyppi_Lataa_Yhteyssprite(char *polku, char *tiedosto)
+int Level_Editor_Prototyyppi_Lataa_Yhteyssprite(char *polku, char *file)
 {
-	
+
 	char tiedostopolku[255];
 
 	strcpy(tiedostopolku,polku);
 	strcat(tiedostopolku,"\\");
-	
-	if (seuraava_vapaa_proto < MAX_PROTOTYYPPEJA)
+
+	if (next_free_proto < MAX_PROTOTYPES)
 	{
-		if (protot[seuraava_vapaa_proto].Lataa(tiedostopolku, tiedosto) == 1)
+		if (prototypes[next_free_proto].Load(tiedostopolku, file) == 1)
 		{
-			strcpy(viesti,"could not load ");
-			strcat(viesti,tiedostopolku);
-			strcat(viesti,tiedosto);
+			strcpy(message,"could not load ");
+			strcat(message,tiedostopolku);
+			strcat(message,file);
 			return 1;
 		}
-		
-		strcpy(kartta->protot[seuraava_vapaa_proto],tiedosto);
+
+		strcpy(map->prototypes[next_free_proto],file);
 	}
 	else
 		return 2;
 
-	seuraava_vapaa_proto++;
+	next_free_proto++;
 
 	return 0;
 }
@@ -912,30 +863,30 @@ void Level_Editor_Prototyyppi_Aseta_Muutos_Sprite(int i, char *tiedostopolku)
 {
 	int j = 0;
 	bool loytyi = false;
-	
-	if (strcmp(protot[i].muutos_sprite,"")!=0)
+
+	if (strcmp(prototypes[i].change_sprite,"")!=0)
 	{
-		while (j<MAX_PROTOTYYPPEJA && !loytyi)
+		while (j<MAX_PROTOTYPES && !loytyi)
 		{
 			if (j!=i)
 			{
-				if (strcmp(protot[i].muutos_sprite,protot[j].tiedosto)==0)
+				if (strcmp(prototypes[i].change_sprite,prototypes[j].file)==0)
 				{
-					protot[i].muutos = j;
+					prototypes[i].transformation = j;
 					loytyi = true;
 				}
 			}
 
 			j++;
 		}
-		
+
 		if (!loytyi)
 		{
 			char polku[255];
 			strcpy(polku,tiedostopolku);// sprites//
 
-			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, protot[i].muutos_sprite)==0)
-				protot[i].muutos = seuraava_vapaa_proto-1;
+			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, prototypes[i].change_sprite)==0)
+				prototypes[i].transformation = next_free_proto-1;
 		}
 	}
 }
@@ -944,30 +895,30 @@ void Level_Editor_Prototyyppi_Aseta_Bonus_Sprite(int i, char *tiedostopolku)
 {
 	int j = 0;
 	bool loytyi = false;
-	
-	if (strcmp(protot[i].bonus_sprite,"")!=0)
+
+	if (strcmp(prototypes[i].bonus_sprite,"")!=0)
 	{
-		while (j<MAX_PROTOTYYPPEJA && !loytyi)
+		while (j<MAX_PROTOTYPES && !loytyi)
 		{
 			if (j!=i)
 			{
-				if (strcmp(protot[i].bonus_sprite,protot[j].tiedosto)==0)
+				if (strcmp(prototypes[i].bonus_sprite,prototypes[j].file)==0)
 				{
-					protot[i].bonus = j;
+					prototypes[i].bonus = j;
 					loytyi = true;
 				}
 			}
 
 			j++;
 		}
-		
+
 		if (!loytyi)
 		{
 			char polku[255];
 			strcpy(polku,tiedostopolku);
 
-			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, protot[i].bonus_sprite)==0)
-				protot[i].bonus = seuraava_vapaa_proto-1;
+			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, prototypes[i].bonus_sprite)==0)
+				prototypes[i].bonus = next_free_proto-1;
 		}
 	}
 }
@@ -976,30 +927,30 @@ void Level_Editor_Prototyyppi_Aseta_Ammus1_Sprite(int i, char *tiedostopolku)
 {
 	int j = 0;
 	bool loytyi = false;
-	
-	if (strcmp(protot[i].ammus1_sprite,"")!=0)
+
+	if (strcmp(prototypes[i].projectile1_sprite,"")!=0)
 	{
-		while (j<MAX_PROTOTYYPPEJA && !loytyi)
+		while (j<MAX_PROTOTYPES && !loytyi)
 		{
 			if (j!=i)
 			{
-				if (strcmp(protot[i].ammus1_sprite,protot[j].tiedosto)==0)
+				if (strcmp(prototypes[i].projectile1_sprite,prototypes[j].file)==0)
 				{
-					protot[i].ammus1 = j;
+					prototypes[i].projectile_1 = j;
 					loytyi = true;
 				}
 			}
 
 			j++;
 		}
-		
+
 		if (!loytyi)
 		{
 			char polku[255];
 			strcpy(polku,tiedostopolku);
 
-			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, protot[i].ammus1_sprite)==0)
-				protot[i].ammus1 = seuraava_vapaa_proto-1;
+			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, prototypes[i].projectile1_sprite)==0)
+				prototypes[i].projectile_1 = next_free_proto-1;
 		}
 	}
 }
@@ -1008,814 +959,766 @@ void Level_Editor_Prototyyppi_Aseta_Ammus2_Sprite(int i, char *tiedostopolku)
 {
 	int j = 0;
 	bool loytyi = false;
-	
-	if (strcmp(protot[i].ammus2_sprite,"")!=0)
+
+	if (strcmp(prototypes[i].projectile2_sprite,"")!=0)
 	{
-		while (j<MAX_PROTOTYYPPEJA && !loytyi)
+		while (j<MAX_PROTOTYPES && !loytyi)
 		{
 			if (j!=i)
 			{
-				if (strcmp(protot[i].ammus2_sprite,protot[j].tiedosto)==0)
+				if (strcmp(prototypes[i].projectile2_sprite,prototypes[j].file)==0)
 				{
-					protot[i].ammus2 = j;
+					prototypes[i].projectile_2 = j;
 					loytyi = true;
 				}
 			}
 
 			j++;
 		}
-		
+
 		if (!loytyi)
 		{
 			char polku[255];
 			strcpy(polku,tiedostopolku);
 
-			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, protot[i].ammus2_sprite)==0)
-				protot[i].ammus2 = seuraava_vapaa_proto-1;
+			if (Level_Editor_Prototyyppi_Lataa_Yhteyssprite(polku, prototypes[i].projectile2_sprite)==0)
+				prototypes[i].projectile_2 = next_free_proto-1;
 		}
 	}
 }
 */
 /*
-int Level_Editor_Prototyyppi_Lataa_Uusi(char *polku, char *tiedosto)
+int Level_Editor_Prototyyppi_Lataa_Uusi(char *polku, char *file)
 {
-	
+
 	char tiedostopolku[255];
 
 	strcpy(tiedostopolku,polku);
 	strcat(tiedostopolku,"\\");
 
-	
-	if (seuraava_vapaa_proto < MAX_PROTOTYYPPEJA)
+
+	if (next_free_proto < MAX_PROTOTYPES)
 	{
-		if (protot[seuraava_vapaa_proto].Lataa(tiedostopolku, tiedosto) == 1)
+		if (prototypes[next_free_proto].Load(tiedostopolku, file) == 1)
 		{
-			strcpy(viesti,"could not load ");
-			strcat(viesti,tiedostopolku);
-			strcat(viesti,tiedosto);
+			strcpy(message,"could not load ");
+			strcat(message,tiedostopolku);
+			strcat(message,file);
 			return 1;
 		}
-		
-		strcpy(kartta->protot[seuraava_vapaa_proto],tiedosto);
-		strcpy(viesti,"loaded sprite ");
-		strcat(viesti,kartta->protot[seuraava_vapaa_proto]);
+
+		strcpy(map->prototypes[next_free_proto],file);
+		strcpy(message,"loaded sprite ");
+		strcat(message,map->prototypes[next_free_proto]);
 	}
 	else
 	{
-		strcpy(viesti,"could not load any more sprites");
+		strcpy(message,"could not load any more sprites");
 		return 2;
 	}
 
 	strcpy(tiedostopolku,polku);
 	strcat(tiedostopolku,"\\");
 
-	seuraava_vapaa_proto++;
-	
+	next_free_proto++;
+
 	return 0;
 }*/
 
-int Level_Editor_Prototyyppi_Lataa_Uusi(char *polku, char *tiedosto)
-{
-	char msg[200];
-	strcpy(msg,"loading new sprite: ");
-	//strcat(msg,polku);
-	//strcat(msg,"\\");
-	strcat(msg,tiedosto);
-	Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
-	
-	//Level_Editor_Loki_Kirjaa("loading new sprite.", LOKI_INFO);
-	Level_Editor_Loki_Tallenna("Ladataan uusi prototyyppi ");
-	Level_Editor_Loki_Tallenna(tiedosto);	
-	Level_Editor_Loki_Tallenna("\n");
+int Level_Editor_Prototyyppi_Lataa_Uusi(char *polku, char *tiedosto) {
+    char msg[200];
+    strcpy(msg, "loading new sprite: ");
+    //strcat(msg,polku);
+    //strcat(msg,"\\");
+    strcat(msg, tiedosto);
+    Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
 
-	char tiedostopolku[_MAX_PATH];
+    //Level_Editor_Loki_Kirjaa("loading new sprite.", LOKI_INFO);
+    Level_Editor_Loki_Tallenna("Ladataan uusi prototyyppi ");
+    Level_Editor_Loki_Tallenna(tiedosto);
+    Level_Editor_Loki_Tallenna("\n");
 
-	strcpy(tiedostopolku,polku);
-	strcat(tiedostopolku,"\\");
+    char tiedostopolku[_MAX_PATH];
 
-	
-	if (seuraava_vapaa_proto < MAX_PROTOTYYPPEJA)
-	{
-		if (protot[seuraava_vapaa_proto].Lataa(tiedostopolku, tiedosto) == 1)
-		{
-			Level_Editor_Loki_Kirjaa("loading sprite failed.", LOKI_VIRHE);
-			//strcpy(viesti,"could not load ");
-			//strcat(viesti,tiedostopolku);
-			//strcat(viesti,tiedosto);
-			return 1;
-		}
-		
-		strcpy(kartta->protot[seuraava_vapaa_proto],tiedosto);
-		strcpy(viesti,"loaded sprite ");
-		strcat(viesti,kartta->protot[seuraava_vapaa_proto]);
-	}
-	else
-	{
-		Level_Editor_Loki_Kirjaa("too many sprites to load.", LOKI_VIRHE);
-		strcpy(viesti,"could not load any more sprites");
-		return 2;
-	}
+    strcpy(tiedostopolku, polku);
+    strcat(tiedostopolku, "\\");
 
-	strcpy(tiedostopolku,polku);
-	strcat(tiedostopolku,"\\");
 
-	seuraava_vapaa_proto++;
-	
-	return 0;
+    if (next_free_proto < MAX_PROTOTYPES) {
+        if (prototypes[next_free_proto].Load(tiedostopolku, tiedosto) == 1) {
+            Level_Editor_Loki_Kirjaa("loading sprite failed.", LOKI_VIRHE);
+            //strcpy(message,"could not load ");
+            //strcat(message,tiedostopolku);
+            //strcat(message,file);
+            return 1;
+        }
+
+        strcpy(map->protos[next_free_proto], tiedosto);
+        strcpy(message, "loaded sprite ");
+        strcat(message, map->protos[next_free_proto]);
+    } else {
+        Level_Editor_Loki_Kirjaa("too many sprites to load.", LOKI_VIRHE);
+        strcpy(message, "could not load any more sprites");
+        return 2;
+    }
+
+    strcpy(tiedostopolku, polku);
+    strcat(tiedostopolku, "\\");
+
+    next_free_proto++;
+
+    return 0;
 }
 
-int Level_Editor_Prototyyppi_Lataa_Kaikki()
-{
-	char tiedosto[_MAX_PATH];
-	int spriteja = 0;
-	int viimeinen_proto = 0;
+int Level_Editor_Prototyyppi_Lataa_Kaikki() {
+    char tiedosto[_MAX_PATH];
+    int spriteja = 0;
+    int viimeinen_proto = 0;
 
-	Level_Editor_Loki_Kirjaa("loading all sprites.", LOKI_INFO);
-	//strcpy(viesti,"map and all sprites loaded");
+    Level_Editor_Loki_Kirjaa("loading all sprites.", LOKI_INFO);
+    //strcpy(message,"map and all sprites loaded");
 
-	for (int i=0;i < MAX_PROTOTYYPPEJA;i++) {
+    for (int i = 0; i < MAX_PROTOTYPES; i++) {
 
-		if (strcmp(kartta->protot[i],"") != 0) {
-			viimeinen_proto = i;
-			strcpy(tiedosto,pk2_hakemisto);
-			strcat(tiedosto,"\\sprites\\");
-			//strcat(tiedosto,kartta->protot[i]);
-			spriteja++;
+        if (strcmp(map->protos[i], "") != 0) {
+            viimeinen_proto = i;
+            strcpy(tiedosto, pk2_hakemisto);
+            strcat(tiedosto, "\\sprites\\");
+            //strcat(file,map->prototypes[i]);
+            spriteja++;
 
-			if (Level_Editor_Prototyyppi_Lataa_Vanha(tiedosto,kartta->protot[i])==1) {
-				Level_Editor_Loki_Tallenna("lataus ep�onnistui.\n");
-				
-				//seuraava_vapaa_proto++;
+            if (Level_Editor_Prototyyppi_Lataa_Vanha(tiedosto, map->protos[i]) == 1) {
+                Level_Editor_Loki_Tallenna("charge_time ep�onnistui.\n");
 
-				//Level_Editor_Prototyyppi_Poista(i);
-				//strcpy(kartta->protot[i],"");
-				//seuraava_vapaa_proto++;
-			}
-			else
-				Level_Editor_Loki_Tallenna("lataus onnistui.\n");
-		}
-		else
-			seuraava_vapaa_proto++;
+                //next_free_proto++;
 
-	}
+                //Level_Editor_Prototyyppi_Poista(i);
+                //strcpy(map->prototypes[i],"");
+                //next_free_proto++;
+            } else
+                Level_Editor_Loki_Tallenna("charge_time onnistui.\n");
+        } else
+            next_free_proto++;
 
-	seuraava_vapaa_proto = viimeinen_proto+1;
+    }
 
-	strcpy(tiedosto,"sprites\\");
+    next_free_proto = viimeinen_proto + 1;
+
+    strcpy(tiedosto, "sprites\\");
 /*
-	for (i=0;i<MAX_PROTOTYYPPEJA;i++)
+	for (i=0;i<MAX_PROTOTYPES;i++)
 	{
-		Level_Editor_Prototyyppi_Aseta_Muutos_Sprite(i, tiedosto);
-		Level_Editor_Prototyyppi_Aseta_Bonus_Sprite( i, tiedosto);
-		Level_Editor_Prototyyppi_Aseta_Ammus1_Sprite(i, tiedosto);
-		Level_Editor_Prototyyppi_Aseta_Ammus2_Sprite(i, tiedosto);
+		Level_Editor_Prototyyppi_Aseta_Muutos_Sprite(i, file);
+		Level_Editor_Prototyyppi_Aseta_Bonus_Sprite( i, file);
+		Level_Editor_Prototyyppi_Aseta_Ammus1_Sprite(i, file);
+		Level_Editor_Prototyyppi_Aseta_Ammus2_Sprite(i, file);
 	}*/
 
-	if (spriteja == 0)
-		strcpy(viesti,"map loaded without sprites");
+    if (spriteja == 0)
+        strcpy(message, "map loaded without sprites");
 
-	Level_Editor_Prototyyppi_Poista_Tyhjat();
+    Level_Editor_Prototyyppi_Poista_Tyhjat();
 
-	Level_Editor_Loki_Tallenna("Tyhjat prototyypit on poistettu");
+    Level_Editor_Loki_Tallenna("Tyhjat prototyypit on poistettu");
 
-	return 0;
+    return 0;
 }
 
-void Level_Editor_Kartta_Varmista(void)
-{
-	//Level_Editor_Loki_Kirjaa("making backup of map (undo)", LOKI_INFO);
-	undo->Kopioi(*kartta);
-	varmistettu = true;
+void Level_Editor_Kartta_Varmista(void) {
+    //Level_Editor_Loki_Kirjaa("making backup of map (undo)", LOKI_INFO);
+    undo->Copy(*map);
+    varmistettu = true;
 }
 
-void Level_Editor_Kartta_Undo(void)
-{
-	if (varmistettu)
-	{
-		Level_Editor_Loki_Kirjaa("used undo", LOKI_INFO);
-		strcpy(viesti,"used undo");
-		kartta->Kopioi(*undo);
-	}
-	else
-		strcpy(viesti,"nothing to undo");
+void Level_Editor_Kartta_Undo(void) {
+    if (varmistettu) {
+        Level_Editor_Loki_Kirjaa("used undo", LOKI_INFO);
+        strcpy(message, "used undo");
+        map->Copy(*undo);
+    } else
+        strcpy(message, "nothing to undo");
 }
 
-int Level_Editor_Kartta_Paivita(void)
-{
-	UCHAR *buffer = NULL;
-	DWORD tod_leveys;
-	UCHAR vari_taka, vari_etu, vari, vari_sprite;
+int Level_Editor_Kartta_Paivita(void) {
+    unsigned char *buffer = NULL;
+    unsigned long tod_leveys;
+    unsigned char vari_taka, vari_etu, vari, vari_sprite;
 
-	PisteDraw_Piirto_Aloita(kuva_kartta, *&buffer, (DWORD &)tod_leveys);
+    PisteDraw_Draw_Begin(kuva_kartta, *&buffer, (unsigned long &) tod_leveys);
 
-	for (int x=0; x<PK2KARTTA_KARTTA_LEVEYS; x++)
-	{
-		for (int y=0; y<PK2KARTTA_KARTTA_KORKEUS; y++)
-		{
-			vari_taka = kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS];
-			vari_etu  = kartta->seinat [x+y*PK2KARTTA_KARTTA_LEVEYS];
-			vari_sprite = kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS];
-			
-			vari = 0;
+    for (int x = 0; x < MAP_WIDTH; x++) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            vari_taka = map->backgrounds[x + y * MAP_WIDTH];
+            vari_etu = map->walls[x + y * MAP_WIDTH];
+            vari_sprite = map->sprites[x + y * MAP_WIDTH];
+
+            vari = 0;
 /*
 			if (vari_taka != 255)
-				vari = 12+128;//96;
+				color = 12+128;//96;
 
 			if (vari_taka >= 130 && vari_taka <= 139)
-				vari = 12+32;			
+				color = 12+32;
 
 			if (vari_etu != 255)
-				vari = 24+128;//96;
+				color = 24+128;//96;
 
 			if (vari_etu != 255)
-				vari = 24+96;			
+				color = 24+96;
 
 			if (vari_etu >= 130 && vari_etu <= 139)
-				vari = 20+32;*/
-			
-			if (vari_taka < 150)
-				vari = karttavarit[vari_taka];
+				color = 20+32;*/
 
-			if (vari_etu < 150 && vari_etu != 255 && vari_etu != PALIKKA_ESTO_ALAS)
-				vari = karttavarit[vari_etu];
-			
-			if (vari_sprite != 255)
-				vari = 231;
-			
-			buffer[x+y*tod_leveys] = vari;
-		}
-	}
+            if (vari_taka < 150)
+                vari = karttavarit[vari_taka];
 
-	PisteDraw_Piirto_Lopeta(kuva_kartta);
+            if (vari_etu < 150 && vari_etu != 255 && vari_etu != BLOCK_RESTRICTION_DOWN)
+                vari = karttavarit[vari_etu];
 
-	Level_Editor_Laske_Spritet();
+            if (vari_sprite != 255)
+                vari = 231;
 
-	return 0;
+            buffer[x + y * tod_leveys] = vari;
+        }
+    }
+
+    PisteDraw_Draw_End(kuva_kartta);
+
+    Level_Editor_Laske_Spritet();
+
+    return 0;
 }
 
-int Level_Editor_Kartta_Oletusasetukset()
-{
-	char tiedosto[_MAX_PATH];
+int Level_Editor_Kartta_Oletusasetukset() {
+    char tiedosto[_MAX_PATH];
 
-	Level_Editor_Loki_Kirjaa("loading map default settings.", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("loading map default settings.", LOKI_INFO);
 
-	if (strcmp(tile_hakemisto," ")!=0){
-		//memset(tiedosto,'\0',sizeof(tiedosto));
-		//strcpy(tiedosto,tile_hakemisto);
-		//strcat(tiedosto,"tiles01.bmp");
-		strcpy(tiedosto,"tiles01.bmp");
-		Level_Editor_Aseta_Palikat(tiedosto);
-		
-		//PisteDraw_Lataa_Kuva(kartta->palikat_buffer,tiedosto,false);
-	}
+    if (strcmp(tile_hakemisto, " ") != 0) {
+        //memset(file,'\0',sizeof(file));
+        //strcpy(file,tile_hakemisto);
+        //strcat(file,"tiles01.bmp");
+        strcpy(tiedosto, "tiles01.bmp");
+        Level_Editor_Aseta_Palikat(tiedosto);
 
-	if (strcmp(pk2_hakemisto," ")!=0){
-		//memset(tiedosto,'\0',sizeof(tiedosto));
-		strcpy(tiedosto,pk2_hakemisto);
-		strcat(tiedosto,"\\sprites");
-		Level_Editor_Prototyyppi_Lataa_Uusi(tiedosto, "rooster.spr");
-		
-	}
+        //PisteDraw_Image_Load(map->block_buffer,file,false);
+    }
 
-	strcpy(kartta->musiikki,"song01.xm");
-	strcpy(karttatiedosto,"untitled.map");
+    if (strcmp(pk2_hakemisto, " ") != 0) {
+        //memset(file,'\0',sizeof(file));
+        strcpy(tiedosto, pk2_hakemisto);
+        strcat(tiedosto, "\\sprites");
+        Level_Editor_Prototyyppi_Lataa_Uusi(tiedosto, "rooster.spr");
 
-	return 0;
+    }
+
+    strcpy(map->music, "song01.xm");
+    strcpy(karttatiedosto, "untitled.map");
+
+    return 0;
 }
 
-int Level_Editor_Kartta_Alusta(void)
-{
-	Level_Editor_Loki_Kirjaa("clearing map.", LOKI_INFO);
-	
-	kartta->Tyhjenna();
-	
-	PisteDraw_Buffer_Tayta(kartta->taustakuva_buffer,37);
+int Level_Editor_Kartta_Alusta(void) {
+    Level_Editor_Loki_Kirjaa("clearing map.", LOKI_INFO);
 
-	Level_Editor_Prototyyppi_Tyhjenna();
-	
-	Level_Editor_Kartta_Oletusasetukset();
+    map->Clear();
 
-	Level_Editor_Kartta_Paivita();
-	
-	Level_Editor_Loki_Kirjaa("map cleared.", LOKI_INFO);
+    PisteDraw_Buffer_Clear(map->background_image_buffer, 37);
 
-	return 0;
+    Level_Editor_Prototyyppi_Tyhjenna();
+
+    Level_Editor_Kartta_Oletusasetukset();
+
+    Level_Editor_Kartta_Paivita();
+
+    Level_Editor_Loki_Kirjaa("map cleared.", LOKI_INFO);
+
+    return 0;
 }
 
-int Level_Editor_Loki_Tallenna(char *viesti)
-{
-	if (kirjoita_loki)
-	{
-		int virhe = 0;
+int Level_Editor_Loki_Tallenna(char *viesti) {
+    if (kirjoita_loki) {
+        int virhe = 0;
 
-		char *filename = "loki.txt";
-			
-		FILE *tiedosto;
+        char *filename = "loki.txt";
 
-		if ((tiedosto = fopen(filename, "a")) == NULL)
-		{
-			return(1);
-		}
+        FILE *tiedosto;
 
-		char mjono[255];
+        if ((tiedosto = fopen(filename, "movement_x")) == NULL) {
+            return (1);
+        }
 
-		//memset(mjono,' ',sizeof(mjono));
-		//mjono[60] = '\n';
+        char mjono[255];
 
-		strcpy(mjono,viesti);
+        //memset(mjono,' ',sizeof(mjono));
+        //mjono[60] = '\n';
 
-		fwrite(mjono,		sizeof(CHAR),	strlen(mjono),  tiedosto);
+        strcpy(mjono, viesti);
 
-		fclose(tiedosto);
-	}
+        fwrite(mjono, sizeof(char), strlen(mjono), tiedosto);
 
-	return(0);
+        fclose(tiedosto);
+    }
+
+    return (0);
 }
 
-int Level_Editor_Kartta_Tallenna(void)
-{
-	Level_Editor_Loki_Kirjaa("trying to save map...", LOKI_INFO);
+int Level_Editor_Kartta_Tallenna(void) {
+    Level_Editor_Loki_Kirjaa("trying to save map...", LOKI_INFO);
 
-	int virhe;
+    int virhe;
 
-	char filename[_MAX_PATH]; 
-	
-	//strcpy(filename,kartta->nimi);
-	strcpy(filename, karttatiedosto);
+    char filename[_MAX_PATH];
 
-	if (strstr(filename,".map") == NULL)
-		strcat(filename,".map");
+    //strcpy(filename,map->name);
+    strcpy(filename, karttatiedosto);
 
-	if ((virhe = kartta->Tallenna(filename)) != 0)
-	{
-		if (virhe == 1)
-		{
-			Level_Editor_Loki_Kirjaa("could not save map!", LOKI_VIRHE);
-			//strcpy(viesti,"could not save map!");
-			return(1);
-		}
-		if (virhe == 2)
-		{
-			strcpy(viesti,"error saving map!");
-			Level_Editor_Loki_Kirjaa("error occured while saving map!", LOKI_VIRHE);
-			return(1);
-		}
-	}
-	
-	Level_Editor_Loki_Kirjaa("map saved succesfully!", LOKI_INFO);
-	strcpy(viesti,"map saved.");
-	
-	return(0);
+    if (strstr(filename, ".map") == NULL)
+        strcat(filename, ".map");
+
+    if ((virhe = map->Save(filename)) != 0) {
+        if (virhe == 1) {
+            Level_Editor_Loki_Kirjaa("could not save map!", LOKI_VIRHE);
+            //strcpy(message,"could not save map!");
+            return (1);
+        }
+        if (virhe == 2) {
+            strcpy(message, "error saving map!");
+            Level_Editor_Loki_Kirjaa("error occured while saving map!", LOKI_VIRHE);
+            return (1);
+        }
+    }
+
+    Level_Editor_Loki_Kirjaa("map saved succesfully!", LOKI_INFO);
+    strcpy(message, "map saved.");
+
+    return (0);
 }
 
-int Level_Editor_Kartta_Lataa(char *filename)
-{
-	int virhe;
+int Level_Editor_Kartta_Lataa(char *filename) {
+    int virhe;
 
-	char msg[200];
-	strcpy(msg,"loading map: ");
-	strcat(msg,filename);
-	Level_Editor_Loki_Kirjaa("----------------------", LOKI_INFO);
-	Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
-	Level_Editor_Loki_Kirjaa("----------------------", LOKI_INFO);
+    char msg[200];
+    strcpy(msg, "loading map: ");
+    strcat(msg, filename);
+    Level_Editor_Loki_Kirjaa("----------------------", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa(msg, LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("----------------------", LOKI_INFO);
 
-	//Level_Editor_Loki_Kirjaa("trying to load map.", LOKI_INFO);
+    //Level_Editor_Loki_Kirjaa("trying to load map.", LOKI_INFO);
 
-	DWORD loki_muistia = PisteDraw_Videomuistia();
-	char muistia[255];
-	itoa(loki_muistia,muistia,10);
-	
-	Level_Editor_Loki_Tallenna("Videomuistia: ");
-	Level_Editor_Loki_Tallenna(muistia);
-	Level_Editor_Loki_Tallenna("\n");
+    unsigned long loki_muistia = PisteDraw_GetMemoryUsed();
+    char muistia[255];
+    itoa(loki_muistia, muistia, 10);
 
-	Level_Editor_Loki_Tallenna("Aloitetaan kartan ");
-	Level_Editor_Loki_Tallenna(filename);
-	Level_Editor_Loki_Tallenna(" lataus.\n");
+    Level_Editor_Loki_Tallenna("Videomuistia: ");
+    Level_Editor_Loki_Tallenna(muistia);
+    Level_Editor_Loki_Tallenna("\n");
 
-	Level_Editor_Kartta_Varmista();
+    Level_Editor_Loki_Tallenna("Aloitetaan kartan ");
+    Level_Editor_Loki_Tallenna(filename);
+    Level_Editor_Loki_Tallenna(" charge_time.\n");
 
-	//Level_Editor_Loki_Tallenna("Kartta varmistettu (undo).\n");
+    Level_Editor_Kartta_Varmista();
 
-	Level_Editor_Prototyyppi_Tyhjenna();
+    //Level_Editor_Loki_Tallenna("Kartta varmistettu (undo).\n");
 
-	//Level_Editor_Loki_Tallenna("Prototyypit tyhjennetty.\n");
+    Level_Editor_Prototyyppi_Tyhjenna();
 
-	strcpy(karttatiedosto, filename);
+    //Level_Editor_Loki_Tallenna("Prototyypit tyhjennetty.\n");
 
-	if ((virhe = kartta->Lataa("",filename)) != 0)
-	{
-		if (virhe == 1)
-		{
-			Level_Editor_Loki_Kirjaa("could not load map!", LOKI_VIRHE);
-			//Level_Editor_Loki_Tallenna("Kartan lataus ep�onnistui.\n");
-			strcpy(karttatiedosto, " ");
-			return(1);
-		}
-		
-		if (virhe == 2)
-		{
-			Level_Editor_Loki_Kirjaa("this editor version cant read this map!", LOKI_VIRHE);
-			return(1);
-		}
-	}
+    strcpy(karttatiedosto, filename);
 
-	Level_Editor_Loki_Kirjaa("map loaded", LOKI_INFO);
-	//strcpy(viesti,"map loaded: ");
+    if ((virhe = map->Load("", filename)) != 0) {
+        if (virhe == 1) {
+            Level_Editor_Loki_Kirjaa("could not load map!", LOKI_VIRHE);
+            //Level_Editor_Loki_Tallenna("Kartan charge_time ep�onnistui.\n");
+            strcpy(karttatiedosto, " ");
+            return (1);
+        }
 
-	strcpy(karttatiedosto, filename);
+        if (virhe == 2) {
+            Level_Editor_Loki_Kirjaa("this editor version cant read this map!", LOKI_VIRHE);
+            return (1);
+        }
+    }
 
-	Level_Editor_Kartta_Paivita();
+    Level_Editor_Loki_Kirjaa("map loaded", LOKI_INFO);
+    //strcpy(message,"map loaded: ");
 
-	//Level_Editor_Loki_Tallenna("Kartta p�ivitetty.\n");
-	
-	
-	kartta_ladattu = true;
+    strcpy(karttatiedosto, filename);
 
-	//Level_Editor_Loki_Tallenna("Kartta ladattu.\n");
+    Level_Editor_Kartta_Paivita();
 
-	if (strcmp(kartta->versio,"1.2")==0 || strcmp(kartta->versio,"1.3")==0)
-		Level_Editor_Prototyyppi_Lataa_Kaikki();
-	else
-		Level_Editor_Prototyyppi_Tyhjenna();
+    //Level_Editor_Loki_Tallenna("Kartta p�ivitetty.\n");
+
+
+    kartta_ladattu = true;
+
+    //Level_Editor_Loki_Tallenna("Kartta loaded.\n");
+
+    if (strcmp(map->version, "1.2") == 0 || strcmp(map->version, "1.3") == 0)
+        Level_Editor_Prototyyppi_Lataa_Kaikki();
+    else
+        Level_Editor_Prototyyppi_Tyhjenna();
 /*
 	char polku[_MAX_DIR];
-	strcpy(polku,pk2_hakemisto);
+	strcpy(polku,pk2_directory);
 	strcat(polku,"\\");
 
-	if (kartta->Lataa_PalikkaPaletti("",kartta->palikka_bmp)!=0)
+	if (map->Lataa_PalikkaPaletti("",map->block_bmp)!=0)
 	{
-		if (kartta->Lataa_PalikkaPaletti(polku,kartta->palikka_bmp)!=0)
+		if (map->Load_Block_Palette(polku,map->block_bmp)!=0)
 		{
-			strcpy(viesti,"could not find tiles ");
-			strcat(viesti,kartta->palikka_bmp);
+			strcpy(message,"could not find tiles ");
+			strcat(message,map->block_bmp);
 		}
 	}
 
-	if (kartta->Lataa_Taustakuva("",kartta->taustakuva)!=0)
+	if (map->Lataa_Taustakuva("",map->background_image)!=0)
 	{
-		if (kartta->Lataa_Taustakuva(polku,kartta->taustakuva)!=0)
+		if (map->Load_Background_Image(polku,map->background_image)!=0)
 		{
-			strcpy(viesti,"could not find background ");
-			strcat(viesti,kartta->taustakuva);
+			strcpy(message,"could not find background ");
+			strcat(message,map->background_image);
 		}
 	}
 */
-	Level_Editor_Loki_Tallenna("Sprite-prototyypit on ladattu.\n");
+    Level_Editor_Loki_Tallenna("Sprite-prototyypit on loaded.\n");
 
-	menu_spritet_eka = 0;
+    menu_spritet_eka = 0;
 
-	Level_Editor_Laske_Spritet();
+    Level_Editor_Laske_Spritet();
 
-	Level_Editor_Laske_TileVarit();
+    Level_Editor_Laske_TileVarit();
 
-	Level_Editor_Kartta_Paivita();
+    Level_Editor_Kartta_Paivita();
 
-	Level_Editor_Loki_Kirjaa("loading map completed.", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("loading map completed.", LOKI_INFO);
 
-	return(0);
+    return (0);
 }
 
-void Level_Editor_Laske_TileVarit()
-{
-	
-	UCHAR *buffer = NULL;
-	DWORD leveys;
-	int i;
-	DWORD x,y;
-	DWORD paavari;
-	DWORD keskiarvoVari;
-	int lapinakyvia;
-	UCHAR vari;
-	DWORD lkm;
-	DWORD paavarit[9];
-	
-	Level_Editor_Loki_Kirjaa("calculating tile colors.", LOKI_INFO);
+void Level_Editor_Laske_TileVarit() {
 
-	PisteDraw_Piirto_Aloita(kartta->palikat_buffer,*&buffer,(DWORD &)leveys);
+    unsigned char *buffer = NULL;
+    unsigned long leveys;
+    int i;
+    unsigned long x, y;
+    unsigned long paavari;
+    unsigned long keskiarvoVari;
+    int lapinakyvia;
+    unsigned char vari;
+    unsigned long lkm;
+    unsigned long paavarit[9];
 
-	for (int tile = 0; tile < 150; tile++){
-		
-		paavari = 0;
-		keskiarvoVari = 0;
-		lapinakyvia = 0;
-		lkm = 0;
-		
-		for (i=0;i<8;i++)
-			paavarit[i] = 0;
+    Level_Editor_Loki_Kirjaa("calculating tile colors.", LOKI_INFO);
 
-		for (x=0;x<32;x++){
-			for (y=0;y<32;y++){
-				
-				vari = buffer[x + ((tile%10)*32) + (y+(tile/10)*32) * leveys];
+    PisteDraw_Draw_Begin(map->block_buffer, *&buffer, (unsigned long &) leveys);
 
-				
-				if (vari < 224) {
-					
-					paavari = (vari/32);
-					paavarit[paavari] = paavarit[paavari] + 1;
-					keskiarvoVari = keskiarvoVari+(vari%32);
-					lkm++;
-				}
-			}
-		}
+    for (int tile = 0; tile < 150; tile++) {
 
-		paavari = 0;
-		DWORD paavarilkm = 0;
+        paavari = 0;
+        keskiarvoVari = 0;
+        lapinakyvia = 0;
+        lkm = 0;
 
-		for (i=0;i<8;i++)
-			if (paavarit[i] > paavarilkm){
-				paavari = i;
-				paavarilkm = paavarit[i];
-			}
+        for (i = 0; i < 8; i++)
+            paavarit[i] = 0;
 
-		if (lkm > 0)
-			keskiarvoVari     = keskiarvoVari / lkm;
-		else
-			keskiarvoVari	  = 0;
+        for (x = 0; x < 32; x++) {
+            for (y = 0; y < 32; y++) {
 
-		if (tile < 90)
-			keskiarvoVari += 3;
-
-		if (tile == PALIKKA_KYTKIN1 || tile == PALIKKA_KYTKIN2 || tile == PALIKKA_KYTKIN3 ||
-			tile == PALIKKA_ALOITUS || tile == PALIKKA_LOPETUS)
-			keskiarvoVari += 12;
-
-		if (keskiarvoVari > 31)
-			keskiarvoVari = 31;
+                vari = buffer[x + ((tile % 10) * 32) + (y + (tile / 10) * 32) * leveys];
 
 
-		karttavarit[tile] = (UCHAR)(keskiarvoVari + paavari*32);
-		//karttavarit[tile] = UCHAR(paavari*32);*/
-	}
+                if (vari < 224) {
+
+                    paavari = (vari / 32);
+                    paavarit[paavari] = paavarit[paavari] + 1;
+                    keskiarvoVari = keskiarvoVari + (vari % 32);
+                    lkm++;
+                }
+            }
+        }
+
+        paavari = 0;
+        unsigned long paavarilkm = 0;
+
+        for (i = 0; i < 8; i++)
+            if (paavarit[i] > paavarilkm) {
+                paavari = i;
+                paavarilkm = paavarit[i];
+            }
+
+        if (lkm > 0)
+            keskiarvoVari = keskiarvoVari / lkm;
+        else
+            keskiarvoVari = 0;
+
+        if (tile < 90)
+            keskiarvoVari += 3;
+
+        if (tile == BLOCK_SWITCH1 || tile == BLOCK_SWITCH2 || tile == BLOCK_SWITCH3 || tile == BLOCK_START ||
+            tile == BLOCK_FINISH)
+            keskiarvoVari += 12;
+
+        if (keskiarvoVari > 31)
+            keskiarvoVari = 31;
 
 
-	PisteDraw_Piirto_Lopeta(kartta->palikat_buffer);
+        karttavarit[tile] = (unsigned char) (keskiarvoVari + paavari * 32);
+        //karttavarit[tile] = unsigned char(paavari*32);*/
+    }
 
-}
 
+    PisteDraw_Draw_End(map->block_buffer);
 
-int Level_Editor_Menu_Alusta(int index, char *otsikko, int leveys, int korkeus, int x, int y, int pika)
-{
-	menut[index].korkeus = korkeus;
-	menut[index].leveys = leveys;
-	menut[index].x = x;
-	menut[index].y = y;
-	strcpy(menut[index].otsikko,otsikko);
-	menut[index].piilota = true;
-	menut[index].pika = pika;
-	return 0;
 }
 
 
-int Level_Editor_Menut_Alusta(void)
-{
-	Level_Editor_Menu_Alusta(MENU_HELP,		"help    (f1)", 256, 240, 192, 120, DIK_F1);
-	Level_Editor_Menu_Alusta(MENU_KARTTA,	"map     (f2)", PK2KARTTA_KARTTA_LEVEYS, PK2KARTTA_KARTTA_KORKEUS, 492, 130, DIK_F2);
-	Level_Editor_Menu_Alusta(MENU_PALIKAT,	"tiles   (f3)", 320, 480, 592, 145, DIK_F3);
-	Level_Editor_Menu_Alusta(MENU_SPRITET,	"sprites (f4)", 320, 480, 262, 45,  DIK_F4);
-	Level_Editor_Menu_Alusta(MENU_TIEDOSTOT,"files   (f5)", 320, 300, 192, 40,  DIK_F5);
-	Level_Editor_Menu_Alusta(MENU_SAVE,		"save    (f6)", 320, 50,  192, 355, DIK_F6);
-	Level_Editor_Menu_Alusta(MENU_INFO,		"map information (f7)", 320, 240,  150, 40, DIK_F7);
-	Level_Editor_Menu_Alusta(MENU_EXIT,		"exit editor?", 256, 35,  RUUDUN_LEVEYS/2-128, RUUDUN_KORKEUS/2-15, DIK_ESCAPE);
-	Level_Editor_Menu_Alusta(MENU_TOOLS,	"tools   (f8)", 320, 200, 422, 210, DIK_F8);
-	Level_Editor_Menu_Alusta(MENU_LOKI,		"log     (f9)", 320, 500, 222, 110, DIK_F9);
-
-	menut[MENU_HELP].piilota = false;
-	
-	return 0;
+int Level_Editor_Menu_Alusta(int index, char *otsikko, int leveys, int korkeus, int x, int y, int pika) {
+    menut[index].korkeus = korkeus;
+    menut[index].leveys = leveys;
+    menut[index].x = x;
+    menut[index].y = y;
+    strcpy(menut[index].otsikko, otsikko);
+    menut[index].piilota = true;
+    menut[index].pika = pika;
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Alusta(void)
-{
-	for (int i=0;i<MAX_DIR_TIEDOSTOJA;i++)
-	{
-		strcpy(tiedostot[i].nimi,"\0");
-		tiedostot[i].tyyppi = 0;
-	}
 
-	return 0;
+int Level_Editor_Menut_Alusta(void) {
+    Level_Editor_Menu_Alusta(MENU_HELP, "help    (f1)", 256, 240, 192, 120, DIK_F1);
+    Level_Editor_Menu_Alusta(MENU_KARTTA, "map     (f2)", MAP_WIDTH, MAP_HEIGHT, 492, 130,
+                             DIK_F2);
+    Level_Editor_Menu_Alusta(MENU_PALIKAT, "tiles   (f3)", 320, 480, 592, 145, DIK_F3);
+    Level_Editor_Menu_Alusta(MENU_SPRITET, "sprites (f4)", 320, 480, 262, 45, DIK_F4);
+    Level_Editor_Menu_Alusta(MENU_TIEDOSTOT, "files   (f5)", 320, 300, 192, 40, DIK_F5);
+    Level_Editor_Menu_Alusta(MENU_SAVE, "save    (f6)", 320, 50, 192, 355, DIK_F6);
+    Level_Editor_Menu_Alusta(MENU_INFO, "map information (f7)", 320, 240, 150, 40, DIK_F7);
+    Level_Editor_Menu_Alusta(MENU_EXIT, "exit editor?", 256, 35, SCREEN_WIDTH / 2 - 128, SCREEN_HEIGHT / 2 - 15,
+                             DIK_ESCAPE);
+    Level_Editor_Menu_Alusta(MENU_TOOLS, "tools   (f8)", 320, 200, 422, 210, DIK_F8);
+    Level_Editor_Menu_Alusta(MENU_LOKI, "log     (f9)", 320, 500, 222, 110, DIK_F9);
+
+    menut[MENU_HELP].piilota = false;
+
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Vertaa(char *a, char *b)
-{
-	int apituus = strlen(a);
-	int bpituus = strlen(b);
-	int looppi = apituus;
+int Level_Editor_Tiedostot_Alusta(void) {
+    for (int i = 0; i < MAX_DIR_TIEDOSTOJA; i++) {
+        strcpy(tiedostot[i].nimi, "\0");
+        tiedostot[i].tyyppi = 0;
+    }
 
-	if (bpituus < apituus)
-		looppi = bpituus;
-
-	strlwr(a);
-	strlwr(b);
-
-	for (int i=0;i<looppi;i++)
-	{
-		if (a[i] < b[i])
-			return 2;
-		
-		if (a[i] > b[i])
-			return 1;		
-	}
-
-	if (apituus > bpituus)
-		return 1;
-
-	if (apituus < bpituus)
-		return 2;
-
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Aakkosta(void)
-{
-	DWORD i,t;
-	TIEDOSTO temp;
-	bool tehty;
+int Level_Editor_Tiedostot_Vertaa(char *a, char *b) {
+    int apituus = strlen(a);
+    int bpituus = strlen(b);
+    int looppi = apituus;
 
-	if (tiedostoja > 1)
-	{
-		for (i=tiedostoja-1;i>=0;i--)
-		{
-			tehty = true;
+    if (bpituus < apituus)
+        looppi = bpituus;
 
-			for (t=0;t<i;t++)
-			{
-				if (Level_Editor_Tiedostot_Vertaa(tiedostot[t].nimi,tiedostot[t+1].nimi) == 1)
-				{
-					temp = tiedostot[t];
-					tiedostot[t] = tiedostot[t+1];
-					tiedostot[t+1] = temp;
-					tehty = false;
-				}
-			}
-			
-			if (tehty)
-				return 0;
-		}
-	}
-	
-	return 0;
+    strlwr(a);
+    strlwr(b);
+
+    for (int i = 0; i < looppi; i++) {
+        if (a[i] < b[i])
+            return 2;
+
+        if (a[i] > b[i])
+            return 1;
+    }
+
+    if (apituus > bpituus)
+        return 1;
+
+    if (apituus < bpituus)
+        return 2;
+
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Hae_Tyyppi2(struct _finddata_t &map_file, long &hFile, int &i, 
-									  char *tiedosto, int tyyppi)
-{
-	//char tiedosto[6];
-	bool loytyi = false;
-	
-	//strcpy(tiedosto,"*.");
-	//strcat(tiedosto,tarkenne);
-	
-	if (i >= MAX_DIR_TIEDOSTOJA)
-		return 2;
-	
-	if((hFile = _findfirst(tiedosto, &map_file )) == -1L ){
-       //strcpy(viesti,"no files found.");
-		_findclose( hFile );
-	}
-	else
-	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = tyyppi;
-		i++;
-		
-		if (tyyppi == TIEDOSTO_MAP)
-			Level_Editor_Aseta_Episodihakemisto();
+int Level_Editor_Tiedostot_Aakkosta(void) {
+    unsigned long i, t;
+    TIEDOSTO temp;
+    bool tehty;
 
-		loytyi = true;
-	}
+    if (tiedostoja > 1) {
+        for (i = tiedostoja - 1; i >= 0; i--) {
+            tehty = true;
 
-	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
-	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = tyyppi;		
-		i++;
-		loytyi = true;
-	}	
+            for (t = 0; t < i; t++) {
+                if (Level_Editor_Tiedostot_Vertaa(tiedostot[t].nimi, tiedostot[t + 1].nimi) == 1) {
+                    temp = tiedostot[t];
+                    tiedostot[t] = tiedostot[t + 1];
+                    tiedostot[t + 1] = temp;
+                    tehty = false;
+                }
+            }
 
-	_findclose( hFile );
+            if (tehty)
+                return 0;
+        }
+    }
 
-	if (!loytyi)
-		return 1;
-
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Hae_Tyyppi(int &i, char *tiedosto, int tyyppi)
-{
+int Level_Editor_Tiedostot_Hae_Tyyppi2(struct _finddata_t &map_file, long &hFile, int &i, char *tiedosto, int tyyppi) {
+    //char file[6];
+    bool loytyi = false;
+
+    //strcpy(file,"*.");
+    //strcat(file,tarkenne);
+
+    if (i >= MAX_DIR_TIEDOSTOJA)
+        return 2;
+
+    if ((hFile = _findfirst(tiedosto, &map_file)) == -1L) {
+        //strcpy(message,"no files found.");
+        _findclose(hFile);
+    } else {
+        strcpy(tiedostot[i].nimi, map_file.name);
+        tiedostot[i].tyyppi = tyyppi;
+        i++;
+
+        if (tyyppi == TIEDOSTO_MAP)
+            Level_Editor_Aseta_Episodihakemisto();
+
+        loytyi = true;
+    }
+
+    while (i < MAX_DIR_TIEDOSTOJA && _findnext(hFile, &map_file) == 0) {
+        strcpy(tiedostot[i].nimi, map_file.name);
+        tiedostot[i].tyyppi = tyyppi;
+        i++;
+        loytyi = true;
+    }
+
+    _findclose(hFile);
+
+    if (!loytyi)
+        return 1;
+
+    return 0;
+}
+
+int Level_Editor_Tiedostot_Hae_Tyyppi(int &i, char *tiedosto, int tyyppi) {
     struct _finddata_t map_file;
     long hFile;
-	bool loytyi = false;
-	
-	if (i >= MAX_DIR_TIEDOSTOJA)
-		return 2;
-	
-	if((hFile = _findfirst(tiedosto, &map_file )) == -1L ){
-       //strcpy(viesti,"no files found.");
-		_findclose( hFile );
-	}
-	else
-	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = tyyppi;
-		i++;
-		
-		if (tyyppi == TIEDOSTO_MAP)
-			Level_Editor_Aseta_Episodihakemisto();
+    bool loytyi = false;
 
-		loytyi = true;
-	}
+    if (i >= MAX_DIR_TIEDOSTOJA)
+        return 2;
 
-	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
-	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = tyyppi;		
-		i++;
-		loytyi = true;
-	}	
+    if ((hFile = _findfirst(tiedosto, &map_file)) == -1L) {
+        //strcpy(message,"no files found.");
+        _findclose(hFile);
+    } else {
+        strcpy(tiedostot[i].nimi, map_file.name);
+        tiedostot[i].tyyppi = tyyppi;
+        i++;
 
-	_findclose( hFile );
+        if (tyyppi == TIEDOSTO_MAP)
+            Level_Editor_Aseta_Episodihakemisto();
 
-	if (!loytyi)
-		return 1;
+        loytyi = true;
+    }
 
-	return 0;
+    while (i < MAX_DIR_TIEDOSTOJA && _findnext(hFile, &map_file) == 0) {
+        strcpy(tiedostot[i].nimi, map_file.name);
+        tiedostot[i].tyyppi = tyyppi;
+        i++;
+        loytyi = true;
+    }
+
+    _findclose(hFile);
+
+    if (!loytyi)
+        return 1;
+
+    return 0;
 }
 
-int Level_Editor_Tiedostot_Hae(void)
-{
+int Level_Editor_Tiedostot_Hae(void) {
 /*    struct _finddata_t map_file;
     long hFile;*/
-	int i=0;
+    int i = 0;
 /*
 	if((hFile = _findfirst( "*.", &map_file )) == -1L )
-       strcpy(viesti,"no directories found");
+       strcpy(message,"no directories found");
 	else
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_DIR;
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_DIR;
 		i++;
 	}
 
 	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_DIR;		
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_DIR;
 		i++;
 	}
 
-	_findclose( hFile );	
+	_findclose( hFile );
 */
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.", TIEDOSTO_DIR) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.", TIEDOSTO_DIR) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.map", TIEDOSTO_MAP) == 2)
-		return 0;		
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.map", TIEDOSTO_MAP) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.bmp", TIEDOSTO_BMP) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.bmp", TIEDOSTO_BMP) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.pcx", TIEDOSTO_BMP) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.pcx", TIEDOSTO_BMP) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.spr", TIEDOSTO_SPR) == 2)
-		return 0;	
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.spr", TIEDOSTO_SPR) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.xm", TIEDOSTO_MUS) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.xm", TIEDOSTO_MUS) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.mod", TIEDOSTO_MUS) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.mod", TIEDOSTO_MUS) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.s3m", TIEDOSTO_MUS) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.s3m", TIEDOSTO_MUS) == 2)
+        return 0;
 
-	if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.it", TIEDOSTO_MUS) == 2)
-		return 0;
+    if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "*.it", TIEDOSTO_MUS) == 2)
+        return 0;
 
-	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole viel� m��ritelty...
-		if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "pk2.exe", 0) == 0)
-			Level_Editor_Tallenna_PK2_Hakemisto(tyohakemisto);
-					
-		/*
+    if (strcmp(pk2_hakemisto, " ") == 0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole viel� m��ritelty...
+        if (Level_Editor_Tiedostot_Hae_Tyyppi(i, "pk2.exe", 0) == 0)
+            Level_Editor_Tallenna_PK2_Hakemisto(working_directory);
+
+    /*
 	if (i >= MAX_DIR_TIEDOSTOJA)
 		return 0;
 
 	if((hFile = _findfirst( "*.map", &map_file )) == -1L )
-       strcpy(viesti,"no map files found");
+       strcpy(message,"no map files found");
 	else
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_MAP;
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_MAP;
 		i++;
 		Level_Editor_Aseta_Episodihakemisto();
 	}
 
 	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_MAP;		
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_MAP;
 		i++;
 	}
 
@@ -1826,15 +1729,15 @@ int Level_Editor_Tiedostot_Hae(void)
 
 	if((hFile = _findfirst( "*.bmp", &map_file )) != -1L )
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_BMP;
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_BMP;
 		i++;
 	}
 
 	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_BMP;		
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_BMP;
 		i++;
 	}
 
@@ -1846,591 +1749,542 @@ int Level_Editor_Tiedostot_Hae(void)
 
 	if((hFile = _findfirst( "*.spr", &map_file )) != -1L )
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_SPR;
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_SPR;
 		i++;
 	}
 
 	while (i<MAX_DIR_TIEDOSTOJA && _findnext( hFile, &map_file ) == 0)
 	{
-		strcpy(tiedostot[i].nimi, map_file.name);
-		tiedostot[i].tyyppi = TIEDOSTO_SPR;		
+		strcpy(tiedostot[i].name, map_file.name);
+		tiedostot[i].type = TIEDOSTO_SPR;
 		i++;
 	}
 
 	_findclose( hFile );
 
-	if (strcmp(pk2_hakemisto," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole viel� m��ritelty...
+	if (strcmp(pk2_directory," ")==0) // jos hakemistoa, jossa pk2.exe sijaitsee ei ole viel� m��ritelty...
 	{
 
 		if((hFile = _findfirst( "*.exe", &map_file )) != -1L )
 		{
 			if (strcmp("PK2.exe", map_file.name)==0)
-				Level_Editor_Tallenna_PK2_Hakemisto(tyohakemisto);
+				Level_Editor_Tallenna_PK2_Hakemisto(working_directory);
 		}
 
 		while (_findnext( hFile, &map_file ) == 0)
 		{
 			if (strcmp("PK2.exe", map_file.name)==0)
-				Level_Editor_Tallenna_PK2_Hakemisto(tyohakemisto);
+				Level_Editor_Tallenna_PK2_Hakemisto(working_directory);
 		}
 
 		_findclose( hFile );
 
 	}
 */
-	tiedostoja = i;
+    tiedostoja = i;
 
-	return 0;
+    return 0;
 }
 
-void Level_Editor_Aseta_Palikat(char *filename)
-{
-	Level_Editor_Loki_Tallenna("Ladataan palikkapaletti.\n");
-	Level_Editor_Loki_Kirjaa("loading tile palette.", LOKI_INFO);
-	
-	if (kartta->Lataa_PalikkaPaletti("",filename) == 1)
-		DirectX_virhe = true;
+void Level_Editor_Aseta_Palikat(char *filename) {
+    Level_Editor_Loki_Tallenna("Ladataan palikkapaletti.\n");
+    Level_Editor_Loki_Kirjaa("loading tile palette.", LOKI_INFO);
 
-	Level_Editor_Laske_TileVarit();
-	
+    if (map->Load_Block_Palette("", filename) == 1)
+        DirectX_virhe = true;
+
+    Level_Editor_Laske_TileVarit();
+
 }
 
-void Level_Editor_Aseta_Taustakuva(char *filename)
-{
-	Level_Editor_Loki_Tallenna("Ladataan taustakuva.\n");
-	Level_Editor_Loki_Kirjaa("loading background image.", LOKI_INFO);
-	
-	if (kartta->Lataa_Taustakuva("",filename) == 1)
-		DirectX_virhe = true;
+void Level_Editor_Aseta_Taustakuva(char *filename) {
+    Level_Editor_Loki_Tallenna("Ladataan background_image.\n");
+    Level_Editor_Loki_Kirjaa("loading background image.", LOKI_INFO);
+
+    if (map->Load_Background_Image("", filename) == 1)
+        DirectX_virhe = true;
 }
 
-int Level_Editor_Init(void)
-{
-	Level_Editor_Loki_Alusta();
-	Level_Editor_Loki_Kirjaa("--------------------", LOKI_INFO);
-	Level_Editor_Loki_Kirjaa("starting new session", LOKI_INFO);
-	Level_Editor_Loki_Kirjaa("--------------------", LOKI_INFO);
-	Level_Editor_Loki_Tallenna("----------------------------------\n");
-	Level_Editor_Loki_Tallenna("Uusi istunto.\n");
-	Level_Editor_Loki_Tallenna("----------------------------------\n");
+int Level_Editor_Init(void) {
+    Level_Editor_Loki_Alusta();
+    Level_Editor_Loki_Kirjaa("--------------------", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("starting new session", LOKI_INFO);
+    Level_Editor_Loki_Kirjaa("--------------------", LOKI_INFO);
+    Level_Editor_Loki_Tallenna("----------------------------------\n");
+    Level_Editor_Loki_Tallenna("New istunto.\n");
+    Level_Editor_Loki_Tallenna("----------------------------------\n");
 
-	for (int ci=0; ci<360; ci++) 
-		cos_table[ci] = cos(3.1415*2* (ci%360)/180)*33;
-    
-	for (int si=0; si<360; si++) 
-		sin_table[si] = sin(3.1415*2* (si%360)/180)*33;
+    for (int ci = 0; ci < 360; ci++)
+        cos_table[ci] = cos(3.1415 * 2 * (ci % 360) / 180) * 33;
 
-	PK2Kartta_Cos_Sin(cos_table, sin_table);
-	PK2Kartta_Aseta_Ruudun_Mitat(RUUDUN_LEVEYS,RUUDUN_KORKEUS);
+    for (int si = 0; si < 360; si++)
+        sin_table[si] = sin(3.1415 * 2 * (si % 360) / 180) * 33;
 
-	_getcwd(tyohakemisto, _MAX_PATH);
+    Map_Cos_Sin(cos_table, sin_table);
+    Map_Set_Screen_Dimensions(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	strcpy(editor_hakemisto,tyohakemisto);
+    _getcwd(working_directory, _MAX_PATH);
 
-	Level_Editor_Loki_Kirjaa("looking for pk2 directory.", LOKI_INFO);
-	Level_Editor_Lataa_PK2_Hakemisto();
-	
-	Level_Editor_Tiedostot_Alusta();
-	Level_Editor_Tiedostot_Hae();
-	Level_Editor_Tiedostot_Aakkosta();
+    strcpy(editor_hakemisto, working_directory);
 
-	if (strcmp(pk2_hakemisto," ")==0)
-	{
-		Level_Editor_Loki_Kirjaa("pk2 directory not found.", LOKI_INFO);
-		MessageBox(ikkunan_kahva, "Welcome to Pekka Kana 2 Level Editor :)\nUse the file window (f5) to find the directory\nwhere you have installed Pekka Kana 2.", "PK2 Level Editor 1.0", MB_OK);
-	}
-	else
-		MessageBox(ikkunan_kahva, "Welcome to Pekka Kana 2 Level Editor:)","PK2 Level Editor 0.91", MB_OK);
+    Level_Editor_Loki_Kirjaa("looking for pk2 directory.", LOKI_INFO);
+    Level_Editor_Lataa_PK2_Hakemisto();
 
+    Level_Editor_Tiedostot_Alusta();
+    Level_Editor_Tiedostot_Hae();
+    Level_Editor_Tiedostot_Aakkosta();
 
-	if ((PisteInput_Alusta((HWND &)ikkunan_kahva, (HINSTANCE &)hinstance_app)) == PI_VIRHE)
-		DirectX_virhe = true;
-
-	if ((PisteDraw_Alusta((HWND &)ikkunan_kahva, (HINSTANCE &) hinstance_app, 
-								  RUUDUN_LEVEYS, RUUDUN_KORKEUS, SCREEN_BPP, MAX_COLORS_PALETTE)) == PD_VIRHE)
-		DirectX_virhe = true;
+    if (strcmp(pk2_hakemisto, " ") == 0) {
+        Level_Editor_Loki_Kirjaa("pk2 directory not found.", LOKI_INFO);
+        MessageBox(window_handle,
+                   "Welcome to Pekka Kana 2 Level Editor :)\nUse the file window (f5) to find the directory\nwhere you have installed Pekka Kana 2.",
+                   "PK2 Level Editor 1.0", MB_OK);
+    } else
+        MessageBox(window_handle, "Welcome to Pekka Kana 2 Level Editor:)", "PK2 Level Editor 0.91", MB_OK);
 
 
-	if ((kuva_editori = PisteDraw_Buffer_Uusi(RUUDUN_LEVEYS,RUUDUN_KORKEUS, true, 255)) == PD_VIRHE)
-		DirectX_virhe = true;
+    if ((PisteInput_Init((HWND &) window_handle, (HINSTANCE &) hinstance_app)) == PI_ERROR)
+        DirectX_virhe = true;
 
-	if ((kuva_kartta  = PisteDraw_Buffer_Uusi(PK2KARTTA_KARTTA_LEVEYS,PK2KARTTA_KARTTA_KORKEUS, true, 255)) == PD_VIRHE)
-		DirectX_virhe = true;	
+    if ((PisteDraw_Init((HWND &) window_handle, (HINSTANCE &) hinstance_app, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP,
+                        MAX_COLORS_PALETTE)) == PD_ERROR)
+        DirectX_virhe = true;
 
-	if (PisteDraw_Lataa_Kuva(kuva_editori,"pk2edit.bmp", true) == PD_VIRHE)
-	{
-		Level_Editor_Loki_Kirjaa("could not load pk2edit.bmp.", LOKI_INFO);
-		DirectX_virhe = true;
-	}
 
-	kartta  = new PK2Kartta();
-	undo	= new PK2Kartta();
+    if ((kuva_editori = PisteDraw_Buffer_Create(SCREEN_WIDTH, SCREEN_HEIGHT, true, 255)) == PD_ERROR)
+        DirectX_virhe = true;
 
-	if ((fontti1 = PisteDraw_Font_Uusi(kuva_editori,1,456,8,8,52)) == PD_VIRHE)
-		DirectX_virhe = true;
-	/*
-	protot[PROTOTYYPPI_KANA].Kana("pk2spr01.bmp");
-	protot[PROTOTYYPPI_MUNA].Muna("pk2spr01.bmp");
-	protot[PROTOTYYPPI_PIKKUKANA].Pikkukana("pk2spr01.bmp");
-	protot[PROTOTYYPPI_OMENA].Omena("pk2spr01.bmp");
+    if ((kuva_kartta = PisteDraw_Buffer_Create(MAP_WIDTH, MAP_HEIGHT, true, 255)) == PD_ERROR)
+        DirectX_virhe = true;
+
+    if (PisteDraw_Image_Load(kuva_editori, "pk2edit.bmp", true) == PD_ERROR) {
+        Level_Editor_Loki_Kirjaa("could not load pk2edit.bmp.", LOKI_INFO);
+        DirectX_virhe = true;
+    }
+
+    map = new PK2Map();
+    undo = new PK2Map();
+
+    if ((font1 = PisteDraw_Font_Create(kuva_editori, 1, 456, 8, 8, 52)) == PD_ERROR)
+        DirectX_virhe = true;
+    /*
+	prototypes[PROTOTYPE_CHICKEN].Kana("pk2spr01.bmp");
+	prototypes[PROTOTYPE_EGG].Muna("pk2spr01.bmp");
+	prototypes[PROTOTYPE_CHICK].Pikkukana("pk2spr01.bmp");
+	prototypes[PROTOTYPE_APPLE].Omena("pk2spr01.bmp");
 */
-	Level_Editor_Kartta_Alusta();
+    Level_Editor_Kartta_Alusta();
 
-	//Level_Editor_Kartta_Oletusasetukset();
+    //Level_Editor_Kartta_Oletusasetukset();
 
-	Level_Editor_Menut_Alusta();
-	
-	Level_Editor_Kartta_Varmista();
+    Level_Editor_Menut_Alusta();
 
-	PisteDraw_Fade_Paletti_In(PD_FADE_NOPEA);
+    Level_Editor_Kartta_Varmista();
 
-	PisteWait_Start();
+    PisteDraw_Fade_Palette_In(PD_FADE_FAST);
 
-	Level_Editor_Loki_Kirjaa("startup completed.", LOKI_INFO);
+    PisteWait_Start();
 
-	Level_Editor_Asetukset_Lataa();
+    Level_Editor_Loki_Kirjaa("startup completed.", LOKI_INFO);
 
-	return 0;
+    Level_Editor_Asetukset_Lataa();
+
+    return 0;
 }
 
 /* PIIRTORUTIINIT ---------------------------------------------------------------*/
 
-int Level_Editor_Piirra_Nuolet(int x, int y, int menuId)
-{
-	int leveys = 13,
-		korkeus = 27;
+int Level_Editor_Piirra_Nuolet(int x, int y, int menuId) {
+    int leveys = 13, korkeus = 27;
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER,x,y,324,1,337,28);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, x, y, 324, 1, 337, 28);
 
-	if (PisteInput_Hiiri_Vasen() && key_delay == 0 && menuId==aktiivinen_menu)
-	{
-		if (hiiri_x > x && hiiri_x < x+leveys && hiiri_y > y && hiiri_y < y+korkeus/2)
-		{
-			key_delay = 8;
-			return 1;
-		}
-		
-		if (hiiri_x > x && hiiri_x < x+leveys && hiiri_y > y+korkeus/2 && hiiri_y < y+korkeus)
-		{
-			key_delay = 8;
-			return 2;
-		}
-	}
+    if (PisteInput_Mouse_Left() && key_delay == 0 && menuId == aktiivinen_menu) {
+        if (mouse_x > x && mouse_x < x + leveys && mouse_y > y && mouse_y < y + korkeus / 2) {
+            key_delay = 8;
+            return 1;
+        }
 
-	return 0;
+        if (mouse_x > x && mouse_x < x + leveys && mouse_y > y + korkeus / 2 && mouse_y < y + korkeus) {
+            key_delay = 8;
+            return 2;
+        }
+    }
+
+    return 0;
 }
 
-int Level_Editor_Piirra_Nuolet2(int x, int y, int menuId)
-{
-	int leveys = 13,
-		korkeus = 13;
+int Level_Editor_Piirra_Nuolet2(int x, int y, int menuId) {
+    int leveys = 13, korkeus = 13;
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER,x,y,   324, 1,337,15);
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER,x+14,y,324,15,337,28);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, x, y, 324, 1, 337, 15);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, x + 14, y, 324, 15, 337, 28);
 
-	if (PisteInput_Hiiri_Vasen() && key_delay == 0 && menuId==aktiivinen_menu)
-	{
-		if (hiiri_x > x && hiiri_x < x+13 && hiiri_y > y && hiiri_y < y+13)
-		{
-			key_delay = 8;
-			return 1;
-		}
-		
-		if (hiiri_x > x+14 && hiiri_x < x+27 && hiiri_y > y && hiiri_y < y+13)
-		{
-			key_delay = 8;
-			return 2;
-		}
-	}
+    if (PisteInput_Mouse_Left() && key_delay == 0 && menuId == aktiivinen_menu) {
+        if (mouse_x > x && mouse_x < x + 13 && mouse_y > y && mouse_y < y + 13) {
+            key_delay = 8;
+            return 1;
+        }
 
-	return 0;
+        if (mouse_x > x + 14 && mouse_x < x + 27 && mouse_y > y && mouse_y < y + 13) {
+            key_delay = 8;
+            return 2;
+        }
+    }
+
+    return 0;
 }
 
-int Level_Editor_Piirra_Nelio(int vasen, int yla, int oikea, int ala, UCHAR color)
-{
+int Level_Editor_Piirra_Nelio(int vasen, int yla, int oikea, int ala, unsigned char color) {
 /*
-	UCHAR *buffer = NULL;
-	DWORD tod_leveys;
+	unsigned char *buffer = NULL;
+	unsigned long tod_leveys;
 
-	PisteDraw_Piirto_Aloita(PD_TAUSTABUFFER, *&buffer, (DWORD &)tod_leveys);
+	PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer, (unsigned long &)tod_leveys);
 
-	for (int x = vasen; x <= oikea; x++)
+	for (int x = left_bound; x <= right_bound; x++)
 	{
-		for (int y = yla; y <= ala; y++)
+		for (int y = top_bound; y <= bottom_bound; y++)
 		{
-			if (y == yla || y == ala || x == vasen || x == oikea)
+			if (y == top_bound || y == bottom_bound || x == left_bound || x == right_bound)
 			{
 				buffer[x+y*tod_leveys] = color;
 			}
-		}		
+		}
 	}
 
-	PisteDraw_Piirto_Lopeta(PD_TAUSTABUFFER);
+	PisteDraw_Draw_End(PD_BACKBUFFER);
 */
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,vasen,yla,oikea,yla+1,color);
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,vasen,ala-1,oikea,ala,color);
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,vasen,yla,vasen+1,ala,color);
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,oikea-1,yla,oikea,ala,color);
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, vasen, yla, oikea, yla + 1, color);
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, vasen, ala - 1, oikea, ala, color);
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, vasen, yla, vasen + 1, ala, color);
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, oikea - 1, yla, oikea, ala, color);
 
-	return 0;
+    return 0;
 }
 
-void Level_Editor_Viiva_Hori(int x, int y, int pituus, UCHAR vari)
-{
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,x,y,x+pituus,y+1,vari);
+void Level_Editor_Viiva_Hori(int x, int y, int pituus, unsigned char vari) {
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, x, y, x + pituus, y + 1, vari);
 }
 
-void Level_Editor_Viiva_Vert(int x, int y, int pituus, UCHAR vari)
-{
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,x,y,x+1,y+pituus,vari);
+void Level_Editor_Viiva_Vert(int x, int y, int pituus, unsigned char vari) {
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, x, y, x + 1, y + pituus, vari);
 }
 
-bool Level_Editor_Nappi(char *otsikko, int vasen, int yla, int menuId)
-{
-	bool paalla = false;
+bool Level_Editor_Nappi(char *otsikko, int vasen, int yla, int menuId) {
+    bool paalla = false;
 
-	int vali = PisteDraw_Font_Kirjoita(fontti1,otsikko,PD_TAUSTABUFFER,vasen+2,yla+2);
-	
-	//UCHAR *buffer = NULL;
-	//DWORD tod_leveys;
-	UCHAR color = 18;
+    int vali = PisteDraw_Font_Write(font1, otsikko, PD_BACKBUFFER, vasen + 2, yla + 2);
 
-	int oikea = vasen+vali+2,
-		ala   = yla+12;
+    //unsigned char *buffer = NULL;
+    //unsigned long tod_leveys;
+    unsigned char color = 18;
 
-	if (hiiri_x < oikea && hiiri_x > vasen && hiiri_y > yla && hiiri_y < ala && 
-		(menuId == aktiivinen_menu || menuId == -1))
-	{
-		paalla = true;
-		color = 29;
-	}
+    int oikea = vasen + vali + 2, ala = yla + 12;
 
-	Level_Editor_Piirra_Nelio(vasen+1,yla+1,oikea+1,ala+1,0);
-	Level_Editor_Piirra_Nelio(vasen,yla,oikea,ala,color);
+    if (mouse_x < oikea && mouse_x > vasen && mouse_y > yla && mouse_y < ala &&
+        (menuId == aktiivinen_menu || menuId == -1)) {
+        paalla = true;
+        color = 29;
+    }
 
-	if (paalla && PisteInput_Hiiri_Vasen() && key_delay == 0)
-	{
-		key_delay = 20;
-		return true;
-	}
-	
-	return false;
+    Level_Editor_Piirra_Nelio(vasen + 1, yla + 1, oikea + 1, ala + 1, 0);
+    Level_Editor_Piirra_Nelio(vasen, yla, oikea, ala, color);
+
+    if (paalla && PisteInput_Mouse_Left() && key_delay == 0) {
+        key_delay = 20;
+        return true;
+    }
+
+    return false;
 }
 
-void Level_Editor_Lista(TOOL_LIST &lista)
-{
-	if (lista.nakyva)
-	{
-		int lista_y = 3;
-		
-		PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,lista.x, lista.y, lista.x + 58, lista.y + 75, 12);
+void Level_Editor_Lista(TOOL_LIST &lista) {
+    if (lista.nakyva) {
+        int lista_y = 3;
 
-		if (hiiri_x > lista.x && hiiri_x < lista.x+58 && hiiri_y > lista.y && hiiri_y < lista.y+75)
-			edit_tila = EDIT_MENU;
+        PisteDraw_Buffer_Clear(PD_BACKBUFFER, lista.x, lista.y, lista.x + 58, lista.y + 75, 12);
 
-		Level_Editor_Piirra_Nelio(lista.x,lista.y,lista.x+58,lista.y+75,1);
+        if (mouse_x > lista.x && mouse_x < lista.x + 58 && mouse_y > lista.y && mouse_y < lista.y + 75)
+            edit_tila = EDIT_MENU;
 
-		if (Level_Editor_Nappi("copy  ",lista.x+3,lista.y+lista_y,-1))	lista.valinta = 1; lista_y += 14;
-		if (Level_Editor_Nappi("paste ",lista.x+3,lista.y+lista_y,-1))	lista.valinta = 2; lista_y += 14;
-		if (Level_Editor_Nappi("cut   ",lista.x+3,lista.y+lista_y,-1))	lista.valinta = 3; lista_y += 14;
-		if (Level_Editor_Nappi("fill  ",lista.x+3,lista.y+lista_y,-1))	lista.valinta = 4; lista_y += 14;
-		if (Level_Editor_Nappi("cancel",lista.x+3,lista.y+lista_y,-1))   lista.valinta = 5; lista_y += 14;
+        Level_Editor_Piirra_Nelio(lista.x, lista.y, lista.x + 58, lista.y + 75, 1);
 
-		if (lista.valinta != 0) 
-			lista.nakyva = false;
-	}
-	//else
-	//	lista.valinta = 0;
+        if (Level_Editor_Nappi("copy  ", lista.x + 3, lista.y + lista_y, -1)) lista.valinta = 1;
+        lista_y += 14;
+        if (Level_Editor_Nappi("paste ", lista.x + 3, lista.y + lista_y, -1)) lista.valinta = 2;
+        lista_y += 14;
+        if (Level_Editor_Nappi("cut   ", lista.x + 3, lista.y + lista_y, -1)) lista.valinta = 3;
+        lista_y += 14;
+        if (Level_Editor_Nappi("fill  ", lista.x + 3, lista.y + lista_y, -1)) lista.valinta = 4;
+        lista_y += 14;
+        if (Level_Editor_Nappi("cancel", lista.x + 3, lista.y + lista_y, -1)) lista.valinta = 5;
+        lista_y += 14;
+
+        if (lista.valinta != 0)
+            lista.nakyva = false;
+    }
+    //else
+    //	lista.valinta = 0;
 }
 
-void Level_Editor_Lista_Nayta(TOOL_LIST &lista, int x, int y)
-{
-	lista.nakyva = true;
-	lista.valinta = 0;
-	lista.x = x;
-	lista.y = y;
+void Level_Editor_Lista_Nayta(TOOL_LIST &lista, int x, int y) {
+    lista.nakyva = true;
+    lista.valinta = 0;
+    lista.x = x;
+    lista.y = y;
 }
 
-bool Level_Editor_Linkki(char *otsikko, int vasen, int yla, int menuId)
-{
-	bool paalla = false;
+bool Level_Editor_Linkki(char *otsikko, int vasen, int yla, int menuId) {
+    bool paalla = false;
 
-	int vali = PisteDraw_Font_Kirjoita(fontti1,otsikko,PD_TAUSTABUFFER,vasen,yla);
-	
-	int oikea = vasen+200, //vali,
-		ala   = yla+8;
+    int vali = PisteDraw_Font_Write(font1, otsikko, PD_BACKBUFFER, vasen, yla);
 
-	if (menuId != aktiivinen_menu)
-		return false;
+    int oikea = vasen + 200, //vali,
+    ala = yla + 8;
 
-	if (hiiri_x < oikea && hiiri_x > vasen && hiiri_y > yla && hiiri_y < ala)
-	{
-		paalla = true;
-	}
+    if (menuId != aktiivinen_menu)
+        return false;
 
-	if (paalla)
-	{
-		UCHAR *buffer = NULL;
-		DWORD tod_leveys;
-		
-		PisteDraw_Piirto_Aloita(PD_TAUSTABUFFER, *&buffer, (DWORD &)tod_leveys);
-	
-		for (int x = vasen; x <= oikea; x++)
-			for (int y = yla; y <= ala; y++)
-				buffer[x+y*tod_leveys] = 41;
-	
-		PisteDraw_Piirto_Lopeta(PD_TAUSTABUFFER);
+    if (mouse_x < oikea && mouse_x > vasen && mouse_y > yla && mouse_y < ala) {
+        paalla = true;
+    }
 
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,otsikko,PD_TAUSTABUFFER,vasen,yla,90);
-	}
+    if (paalla) {
+        unsigned char *buffer = NULL;
+        unsigned long tod_leveys;
 
-	if (paalla && PisteInput_Hiiri_Vasen() && key_delay == 0)
-	{
-		key_delay = 20;
-		return true;
-	}
-	
-	return false;
+        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer, (unsigned long &) tod_leveys);
+
+        for (int x = vasen; x <= oikea; x++)
+            for (int y = yla; y <= ala; y++)
+                buffer[x + y * tod_leveys] = 41;
+
+        PisteDraw_Draw_End(PD_BACKBUFFER);
+
+        PisteDraw_Font_Write_Transparent(font1, otsikko, PD_BACKBUFFER, vasen, yla, 90);
+    }
+
+    if (paalla && PisteInput_Mouse_Left() && key_delay == 0) {
+        key_delay = 20;
+        return true;
+    }
+
+    return false;
 }
 
 
-bool Level_Editor_Kysy2(char *teksti, int vasen, int yla, int lkm)
-{
-	bool paalla = false;
-	
-	UCHAR *buffer = NULL;
-	DWORD tod_leveys;
-	UCHAR color = 10;
+bool Level_Editor_Kysy2(char *teksti, int vasen, int yla, int lkm) {
+    bool paalla = false;
 
-	char vastaus[300];	
-	char merkki;
-	int font_index = 0;
+    unsigned char *buffer = NULL;
+    unsigned long tod_leveys;
+    unsigned char color = 10;
 
-	int oikea = vasen+lkm*8,
-		ala   = yla+10;	
+    char vastaus[300];
+    char merkki;
+    int font_index = 0;
 
-	int pituus = strlen(teksti);
+    int oikea = vasen + lkm * 8, ala = yla + 10;
 
-	int i;
+    int pituus = strlen(teksti);
 
-	strcpy(vastaus,teksti);
+    int i;
 
-	font_index = (hiiri_x-vasen)/8;
+    strcpy(vastaus, teksti);
 
-	if (hiiri_x < oikea && hiiri_x > vasen && hiiri_y > yla && hiiri_y < ala)
-	{
-		paalla = true;
-		color = 46;
-		editoi_tekstia = true;
-		font_index = (hiiri_x-vasen)/8;
-	}
+    font_index = (mouse_x - vasen) / 8;
 
-	if (font_index < lkm && paalla)
-	{
-		merkki = PisteInput_Lue_Nappaimisto();
-		
-		if (merkki != '\0' && key_delay == 0)
-		{
-			if (merkki == '\n')
-			{
-				for (i=font_index;i<lkm;i++)
-					vastaus[i] = ' ';
-				key_delay = 20;
-				//merkki = '\0';
-			}
-			else
-			{
-				vastaus[font_index] = merkki;
-			
-				font_index++;
-				key_delay = 20;
-				hiiri_x += 8;
-			}
-			
-			if (PisteInput_Keydown(DIK_BACK))
-			{
-				key_delay = 20;
-				hiiri_x -= 8;
-				if (font_index > 0)
-					font_index--;
-			}
+    if (mouse_x < oikea && mouse_x > vasen && mouse_y > yla && mouse_y < ala) {
+        paalla = true;
+        color = 46;
+        editoi_tekstia = true;
+        font_index = (mouse_x - vasen) / 8;
+    }
 
-			if (PisteInput_Keydown(DIK_DELETE))
-			{
-				for (i=font_index;i<lkm-1;i++)
-					vastaus[i] = vastaus[i+1];				
-				key_delay = 20;
-			}
-		}
-	
-		vastaus[lkm] = '\0';
-	}
+    if (font_index < lkm && paalla) {
+        merkki = PisteInput_Read_Keyboard();
 
-	PisteDraw_Piirto_Aloita(PD_TAUSTABUFFER, *&buffer, (DWORD &)tod_leveys);
-	
-	for (int x = vasen; x <= oikea; x++)
-		for (int y = yla; y <= ala; y++)
-			buffer[x+y*tod_leveys] = color;
+        if (merkki != '\0' && key_delay == 0) {
+            if (merkki == '\n') {
+                for (i = font_index; i < lkm; i++)
+                    vastaus[i] = ' ';
+                key_delay = 20;
+                //merkki = '\0';
+            } else {
+                vastaus[font_index] = merkki;
 
-	if (paalla)
-		for (x = vasen+font_index*8; x <= vasen+font_index*8+8; x++)
-			for (int y = yla; y <= ala; y++)
-				buffer[x+y*tod_leveys] = 20;		
+                font_index++;
+                key_delay = 20;
+                mouse_x += 8;
+            }
 
-	PisteDraw_Piirto_Lopeta(PD_TAUSTABUFFER);
+            if (PisteInput_KeyDown(DIK_BACK)) {
+                key_delay = 20;
+                mouse_x -= 8;
+                if (font_index > 0)
+                    font_index--;
+            }
 
-	PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,vastaus,PD_TAUSTABUFFER,vasen,yla+2,85);
+            if (PisteInput_KeyDown(DIK_DELETE)) {
+                for (i = font_index; i < lkm - 1; i++)
+                    vastaus[i] = vastaus[i + 1];
+                key_delay = 20;
+            }
+        }
 
-	strcpy(teksti,vastaus);
-	
-	return paalla;
+        vastaus[lkm] = '\0';
+    }
+
+    PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer, (unsigned long &) tod_leveys);
+
+    for (int x = vasen; x <= oikea; x++)
+        for (int y = yla; y <= ala; y++)
+            buffer[x + y * tod_leveys] = color;
+
+    if (paalla)
+        for (int x = vasen + font_index * 8; x <= vasen + font_index * 8 + 8; x++)
+            for (int y = yla; y <= ala; y++)
+                buffer[x + y * tod_leveys] = 20;
+
+    PisteDraw_Draw_End(PD_BACKBUFFER);
+
+    PisteDraw_Font_Write_Transparent(font1, vastaus, PD_BACKBUFFER, vasen, yla + 2, 85);
+
+    strcpy(teksti, vastaus);
+
+    return paalla;
 }
 
-bool Level_Editor_Kysy(char *teksti, int vasen, int yla, int lkm, int id, int menuId)
-{
-	bool editoi = false;
-	
-	UCHAR color = 10;
+bool Level_Editor_Kysy(char *teksti, int vasen, int yla, int lkm, int id, int menuId) {
+    bool editoi = false;
 
-	char merkki;
+    unsigned char color = 10;
 
-	int oikea = vasen+lkm*8,
-		ala   = yla+10;	
+    char merkki;
 
-	int pituus = strlen(teksti);
+    int oikea = vasen + lkm * 8, ala = yla + 10;
 
-	int i;
+    int pituus = strlen(teksti);
 
-	if (menuId == aktiivinen_menu)
-	{
-		if (hiiri_x < oikea && hiiri_x > vasen && hiiri_y > yla && hiiri_y < ala &&
-			key_delay == 0 && PisteInput_Hiiri_Vasen())
-		{
-			editKursori = (hiiri_x-vasen)/8;
-			editKenttaId = id;
-			memset(editTeksti,'\0',sizeof(editTeksti));
-			strcpy(editTeksti,teksti); 
-			key_delay = 20;
+    int i;
 
-			if (editKursori > pituus)
-				editKursori = pituus;	
-		}
+    if (menuId == aktiivinen_menu) {
+        if (mouse_x < oikea && mouse_x > vasen && mouse_y > yla && mouse_y < ala && key_delay == 0 &&
+                PisteInput_Mouse_Left()) {
+            editKursori = (mouse_x - vasen) / 8;
+            editKenttaId = id;
+            memset(editTeksti, '\0', sizeof(editTeksti));
+            strcpy(editTeksti, teksti);
+            key_delay = 20;
 
-		if (id == editKenttaId)
-		{
-			editoi = true;
-			editoi_tekstia = true;
-			color = 46;
-		}
+            if (editKursori > pituus)
+                editKursori = pituus;
+        }
+
+        if (id == editKenttaId) {
+            editoi = true;
+            editoi_tekstia = true;
+            color = 46;
+        }
 
 
-		if (/*editKursori < lkm &&*/ editoi)
-		{
-			merkki = PisteInput_Lue_Nappaimisto();
-			
-			if (merkki != '\0' && key_delay == 0)
-			{
-				if (merkki == '\n')
-				{
-					for (i=editKursori;i<lkm;i++)
-						editTeksti[i] = '\0';
+        if (/*editKursori < lkm &&*/ editoi) {
+            merkki = PisteInput_Read_Keyboard();
 
-					editKenttaId = 0;
-					key_delay = 20;
-					editoi_tekstia = false;
-				}
-				else
-				{
-					editTeksti[editKursori] = merkki;
+            if (merkki != '\0' && key_delay == 0) {
+                if (merkki == '\n') {
+                    for (i = editKursori; i < lkm; i++)
+                        editTeksti[i] = '\0';
 
-					pituus = strlen(editTeksti);
+                    editKenttaId = 0;
+                    key_delay = 20;
+                    editoi_tekstia = false;
+                } else {
+                    editTeksti[editKursori] = merkki;
 
-					if (editKursori < lkm-1)
-						editKursori++;
-					
-					if (merkki == editMerkki)
-						key_delay = 10;//5;
-					else
-						key_delay = 20;//15;
-					
-					editMerkki = merkki;
-				}
-			}
-			
-			if (key_delay == 0)
-			{
-				if (PisteInput_Keydown(DIK_BACK))
-				{
-					if (editKursori > 0)
-					{
-						editKursori--;
+                    pituus = strlen(editTeksti);
 
-						for (i=editKursori;i<lkm-1;i++)
-							editTeksti[i] = editTeksti[i+1];
-						
-						editTeksti[lkm-1] = '\0';
-						editTeksti[lkm] = '\0';
-					}
+                    if (editKursori < lkm - 1)
+                        editKursori++;
 
-					if (editMerkki == DIK_BACK)
-						key_delay = 5;
-					else
-						key_delay = 20;
-					
-					editMerkki = DIK_BACK;
+                    if (merkki == editMerkki)
+                        key_delay = 10;//5;
+                    else
+                        key_delay = 20;//15;
 
-				}
+                    editMerkki = merkki;
+                }
+            }
 
-				if (PisteInput_Keydown(DIK_DELETE))
-				{
-					for (i=editKursori;i<lkm-1;i++)
-						editTeksti[i] = editTeksti[i+1];
-					
-					editTeksti[lkm-1] = '\0';
-					editTeksti[lkm] = '\0';
+            if (key_delay == 0) {
+                if (PisteInput_KeyDown(DIK_BACK)) {
+                    if (editKursori > 0) {
+                        editKursori--;
 
-					if (editMerkki == 'D')
-						key_delay = 5;
-					else
-						key_delay = 20;
-					
-					editMerkki = 'D';
-				}
+                        for (i = editKursori; i < lkm - 1; i++)
+                            editTeksti[i] = editTeksti[i + 1];
 
-				if (PisteInput_Keydown(DIK_LEFT))
-				{
-					if (editKursori > 0)
-						editKursori--;
-					
-					key_delay = 5;
-				}
+                        editTeksti[lkm - 1] = '\0';
+                        editTeksti[lkm] = '\0';
+                    }
 
-				if (PisteInput_Keydown(DIK_RIGHT))
-				{
-					if (editKursori < lkm-1 && editKursori < pituus)
-						editKursori++;
+                    if (editMerkki == DIK_BACK)
+                        key_delay = 5;
+                    else
+                        key_delay = 20;
 
-					key_delay = 5;
-				}		
-			
-			}
-			
-			editTeksti[lkm] = '\0';
-		}
-	}
+                    editMerkki = DIK_BACK;
 
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,vasen,yla,oikea,ala,color);
-	
-	if (editoi)
-		PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,vasen+editKursori*8,yla,vasen+editKursori*8+8,ala,20);
+                }
 
-	PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,teksti,PD_TAUSTABUFFER,vasen,yla+2,85);
+                if (PisteInput_KeyDown(DIK_DELETE)) {
+                    for (i = editKursori; i < lkm - 1; i++)
+                        editTeksti[i] = editTeksti[i + 1];
 
-	if (editoi)
-		strcpy(teksti,editTeksti);
+                    editTeksti[lkm - 1] = '\0';
+                    editTeksti[lkm] = '\0';
 
-	return editoi;
+                    if (editMerkki == 'D')
+                        key_delay = 5;
+                    else
+                        key_delay = 20;
+
+                    editMerkki = 'D';
+                }
+
+                if (PisteInput_KeyDown(DIK_LEFT)) {
+                    if (editKursori > 0)
+                        editKursori--;
+
+                    key_delay = 5;
+                }
+
+                if (PisteInput_KeyDown(DIK_RIGHT)) {
+                    if (editKursori < lkm - 1 && editKursori < pituus)
+                        editKursori++;
+
+                    key_delay = 5;
+                }
+
+            }
+
+            editTeksti[lkm] = '\0';
+        }
+    }
+
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, vasen, yla, oikea, ala, color);
+
+    if (editoi)
+        PisteDraw_Buffer_Clear(PD_BACKBUFFER, vasen + editKursori * 8, yla, vasen + editKursori * 8 + 8, ala, 20);
+
+    PisteDraw_Font_Write_Transparent(font1, teksti, PD_BACKBUFFER, vasen, yla + 2, 85);
+
+    if (editoi)
+        strcpy(teksti, editTeksti);
+
+    return editoi;
 }
 
 /*
@@ -2445,207 +2299,214 @@ int Level_Editor_Menu_Tyhja(int i)
 }
 */
 
-int Level_Editor_Menu_Spritet(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16;
-	int vali;
-	
-	PisteDraw_Aseta_Klipperi(PD_TAUSTABUFFER, menut[i].x, menut[i].y, menut[i].x+menut[i].leveys, menut[i].y+menut[i].korkeus+16);
+int Level_Editor_Menu_Spritet(int i) {
+    int x = menut[i].x, y = menut[i].y + 16;
+    int vali;
 
-	int piirto_y = 5, piirto_x = 15, rv_korkeus = 0;
-	bool rivinvaihto = false;
-	
-	int eka_proto = menu_spritet_eka;
-	int vika_proto = menu_spritet_eka+8;
+    PisteDraw_SetClipper(PD_BACKBUFFER, menut[i].x, menut[i].y, menut[i].x + menut[i].leveys,
+                         menut[i].y + menut[i].korkeus + 16);
 
-	if (vika_proto > MAX_PROTOTYYPPEJA)
-		vika_proto = MAX_PROTOTYYPPEJA;
+    int piirto_y = 5, piirto_x = 15, rv_korkeus = 0;
+    bool rivinvaihto = false;
 
-	if (eka_proto < 0)
-		eka_proto = 0;
+    int eka_proto = menu_spritet_eka;
+    int vika_proto = menu_spritet_eka + 8;
 
-	char luku[10];
-	int j_luku = eka_proto;
+    if (vika_proto > MAX_PROTOTYPES)
+        vika_proto = MAX_PROTOTYPES;
 
-	for (int proto=eka_proto; proto<=vika_proto; proto++)
-	{
-		if (protot[proto].korkeus > 0)
-		{
-			if (protot[proto].korkeus > rv_korkeus)
-				rv_korkeus = protot[proto].korkeus;
+    if (eka_proto < 0)
+        eka_proto = 0;
 
-			if (hiiri_x > x+piirto_x-1 && hiiri_x < x+piirto_x+protot[proto].kuva_frame_leveys+1/*leveys+1*/ &&
-				hiiri_y > y+piirto_y-1 && hiiri_y < y+piirto_y+protot[proto].kuva_frame_korkeus+1/*korkeus+1*/ &&
-				hiiri_y < menut[i].y+menut[i].korkeus+16)
-			{	
-				Level_Editor_Piirra_Nelio(x+piirto_x-1, y+piirto_y-1, 
-										  x+piirto_x+protot[proto].kuva_frame_leveys+1,/*  .frame_leveys+1*/
-										  y+piirto_y+protot[proto].kuva_frame_korkeus+1, /*korkeus+1*/ 31);
+    char luku[10];
+    int j_luku = eka_proto;
 
-				if (key_delay == 0 && PisteInput_Hiiri_Vasen())
-				{
-					proto_valittu = proto;
-					key_delay = 10;
-				}
-				
-				if (key_delay == 0 && PisteInput_Keydown(DIK_DELETE))
-				{
-					Level_Editor_Loki_Kirjaa("deleting sprite.", LOKI_INFO);
-					Level_Editor_Prototyyppi_Poista(proto);
-					key_delay = 30;
-				}
-			}
-			else
-			{
-				Level_Editor_Piirra_Nelio(x+piirto_x-1, y+piirto_y-1, 
-										  x+piirto_x+protot[proto].kuva_frame_leveys+1, 
-										  y+piirto_y+protot[proto].kuva_frame_korkeus+1, 18);
-			}
-			
+    for (int proto = eka_proto; proto <= vika_proto; proto++) {
+        if (prototypes[proto].height > 0) {
+            if (prototypes[proto].height > rv_korkeus)
+                rv_korkeus = prototypes[proto].height;
+
+            if (mouse_x > x + piirto_x - 1 &&
+                mouse_x < x + piirto_x + prototypes[proto].frame_width + 1/*width+1*/ &&
+                mouse_y > y + piirto_y - 1 &&
+                mouse_y < y + piirto_y + prototypes[proto].frame_height + 1/*height+1*/ &&
+                mouse_y < menut[i].y + menut[i].korkeus + 16) {
+                Level_Editor_Piirra_Nelio(x + piirto_x - 1, y + piirto_y - 1,
+                                          x + piirto_x + prototypes[proto].frame_width + 1,/*  .frame_leveys+1*/
+                                          y + piirto_y + prototypes[proto].frame_height + 1, /*height+1*/ 31);
+
+                if (key_delay == 0 && PisteInput_Mouse_Left()) {
+                    proto_valittu = proto;
+                    key_delay = 10;
+                }
+
+                if (key_delay == 0 && PisteInput_KeyDown(DIK_DELETE)) {
+                    Level_Editor_Loki_Kirjaa("deleting sprite.", LOKI_INFO);
+                    Level_Editor_Prototyyppi_Poista(proto);
+                    key_delay = 30;
+                }
+            } else {
+                Level_Editor_Piirra_Nelio(x + piirto_x - 1, y + piirto_y - 1,
+                                          x + piirto_x + prototypes[proto].frame_width + 1,
+                                          y + piirto_y + prototypes[proto].frame_height + 1, 18);
+            }
+
 //			itoa(j_luku+1,luku,10);
-//			PisteDraw_Font_Kirjoita(fontti1,luku,PD_TAUSTABUFFER,x+4,y+piirto_y);
-			protot[proto].Piirra(x+piirto_x,y+piirto_y,0);
-			PisteDraw_Font_Kirjoita(fontti1,protot[proto].nimi,PD_TAUSTABUFFER,x+120,y+piirto_y);
-			PisteDraw_Font_Kirjoita(fontti1,kartta->protot[proto],PD_TAUSTABUFFER,x+120,y+piirto_y+10);
-			
-			if (protot[proto].tyyppi == TYYPPI_PELIHAHMO)
-			{
-				if (proto == kartta->pelaaja_sprite)
-					vali = PisteDraw_Font_Kirjoita(fontti1,"player: yes",PD_TAUSTABUFFER,x+120,y+piirto_y+20);
-				else
-					vali = PisteDraw_Font_Kirjoita(fontti1,"player: no",PD_TAUSTABUFFER,x+120,y+piirto_y+20);
+//			PisteDraw_Font_Write(font1,luku,PD_BACKBUFFER,x+4,y+piirto_y);
+            prototypes[proto].Draw(x + piirto_x, y + piirto_y, 0);
+            PisteDraw_Font_Write(font1, prototypes[proto].name, PD_BACKBUFFER, x + 120, y + piirto_y);
+            PisteDraw_Font_Write(font1, map->protos[proto], PD_BACKBUFFER, x + 120, y + piirto_y + 10);
 
-				if (Level_Editor_Nappi("set player",x+125+vali,y+piirto_y+18,i))
-				{
-					kartta->pelaaja_sprite = proto;
-				}
-			}
+            if (prototypes[proto].type == TYPE_GAME_CHARACTER) {
+                if (proto == map->player_sprite)
+                    vali = PisteDraw_Font_Write(font1, "player: yes", PD_BACKBUFFER, x + 120, y + piirto_y + 20);
+                else
+                    vali = PisteDraw_Font_Write(font1, "player: no", PD_BACKBUFFER, x + 120, y + piirto_y + 20);
 
-			itoa(j_luku+1,luku,10);
-			PisteDraw_Font_Kirjoita(fontti1,luku,PD_TAUSTABUFFER,x+4,y+piirto_y);
+                if (Level_Editor_Nappi("set player", x + 125 + vali, y + piirto_y + 18, i)) {
+                    map->player_sprite = proto;
+                }
+            }
 
-			//vali = PisteDraw_Font_Kirjoita(fontti1,"bonus: ",PD_TAUSTABUFFER,x+240,y+piirto_y);
-			//PisteDraw_Font_Kirjoita(fontti1,protot[proto].bonus_sprite,PD_TAUSTABUFFER,x+240+vali,y+piirto_y);
-			
+            itoa(j_luku + 1, luku, 10);
+            PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + 4, y + piirto_y);
 
-			Level_Editor_Viiva_Hori(x,y+piirto_y-3,320,13);
-			
-			if (protot[proto].kuva_frame_korkeus > 30)
-				piirto_y += protot[proto].kuva_frame_korkeus + 6;  //rv_korkeus + 4;
-			else
-				piirto_y += 36;
+            //vali = PisteDraw_Font_Write(font1,"bonus: ",PD_BACKBUFFER,x+240,y+piirto_y);
+            //PisteDraw_Font_Write(font1,prototypes[proto].bonus_sprite,PD_BACKBUFFER,x+240+vali,y+piirto_y);
 
-			piirto_x = 15;
-			rv_korkeus = 0;
+
+            Level_Editor_Viiva_Hori(x, y + piirto_y - 3, 320, 13);
+
+            if (prototypes[proto].frame_height > 30)
+                piirto_y += prototypes[proto].frame_height + 6;  //rv_korkeus + 4;
+            else
+                piirto_y += 36;
+
+            piirto_x = 15;
+            rv_korkeus = 0;
 /*
 			else
 			{
-				piirto_x += protot[proto].leveys + 4;
-			}			
+				piirto_x += prototypes[proto].width + 4;
+			}
 */
-			j_luku++;
-		}
-	}
+            j_luku++;
+        }
+    }
 
-	int nuoli = Level_Editor_Piirra_Nuolet(x+menut[i].leveys-15,y+menut[i].korkeus-30,i);
-	
-	if (nuoli == 1 && menu_spritet_eka > 0)
-	{
-		menu_spritet_eka--;
-	}
+    int nuoli = Level_Editor_Piirra_Nuolet(x + menut[i].leveys - 15, y + menut[i].korkeus - 30, i);
 
-	if (nuoli == 2 && menu_spritet_eka < MAX_PROTOTYYPPEJA-1)
-	{
-		menu_spritet_eka++;
-	}
+    if (nuoli == 1 && menu_spritet_eka > 0) {
+        menu_spritet_eka--;
+    }
 
-	PisteDraw_Aseta_Klipperi(PD_TAUSTABUFFER,0,0,RUUDUN_LEVEYS,RUUDUN_KORKEUS);
+    if (nuoli == 2 && menu_spritet_eka < MAX_PROTOTYPES - 1) {
+        menu_spritet_eka++;
+    }
 
-	return 0;
+    PisteDraw_SetClipper(PD_BACKBUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    return 0;
 }
 
-int Level_Editor_Menu_Help(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16,
-		my = y+19;
+int Level_Editor_Menu_Help(int i) {
+    int x = menut[i].x, y = menut[i].y + 16, my = y + 19;
 
-	PisteDraw_Font_Kirjoita(fontti1,"f1 = help", PD_TAUSTABUFFER, x+3, my);			my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f2 = map", PD_TAUSTABUFFER, x+3, my);			my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f3 = tile palette", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f4 = sprites", PD_TAUSTABUFFER, x+3, my);		my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f5 = load map/files", PD_TAUSTABUFFER, x+3, my);		my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f6 = save map", PD_TAUSTABUFFER, x+3, my);		my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f7 = map information", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"f8 = clear map", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"s  = quick save ", PD_TAUSTABUFFER, x+3, my);	my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"u  = undo ", PD_TAUSTABUFFER, x+3, my);		my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"a  = animate moving tiles", PD_TAUSTABUFFER, x+3, my);	my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"shift = background / foreground", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"mouse left  = draw", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"mouse right = remove", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"mouse left  = paint (map menu)", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"mouse right = go to (map menu)", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"alt + mouse = select area", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"ctrl + c = copy", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"ctrl + b = paste simple", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"ctrl + v = paste pattern", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"ctrl + x = cut", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"arrows = scroll map", PD_TAUSTABUFFER, x+3, my);my+=9;
-	PisteDraw_Font_Kirjoita(fontti1,"esc = exit", PD_TAUSTABUFFER, x+3, my);my+=9;
+    PisteDraw_Font_Write(font1, "f1 = help", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f2 = map", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f3 = tile palette", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f4 = sprites", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f5 = load map/files", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f6 = save map", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f7 = map information", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "f8 = clear map", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "s  = quick save ", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "u  = undo ", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "movement_x  = animate moving tiles", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "shift = background / foreground", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "mouse left  = draw", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "mouse right = remove", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "mouse left  = paint (map menu)", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "mouse right = go to (map menu)", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "alt + mouse = select area", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "ctrl + c = copy", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "ctrl + movement_y = paste simple", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "ctrl + v = paste pattern", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "ctrl + x = cut", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "arrows = scroll map", PD_BACKBUFFER, x + 3, my);
+    my += 9;
+    PisteDraw_Font_Write(font1, "esc = exit", PD_BACKBUFFER, x + 3, my);
+    my += 9;
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Kartta(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+15;
+int Level_Editor_Menu_Kartta(int i) {
+    int x = menut[i].x, y = menut[i].y + 15;
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_kartta,PD_TAUSTABUFFER, x, y, 0, 0, PK2KARTTA_KARTTA_LEVEYS, PK2KARTTA_KARTTA_KORKEUS);
+    PisteDraw_Buffer_Flip_Fast(kuva_kartta, PD_BACKBUFFER, x, y, 0, 0, MAP_WIDTH,
+                               MAP_HEIGHT);
 
-	if (aktiivinen_menu == i)
-	{
-		if (menut[i].lista.nakyva)
-			Level_Editor_Lista(menut[i].lista);
-		
-		RECT nelio = {0,0,0,0};
-		nelio.left = hiiri_x-(RUUDUN_LEVEYS/32)/2;
-		nelio.top = hiiri_y-(RUUDUN_KORKEUS/32)/2;
+    if (aktiivinen_menu == i) {
+        if (menut[i].lista.nakyva)
+            Level_Editor_Lista(menut[i].lista);
 
-		if (nelio.left < x)
-			nelio.left = x;
+        RECT nelio = {0, 0, 0, 0};
+        nelio.left = mouse_x - (SCREEN_WIDTH / 32) / 2;
+        nelio.top = mouse_y - (SCREEN_HEIGHT / 32) / 2;
 
-		if (nelio.left+RUUDUN_LEVEYS/32 > x + menut[i].leveys)
-			nelio.left = x + menut[i].leveys - RUUDUN_LEVEYS/32;		
+        if (nelio.left < x)
+            nelio.left = x;
 
-		if (nelio.top < y)
-			nelio.top = y;
+        if (nelio.left + SCREEN_WIDTH / 32 > x + menut[i].leveys)
+            nelio.left = x + menut[i].leveys - SCREEN_WIDTH / 32;
 
-		if (nelio.top+RUUDUN_KORKEUS/32 > y + menut[i].korkeus)
-			nelio.top = y + menut[i].korkeus - RUUDUN_KORKEUS/32;
+        if (nelio.top < y)
+            nelio.top = y;
 
-		nelio.right  = nelio.left + RUUDUN_LEVEYS/32;
-		nelio.bottom = nelio.top + RUUDUN_KORKEUS/32;
+        if (nelio.top + SCREEN_HEIGHT / 32 > y + menut[i].korkeus)
+            nelio.top = y + menut[i].korkeus - SCREEN_HEIGHT / 32;
 
-		Level_Editor_Piirra_Nelio(nelio.left-1, nelio.top-1, nelio.right+1, nelio.bottom+1, 0);
-		Level_Editor_Piirra_Nelio(nelio.left, nelio.top, nelio.right, nelio.bottom, 31);
-		Level_Editor_Piirra_Nelio(nelio.left+1, nelio.top+1, nelio.right-1, nelio.bottom-1, 0);
+        nelio.right = nelio.left + SCREEN_WIDTH / 32;
+        nelio.bottom = nelio.top + SCREEN_HEIGHT / 32;
 
-		if (PisteInput_Hiiri_Vasen() && hiiri_y > y && key_delay == 0)
-		{
-			kartta_x = nelio.left - x;
-			kartta_y = nelio.top - y;
-		}
-		/*
-		if (PisteInput_Hiiri_Oikea() && hiiri_y > y && kartta_kohde_status == 0 && key_delay == 0)
+        Level_Editor_Piirra_Nelio(nelio.left - 1, nelio.top - 1, nelio.right + 1, nelio.bottom + 1, 0);
+        Level_Editor_Piirra_Nelio(nelio.left, nelio.top, nelio.right, nelio.bottom, 31);
+        Level_Editor_Piirra_Nelio(nelio.left + 1, nelio.top + 1, nelio.right - 1, nelio.bottom - 1, 0);
+
+        if (PisteInput_Mouse_Left() && mouse_y > y && key_delay == 0) {
+            kartta_x = nelio.left - x;
+            kartta_y = nelio.top - y;
+        }
+        /*
+		if (PisteInput_Hiiri_Oikea() && mouse_y > y && kartta_kohde_status == 0 && key_delay == 0)
 		{
 			kartta_kohde_status = 1;
-			kartta_kohde.left	= hiiri_x;
-			kartta_kohde.top	= hiiri_y;
-			kartta_kohde.right	= hiiri_x;
-			kartta_kohde.bottom = hiiri_y;
+			kartta_kohde.left	= mouse_x;
+			kartta_kohde.top	= mouse_y;
+			kartta_kohde.right	= mouse_x;
+			kartta_kohde.bottom = mouse_y;
 			key_delay = 25;
 		}
 
@@ -2653,18 +2514,18 @@ int Level_Editor_Menu_Kartta(int i)
 		{
 			if (kartta_kohde.left < x)
 				kartta_kohde.left = x;
-			
+
 			if (kartta_kohde.top < y)
 				kartta_kohde.top = y;
-			
-			if (hiiri_x >= kartta_kohde.left && hiiri_x < x+menut[i].leveys)
-				kartta_kohde.right  = hiiri_x;
-			if (hiiri_y >= kartta_kohde.top && hiiri_y < y+menut[i].korkeus)
-				kartta_kohde.bottom = hiiri_y;
-			
+
+			if (mouse_x >= kartta_kohde.left && mouse_x < x+menut[i].width)
+				kartta_kohde.right  = mouse_x;
+			if (mouse_y >= kartta_kohde.top && mouse_y < y+menut[i].height)
+				kartta_kohde.bottom = mouse_y;
+
 			Level_Editor_Piirra_Nelio(kartta_kohde.left, kartta_kohde.top, kartta_kohde.right, kartta_kohde.bottom, 48);
-		
-			if ((PisteInput_Hiiri_Oikea() && hiiri_y > y && key_delay == 0) || edit_tila == EDIT_KARTTA)
+
+			if ((PisteInput_Mouse_Right() && mouse_y > y && key_delay == 0) || edit_tila == EDIT_KARTTA)
 			{
 				kartta_kohde_status = 2;
 				Level_Editor_Lista_Nayta(menut[i].lista,x+90,y+35);
@@ -2676,22 +2537,22 @@ int Level_Editor_Menu_Kartta(int i)
 		{
 			if (kartta_kohde.left < x)
 				kartta_kohde.left = x;
-			
+
 			if (kartta_kohde.top < y)
 				kartta_kohde.top = y;
 
-			if (kartta_kohde.right > x+menut[i].leveys)
-				kartta_kohde.right = x+menut[i].leveys;
+			if (kartta_kohde.right > x+menut[i].width)
+				kartta_kohde.right = x+menut[i].width;
 
-			if (kartta_kohde.bottom > y+menut[i].korkeus)
-				kartta_kohde.bottom = y+menut[i].korkeus;			
+			if (kartta_kohde.bottom > y+menut[i].height)
+				kartta_kohde.bottom = y+menut[i].height;
 
 			int k_vasen = kartta_kohde.left - x,
 				k_yla	= kartta_kohde.top - y,
 				k_oikea = kartta_kohde.right - x,
 				k_ala	= kartta_kohde.bottom - y,
 				kx = 0, ky = 0;
-			
+
 			Level_Editor_Piirra_Nelio(kartta_kohde.left, kartta_kohde.top, kartta_kohde.right, kartta_kohde.bottom, 48);
 
 			if (menut[i].lista.valinta == 4)
@@ -2703,48 +2564,48 @@ int Level_Editor_Menu_Kartta(int i)
 					{
 						if (edit_tila == EDIT_SPRITE)
 						{
-							kartta->spritet[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = proto_valittu;
+							map->sprites[kx+ky*MAP_WIDTH] = proto_valittu;
 						}
 						else
 						{
 							if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-								kartta->seinat[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = edit_palikka;
+								map->walls[kx+ky*MAP_WIDTH] = edit_palikka;
 							if (edit_kerros == EDIT_KERROS_TAUSTA)
-								kartta->taustat[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = edit_palikka;
+								map->backgrounds[kx+ky*MAP_WIDTH] = edit_palikka;
 						}
 					}
-				
+
 				Level_Editor_Kartta_Paivita();
 
-				strcpy(viesti,"u = undo paste");
+				strcpy(message,"u = undo paste");
 
 				kartta_kohde_status = 0;
 				key_delay = 25;
-			}			
+			}
 
 			if (menut[i].lista.valinta == 3)
 			{
 				Level_Editor_Kartta_Varmista();
-				
+
 				for (kx = k_vasen; kx < k_oikea; kx++)
 					for (ky = k_yla; ky < k_ala; ky++)
 					{
 						if (edit_tila == EDIT_SPRITE)
 						{
-							kartta->spritet[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = 255;
+							map->sprites[kx+ky*MAP_WIDTH] = 255;
 						}
 						else
 						{
 							if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-								kartta->seinat[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = 255;
+								map->walls[kx+ky*MAP_WIDTH] = 255;
 							if (edit_kerros == EDIT_KERROS_TAUSTA)
-								kartta->taustat[kx+ky*PK2KARTTA_KARTTA_LEVEYS] = 255;
+								map->backgrounds[kx+ky*MAP_WIDTH] = 255;
 						}
 					}
-				
+
 				Level_Editor_Kartta_Paivita();
 
-				strcpy(viesti,"u = undo delete");
+				strcpy(message,"u = undo delete");
 
 				kartta_kohde_status = 0;
 				key_delay = 25;
@@ -2753,1316 +2614,1248 @@ int Level_Editor_Menu_Kartta(int i)
 			if (!menut[i].lista.nakyva)
 				kartta_kohde_status = 0;
 
-			
-			//PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"mouse right = cancel, space = fill", PD_TAUSTABUFFER, x+2, menut[i].korkeus+menut[i].y-17, 70);
-			//PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"delete = delete", PD_TAUSTABUFFER, x+2, menut[i].korkeus+menut[i].y-9, 70);
-			
-		}*/
-	}
 
-	return 0;
+			//PisteDraw_Font_Kirjoita_Lapinakyva(font1,"mouse right = cancel, space = fill", PD_BACKBUFFER, x+2, menut[i].height+menut[i].y-17, 70);
+			//PisteDraw_Font_Write_Transparent(font1,"delete = delete", PD_BACKBUFFER, x+2, menut[i].height+menut[i].y-9, 70);
+
+		}*/
+    }
+
+    return 0;
 }
 
-int Level_Editor_Menu_Palikat(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+15,
-		y_plus = menu_palikat_nayta_y * 32;
+int Level_Editor_Menu_Palikat(int i) {
+    int x = menut[i].x, y = menut[i].y + 15, y_plus = menu_palikat_nayta_y * 32;
 
-	char luku[10];
+    char luku[10];
 
-	PisteDraw_Buffer_Flip_Nopea(kartta->palikat_buffer,PD_TAUSTABUFFER, x, y, 0, 0+y_plus, 320, 480+y_plus);
+    PisteDraw_Buffer_Flip_Fast(map->block_buffer, PD_BACKBUFFER, x, y, 0, 0 + y_plus, 320, 480 + y_plus);
 
-	if (aktiivinen_menu == i)
-	{
-		RECT nelio = {0,0,0,0};
-		
-		nelio.left = (((hiiri_x-x)/32)*32)+x;
-		nelio.top =  (((hiiri_y-y)/32)*32)+y;
+    if (aktiivinen_menu == i) {
+        RECT nelio = {0, 0, 0, 0};
 
-		if (nelio.left < x)
-			nelio.left = x;
+        nelio.left = (((mouse_x - x) / 32) * 32) + x;
+        nelio.top = (((mouse_y - y) / 32) * 32) + y;
 
-		if (nelio.left+32 > x + menut[i].leveys)
-			nelio.left = x + menut[i].leveys - 32;		
+        if (nelio.left < x)
+            nelio.left = x;
 
-		if (nelio.top < y)
-			nelio.top = y;
+        if (nelio.left + 32 > x + menut[i].leveys)
+            nelio.left = x + menut[i].leveys - 32;
 
-		if (nelio.top+32 > y + menut[i].korkeus)
-			nelio.top = y + menut[i].korkeus - 32;
+        if (nelio.top < y)
+            nelio.top = y;
 
-		nelio.right  = nelio.left + 32;
-		nelio.bottom = nelio.top + 32;
+        if (nelio.top + 32 > y + menut[i].korkeus)
+            nelio.top = y + menut[i].korkeus - 32;
 
-		Level_Editor_Piirra_Nelio(nelio.left+1, nelio.top+1, nelio.right+1, nelio.bottom+1, 0);
-		Level_Editor_Piirra_Nelio(nelio.left, nelio.top, nelio.right, nelio.bottom, 120);
+        nelio.right = nelio.left + 32;
+        nelio.bottom = nelio.top + 32;
 
-		int px = (hiiri_x-x)/32;
-		int py = ((hiiri_y-y)/32)*10;
+        Level_Editor_Piirra_Nelio(nelio.left + 1, nelio.top + 1, nelio.right + 1, nelio.bottom + 1, 0);
+        Level_Editor_Piirra_Nelio(nelio.left, nelio.top, nelio.right, nelio.bottom, 120);
 
-		itoa(px+py+menu_palikat_nayta_y*10+1,luku,10);
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,nelio.left+2,nelio.top+2,65);
+        int px = (mouse_x - x) / 32;
+        int py = ((mouse_y - y) / 32) * 10;
 
-		if (PisteInput_Hiiri_Vasen() && hiiri_y > y)
-		{
-			edit_palikka = px + py + menu_palikat_nayta_y*10;
-			proto_valittu = MAX_PROTOTYYPPEJA;
-			key_delay = 15;
-		}
+        itoa(px + py + menu_palikat_nayta_y * 10 + 1, luku, 10);
+        PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, nelio.left + 2, nelio.top + 2, 65);
 
-		/*if (PisteInput_Hiiri_Oikea() && hiiri_y > y && key_delay == 0)
+        if (PisteInput_Mouse_Left() && mouse_y > y) {
+            edit_palikka = px + py + menu_palikat_nayta_y * 10;
+            proto_valittu = MAX_PROTOTYPES;
+            key_delay = 15;
+        }
+
+        /*if (PisteInput_Mouse_Right() && mouse_y > y && key_delay == 0)
 		{
 			menu_palikat_nayta_y += 2;
 			if (menu_palikat_nayta_y > 2)
 				menu_palikat_nayta_y = 0;
 			key_delay = 15;
 		}*/
-	}
+    }
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Tiedostot(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16,
-		linkki_y = 0;
+int Level_Editor_Menu_Tiedostot(int i) {
+    int x = menut[i].x, y = menut[i].y + 16, linkki_y = 0;
 
-	bool paivita = false;
-	char otsikko[_MAX_DIR];
+    bool paivita = false;
+    char otsikko[_MAX_DIR];
 
-	if (menu_tiedostot_eka < 0)
-		menu_tiedostot_eka = 0;
+    if (menu_tiedostot_eka < 0)
+        menu_tiedostot_eka = 0;
 
-	if (menu_tiedostot_eka > MAX_DIR_TIEDOSTOJA-2)
-		menu_tiedostot_eka = MAX_DIR_TIEDOSTOJA-2;
+    if (menu_tiedostot_eka > MAX_DIR_TIEDOSTOJA - 2)
+        menu_tiedostot_eka = MAX_DIR_TIEDOSTOJA - 2;
 
-	int eka_tiedosto  = menu_tiedostot_eka;
-	int vika_tiedosto = menu_tiedostot_eka+35;
+    int eka_tiedosto = menu_tiedostot_eka;
+    int vika_tiedosto = menu_tiedostot_eka + 35;
 
-	if (vika_tiedosto > MAX_DIR_TIEDOSTOJA)
-		vika_tiedosto = MAX_DIR_TIEDOSTOJA;
+    if (vika_tiedosto > MAX_DIR_TIEDOSTOJA)
+        vika_tiedosto = MAX_DIR_TIEDOSTOJA;
 
-	if (eka_tiedosto < 0)
-		eka_tiedosto = 0;
+    if (eka_tiedosto < 0)
+        eka_tiedosto = 0;
 
-	int ti = menu_tiedostot_eka;
-	int tilask = 0;
+    int ti = menu_tiedostot_eka;
+    int tilask = 0;
 
-	//for (int ti=eka_tiedosto;ti<vika_tiedosto;ti++)
-	while (linkki_y<33*9 && ti < MAX_DIR_TIEDOSTOJA)
-	{
-		if (tiedostot[ti].tyyppi != 0)
-		{
-			if (tiedostot[ti].tyyppi == TIEDOSTO_DIR && nayta_hakemistot)
+    //for (int ti=eka_tiedosto;ti<vika_tiedosto;ti++)
+    while (linkki_y < 33 * 9 && ti < MAX_DIR_TIEDOSTOJA) {
+        if (tiedostot[ti].tyyppi != 0) {
+            if (tiedostot[ti].tyyppi == TIEDOSTO_DIR && nayta_hakemistot) {
+                strcpy(otsikko, tiedostot[ti].nimi);
+                PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, x + 5, y + linkki_y + 3, 338, 1, 346, 8);
+                //strcat(otsikko,"...");
+                if (Level_Editor_Linkki(otsikko, x + 5 + 10, y + linkki_y + 3, i)) {
+                    if (_chdir(tiedostot[ti].nimi) == 0) {
+                        _getcwd(working_directory, _MAX_PATH);
+                        paivita = true;
+                        strcpy(message, "changed directory");
+                        menu_tiedostot_eka = 0;
+                    } else
+                        strcpy(message, "could not open directory");
+                }
+                linkki_y += 9;
+            }
+
+            switch (menu_tiedostot_nayta) {
+                case 1:
+                    if (tiedostot[ti].tyyppi == TIEDOSTO_MAP) {
+                        if (Level_Editor_Linkki(tiedostot[ti].nimi, x + 5, y + linkki_y + 3, i))
+                            Level_Editor_Kartta_Lataa(tiedostot[ti].nimi);
+                        linkki_y += 9;
+                    }
+                    break;
+                case 2:
+                    if (tiedostot[ti].tyyppi == TIEDOSTO_BMP) {
+                        if (Level_Editor_Linkki(tiedostot[ti].nimi, x + 5, y + linkki_y + 3, i)) {
+                            Level_Editor_Aseta_Palikat(tiedostot[ti].nimi);
+                            strcpy(message, "tile palette loaded from picture");
+                        }
+                        linkki_y += 9;
+                    }
+                    break;
+                case 3:
+                    if (tiedostot[ti].tyyppi == TIEDOSTO_SPR) {
+                        if (Level_Editor_Linkki(tiedostot[ti].nimi, x + 5, y + linkki_y + 3, i))
+                            if (Level_Editor_Prototyyppi_Lataa_Uusi(working_directory, tiedostot[ti].nimi) != 0)//..New
+                            {
+                                //strcpy(message,"could not load sprite ");
+                                //strcat(message,tiedostot[ti].name);
+                            }
+                        linkki_y += 9;
+                    }
+                    break;
+                case 4:
+                    if (tiedostot[ti].tyyppi == TIEDOSTO_BMP) {
+                        if (Level_Editor_Linkki(tiedostot[ti].nimi, x + 5, y + linkki_y + 3, i)) {
+                            Level_Editor_Aseta_Taustakuva(tiedostot[ti].nimi);
+                            strcpy(message, "background loaded from picture");
+                        }
+                        linkki_y += 9;
+                    }
+                    break;
+                case 5:
+                    if (tiedostot[ti].tyyppi == TIEDOSTO_MUS) {
+                        if (Level_Editor_Linkki(tiedostot[ti].nimi, x + 5, y + linkki_y + 3, i)) {
+                            //Level_Editor_Aseta_Taustakuva(tiedostot[ti].name);
+                            strcpy(map->music, tiedostot[ti].nimi);
+                            strcpy(message, "loaded music.");
+                        }
+                        linkki_y += 9;
+                    }
+                    break;
+                default:
+                    break;//linkki_y += 9; break;
+            }
+
+            /*
+			if (Level_Editor_Linkki(tiedostot[ti].name,x+5,y+linkki_y+3))
 			{
-				strcpy(otsikko,tiedostot[ti].nimi);
-				PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER,x+5,y+linkki_y+3,338,1,346,8);
-				//strcat(otsikko,"...");
-				if (Level_Editor_Linkki(otsikko,x+5+10,y+linkki_y+3,i))
+				if (tiedostot[ti].type == TIEDOSTO_DIR)
 				{
-					if (_chdir(tiedostot[ti].nimi) == 0)
+					if (_chdir(tiedostot[ti].name) == 0)
 					{
-						_getcwd(tyohakemisto, _MAX_PATH );
+						_getcwd(working_directory, _MAX_PATH );
 						paivita = true;
-						strcpy(viesti,"changed directory");
-						menu_tiedostot_eka = 0;
-					}
-					else
-						strcpy(viesti,"could not open directory");
-				}
-				linkki_y += 9;
-			}			
-			
-			switch (menu_tiedostot_nayta)
-			{
-			case 1:	if (tiedostot[ti].tyyppi == TIEDOSTO_MAP)
-					{
-						if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3,i))
-							Level_Editor_Kartta_Lataa(tiedostot[ti].nimi);
-						linkki_y += 9;
-					}
-					break;
-			case 2:	if (tiedostot[ti].tyyppi == TIEDOSTO_BMP)
-					{
-						if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3,i))
-						{
-							Level_Editor_Aseta_Palikat(tiedostot[ti].nimi);
-							strcpy(viesti,"tile palette loaded from picture");
-						}
-						linkki_y += 9;
-					}
-					break;
-			case 3:	if (tiedostot[ti].tyyppi == TIEDOSTO_SPR)
-					{
-						if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3,i))
-							if (Level_Editor_Prototyyppi_Lataa_Uusi(tyohakemisto,tiedostot[ti].nimi) != 0)//..Uusi
-							{
-								//strcpy(viesti,"could not load sprite ");
-								//strcat(viesti,tiedostot[ti].nimi);
-							}
-						linkki_y += 9;
-					}
-					break;
-			case 4:	if (tiedostot[ti].tyyppi == TIEDOSTO_BMP)
-					{
-						if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3,i))
-						{
-							Level_Editor_Aseta_Taustakuva(tiedostot[ti].nimi);
-							strcpy(viesti,"background loaded from picture");
-						}
-						linkki_y += 9;
-					}
-					break;
-			case 5:	if (tiedostot[ti].tyyppi == TIEDOSTO_MUS)
-					{
-						if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3,i))
-						{
-							//Level_Editor_Aseta_Taustakuva(tiedostot[ti].nimi);
-							strcpy(kartta->musiikki, tiedostot[ti].nimi);
-							strcpy(viesti,"loaded music.");
-						}
-						linkki_y += 9;
-					}
-					break;
-			default:break;//linkki_y += 9; break;
-			}
-			
-					/*		
-			if (Level_Editor_Linkki(tiedostot[ti].nimi,x+5,y+linkki_y+3))
-			{
-				if (tiedostot[ti].tyyppi == TIEDOSTO_DIR)
-				{
-					if (_chdir(tiedostot[ti].nimi) == 0)
-					{
-						_getcwd(tyohakemisto, _MAX_PATH );
-						paivita = true;
-						strcpy(viesti,"changed directory");
+						strcpy(message,"changed directory");
 
 					}
 					else
-						strcpy(viesti,"could not open directory");
+						strcpy(message,"could not open directory");
 				}
-				
-				if (tiedostot[ti].tyyppi == TIEDOSTO_MAP)
+
+				if (tiedostot[ti].type == TIEDOSTO_MAP)
 				{
-					Level_Editor_Kartta_Lataa(tiedostot[ti].nimi);
+					Level_Editor_Kartta_Lataa(tiedostot[ti].name);
 				}
-				
-				if (tiedostot[ti].tyyppi == TIEDOSTO_BMP)
+
+				if (tiedostot[ti].type == TIEDOSTO_BMP)
 				{
-					Level_Editor_Aseta_Palikat(tiedostot[ti].nimi);
-					strcpy(viesti,"block palette loaded from picture");
+					Level_Editor_Aseta_Palikat(tiedostot[ti].name);
+					strcpy(message,"block palette loaded from picture");
 				}
-				
-				if (tiedostot[ti].tyyppi == TIEDOSTO_SPR)
+
+				if (tiedostot[ti].type == TIEDOSTO_SPR)
 				{
-					if (Level_Editor_Prototyyppi_Lataa_Uusi(tiedostot[ti].nimi) != 0)
+					if (Level_Editor_Prototyyppi_Lataa_Uusi(tiedostot[ti].name) != 0)
 					{
-						strcpy(viesti,"could not load sprite ");
-						strcat(viesti,tiedostot[ti].nimi);
+						strcpy(message,"could not load sprite ");
+						strcat(message,tiedostot[ti].name);
 					}
 				}
 			}*/
-		}
-		ti++;
-	}
+        }
+        ti++;
+    }
 
-	Level_Editor_Viiva_Vert(x + menut[i].leveys - 102, y, 300, 41);
+    Level_Editor_Viiva_Vert(x + menut[i].leveys - 102, y, 300, 41);
 
-	if (Level_Editor_Nappi("save   ",x + menut[i].leveys - 96,y+2,i ))
-	{
-		menut[MENU_SAVE].piilota = false;
-		menu_tiedostot_eka = 0;
-		
-		if (strcmp(epd_hakemisto," ")!=0)
-		{
-			if (_chdir(epd_hakemisto) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to last map folder");
-				paivita = true;
-			}
-		}
-	}
-	
-	Level_Editor_Viiva_Hori(x + menut[i].leveys - 102, y+20, 100, 41);
-	
-	if (Level_Editor_Nappi("maps   ",x + menut[i].leveys - 96,y+24,i))
-	{
-		menu_tiedostot_nayta = 1;
-		menu_tiedostot_eka = 0;
-		
-		if (strcmp(epd_hakemisto," ")!=0)
-		{
-			if (_chdir(epd_hakemisto) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to last map folder");
-				paivita = true;
-			}
-		}
-	}
-	
-	if (Level_Editor_Nappi("tiles  ",x + menut[i].leveys - 96,y+38,i))
-	{
-		menu_tiedostot_nayta = 2;
-		menu_tiedostot_eka = 0;
+    if (Level_Editor_Nappi("save   ", x + menut[i].leveys - 96, y + 2, i)) {
+        menut[MENU_SAVE].piilota = false;
+        menu_tiedostot_eka = 0;
 
-		if (strcmp(tile_hakemisto," ")==0)
-			strcpy(tile_hakemisto,epd_hakemisto);
-		
-		if (strcmp(tile_hakemisto," ")!=0)
-		{
-			if (_chdir(tile_hakemisto) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to last map folder");
-				paivita = true;
-			}
-		}
-	}
-	
-	if (Level_Editor_Nappi("sprites",x + menut[i].leveys - 96,y+52,i))
-	{
-		menu_tiedostot_nayta = 3;
-		menu_tiedostot_eka = 0;
+        if (strcmp(epd_hakemisto, " ") != 0) {
+            if (_chdir(epd_hakemisto) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to last map folder");
+                paivita = true;
+            }
+        }
+    }
 
-		if (strcmp(pk2_hakemisto," ")!=0)
-		{
-			char temp[_MAX_DIR];
-			strcpy(temp, pk2_hakemisto);
-			strcat(temp,"\\sprites");
-			if (_chdir(temp) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to sprites folder");
-				paivita = true;
-			}
-		}
-	}
+    Level_Editor_Viiva_Hori(x + menut[i].leveys - 102, y + 20, 100, 41);
 
-	if (Level_Editor_Nappi("scenery",x + menut[i].leveys - 96,y+66,i))
-	{
-		menu_tiedostot_nayta = 4;
-		menu_tiedostot_eka = 0;
+    if (Level_Editor_Nappi("maps   ", x + menut[i].leveys - 96, y + 24, i)) {
+        menu_tiedostot_nayta = 1;
+        menu_tiedostot_eka = 0;
 
-		if (strcmp(bg_hakemisto," ")==0)
-			strcpy(bg_hakemisto,epd_hakemisto);		
+        if (strcmp(epd_hakemisto, " ") != 0) {
+            if (_chdir(epd_hakemisto) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to last map folder");
+                paivita = true;
+            }
+        }
+    }
 
-		if (strcmp(bg_hakemisto," ")!=0)
-		{
-			if (_chdir(bg_hakemisto) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to last map folder");
-				paivita = true;
-			}
-		}
-	}
+    if (Level_Editor_Nappi("tiles  ", x + menut[i].leveys - 96, y + 38, i)) {
+        menu_tiedostot_nayta = 2;
+        menu_tiedostot_eka = 0;
 
-	if (Level_Editor_Nappi("music  ",x + menut[i].leveys - 96,y+80,i))
-	{
-		menu_tiedostot_nayta = 5;
-		menu_tiedostot_eka = 0;
+        if (strcmp(tile_hakemisto, " ") == 0)
+            strcpy(tile_hakemisto, epd_hakemisto);
 
-		if (strcmp(pk2_hakemisto," ")!=0)
-		{
-			char temp[_MAX_DIR];
-			strcpy(temp, pk2_hakemisto);
-			strcat(temp,"\\music");
-			if (_chdir(temp) == 0)
-			{
-				_getcwd(tyohakemisto, _MAX_PATH );
-				strcpy(viesti,"moved to music folder");
-				paivita = true;
-			}
-		}
-	}
+        if (strcmp(tile_hakemisto, " ") != 0) {
+            if (_chdir(tile_hakemisto) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to last map folder");
+                paivita = true;
+            }
+        }
+    }
 
-	if (nayta_hakemistot) {
-		if (Level_Editor_Nappi("hide dirs",x + menut[i].leveys - 96,y+110,i)) nayta_hakemistot = !nayta_hakemistot;
-	}
-	else {
-		if (Level_Editor_Nappi("show dirs",x + menut[i].leveys - 96,y+110,i)) nayta_hakemistot = !nayta_hakemistot;
-	}
+    if (Level_Editor_Nappi("sprites", x + menut[i].leveys - 96, y + 52, i)) {
+        menu_tiedostot_nayta = 3;
+        menu_tiedostot_eka = 0;
 
-	if (paivita)
-	{
-		Level_Editor_Tiedostot_Alusta();
-		Level_Editor_Tiedostot_Hae();
-		Level_Editor_Tiedostot_Aakkosta();
-	}
+        if (strcmp(pk2_hakemisto, " ") != 0) {
+            char temp[_MAX_DIR];
+            strcpy(temp, pk2_hakemisto);
+            strcat(temp, "\\sprites");
+            if (_chdir(temp) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to sprites folder");
+                paivita = true;
+            }
+        }
+    }
 
-	int nuoli = Level_Editor_Piirra_Nuolet(x+menut[i].leveys-15,y+menut[i].korkeus-30,i);
-	
-	if (nuoli == 1 && menu_tiedostot_eka > 0)
-	{
-		menu_tiedostot_eka -= 15;
-	}
+    if (Level_Editor_Nappi("scenery", x + menut[i].leveys - 96, y + 66, i)) {
+        menu_tiedostot_nayta = 4;
+        menu_tiedostot_eka = 0;
 
-	if (nuoli == 2 && menu_tiedostot_eka < MAX_DIR_TIEDOSTOJA-1)
-	{
-		menu_tiedostot_eka += 15;
-	}
+        if (strcmp(bg_hakemisto, " ") == 0)
+            strcpy(bg_hakemisto, epd_hakemisto);
 
-	return 0;
+        if (strcmp(bg_hakemisto, " ") != 0) {
+            if (_chdir(bg_hakemisto) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to last map folder");
+                paivita = true;
+            }
+        }
+    }
+
+    if (Level_Editor_Nappi("music  ", x + menut[i].leveys - 96, y + 80, i)) {
+        menu_tiedostot_nayta = 5;
+        menu_tiedostot_eka = 0;
+
+        if (strcmp(pk2_hakemisto, " ") != 0) {
+            char temp[_MAX_DIR];
+            strcpy(temp, pk2_hakemisto);
+            strcat(temp, "\\music");
+            if (_chdir(temp) == 0) {
+                _getcwd(working_directory, _MAX_PATH);
+                strcpy(message, "moved to music folder");
+                paivita = true;
+            }
+        }
+    }
+
+    if (nayta_hakemistot) {
+        if (Level_Editor_Nappi("hide dirs", x + menut[i].leveys - 96, y + 110, i)) nayta_hakemistot = !nayta_hakemistot;
+    } else {
+        if (Level_Editor_Nappi("show dirs", x + menut[i].leveys - 96, y + 110, i)) nayta_hakemistot = !nayta_hakemistot;
+    }
+
+    if (paivita) {
+        Level_Editor_Tiedostot_Alusta();
+        Level_Editor_Tiedostot_Hae();
+        Level_Editor_Tiedostot_Aakkosta();
+    }
+
+    int nuoli = Level_Editor_Piirra_Nuolet(x + menut[i].leveys - 15, y + menut[i].korkeus - 30, i);
+
+    if (nuoli == 1 && menu_tiedostot_eka > 0) {
+        menu_tiedostot_eka -= 15;
+    }
+
+    if (nuoli == 2 && menu_tiedostot_eka < MAX_DIR_TIEDOSTOJA - 1) {
+        menu_tiedostot_eka += 15;
+    }
+
+    return 0;
 }
 
-int Level_Editor_Menu_Tallenna(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16;
+int Level_Editor_Menu_Tallenna(int i) {
+    int x = menut[i].x, y = menut[i].y + 16;
 
-	PisteDraw_Font_Kirjoita(fontti1,"type the name of the level:", PD_TAUSTABUFFER, x+3, y+3);
+    PisteDraw_Font_Write(font1, "type the name of the level:", PD_BACKBUFFER, x + 3, y + 3);
 
-	Level_Editor_Kysy(karttatiedosto,x+3,y+15,12, KENTTA_FILE,i);
+    Level_Editor_Kysy(karttatiedosto, x + 3, y + 15, 12, KENTTA_FILE, i);
 
-	if (Level_Editor_Nappi("save",x+3,y+30,i))
-	{
-		Level_Editor_Kartta_Tallenna();	
-		Level_Editor_Tiedostot_Alusta();
-		Level_Editor_Tiedostot_Hae();
-		Level_Editor_Tiedostot_Aakkosta();
-	}
+    if (Level_Editor_Nappi("save", x + 3, y + 30, i)) {
+        Level_Editor_Kartta_Tallenna();
+        Level_Editor_Tiedostot_Alusta();
+        Level_Editor_Tiedostot_Hae();
+        Level_Editor_Tiedostot_Aakkosta();
+    }
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Lopetus(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16;
+int Level_Editor_Menu_Lopetus(int i) {
+    int x = menut[i].x, y = menut[i].y + 16;
 
-	PisteDraw_Font_Kirjoita(fontti1,"do you really want to quit?", PD_TAUSTABUFFER, x+3, y+3);
+    PisteDraw_Font_Write(font1, "do you really want to quit?", PD_BACKBUFFER, x + 3, y + 3);
 
-	if (Level_Editor_Nappi("quit",x+3,y+20,i))
-	{
-		PisteDraw_Fade_Paletti_Out(PD_FADE_NOPEA);
-		exit_editor = true;
-		key_delay = 15;	
-	}
+    if (Level_Editor_Nappi("quit", x + 3, y + 20, i)) {
+        PisteDraw_Fade_Palette_Out(PD_FADE_FAST);
+        exit_editor = true;
+        key_delay = 15;
+    }
 
-	if (Level_Editor_Nappi("cancel",x+45,y+20,i))
-	{
-		menut[i].piilota = true;
-		key_delay = 15;		
-	}
+    if (Level_Editor_Nappi("cancel", x + 45, y + 20, i)) {
+        menut[i].piilota = true;
+        key_delay = 15;
+    }
 
-	if (Level_Editor_Nappi("save and quit",x+100,y+20,i))
-	{
-		if (Level_Editor_Kartta_Tallenna()==0)
-		{
-			PisteDraw_Fade_Paletti_Out(PD_FADE_NOPEA);
-			exit_editor = true;
-		}
+    if (Level_Editor_Nappi("save and quit", x + 100, y + 20, i)) {
+        if (Level_Editor_Kartta_Tallenna() == 0) {
+            PisteDraw_Fade_Palette_Out(PD_FADE_FAST);
+            exit_editor = true;
+        }
 
-		key_delay = 15;	
-	}
+        key_delay = 15;
+    }
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Tiedot(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16,
-		my = y+19,
-		vali = 0;
+int Level_Editor_Menu_Tiedot(int i) {
+    int x = menut[i].x, y = menut[i].y + 16, my = y + 19, vali = 0;
 
-	char luku[20];
-	
-	vali = PisteDraw_Font_Kirjoita(fontti1,"version", PD_TAUSTABUFFER, x+3, my);
-	PisteDraw_Font_Kirjoita(fontti1,kartta->versio, PD_TAUSTABUFFER, x+3+vali+16, my);my+=12;
+    char luku[20];
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"name:", PD_TAUSTABUFFER, x+3, my);
-	Level_Editor_Kysy(kartta->nimi,x+83,my,16,KENTTA_NIMI,i);my+=12;
+    vali = PisteDraw_Font_Write(font1, "version", PD_BACKBUFFER, x + 3, my);
+    PisteDraw_Font_Write(font1, map->version, PD_BACKBUFFER, x + 3 + vali + 16, my);
+    my += 12;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"file name:", PD_TAUSTABUFFER, x+3, my);
-	Level_Editor_Kysy(karttatiedosto,x+83,my,12, KENTTA_FILE,i);my+=12;	
+    vali = PisteDraw_Font_Write(font1, "name:", PD_BACKBUFFER, x + 3, my);
+    Level_Editor_Kysy(map->name, x + 83, my, 16, KENTTA_NIMI, i);
+    my += 12;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"creator:", PD_TAUSTABUFFER, x+3, my);
-	Level_Editor_Kysy(kartta->tekija,x+83,my,29, KENTTA_TEKIJA,i);my+=12;
+    vali = PisteDraw_Font_Write(font1, "file name:", PD_BACKBUFFER, x + 3, my);
+    Level_Editor_Kysy(karttatiedosto, x + 83, my, 12, KENTTA_FILE, i);
+    my += 12;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"tile picture:", PD_TAUSTABUFFER, x+3, my);
-	PisteDraw_Font_Kirjoita(fontti1,kartta->palikka_bmp, PD_TAUSTABUFFER, x+3+vali+16, my);my+=12;
+    vali = PisteDraw_Font_Write(font1, "creator:", PD_BACKBUFFER, x + 3, my);
+    Level_Editor_Kysy(map->author, x + 83, my, 29, KENTTA_TEKIJA, i);
+    my += 12;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"background picture:", PD_TAUSTABUFFER, x+3, my);
-	PisteDraw_Font_Kirjoita(fontti1,kartta->taustakuva, PD_TAUSTABUFFER, x+3+vali+16, my);my+=12;
+    vali = PisteDraw_Font_Write(font1, "tile picture:", PD_BACKBUFFER, x + 3, my);
+    PisteDraw_Font_Write(font1, map->block_bmp, PD_BACKBUFFER, x + 3 + vali + 16, my);
+    my += 12;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"background music:", PD_TAUSTABUFFER, x+3, my);
-	//PisteDraw_Font_Kirjoita(fontti1,kartta->musiikki, PD_TAUSTABUFFER, x+3+vali+16, my);my+=12;
-	Level_Editor_Kysy(kartta->musiikki,x+3+vali+16,my,12, KENTTA_MUSIIKKI,i);my+=12;
+    vali = PisteDraw_Font_Write(font1, "background picture:", PD_BACKBUFFER, x + 3, my);
+    PisteDraw_Font_Write(font1, map->background_image, PD_BACKBUFFER, x + 3 + vali + 16, my);
+    my += 12;
 
-	int nuoli;
-	nuoli = Level_Editor_Piirra_Nuolet2(x+108,my,i);
-	if (nuoli == 2 && kartta->jakso > 0)
-		kartta->jakso--;
-	if (nuoli == 1)
-		kartta->jakso++;
+    vali = PisteDraw_Font_Write(font1, "background music:", PD_BACKBUFFER, x + 3, my);
+    //PisteDraw_Font_Write(font1,map->music, PD_BACKBUFFER, x+3+vali+16, my);my+=12;
+    Level_Editor_Kysy(map->music, x + 3 + vali + 16, my, 12, KENTTA_MUSIIKKI, i);
+    my += 12;
 
-	if (kartta->jakso < 0)
-		kartta->jakso = 0;
+    int nuoli;
+    nuoli = Level_Editor_Piirra_Nuolet2(x + 108, my, i);
+    if (nuoli == 2 && map->stage > 0)
+        map->stage--;
+    if (nuoli == 1)
+        map->stage++;
 
-	itoa(kartta->jakso,luku,10);
-	vali = PisteDraw_Font_Kirjoita(fontti1,"level:", PD_TAUSTABUFFER, x+3, my);
-	PisteDraw_Font_Kirjoita(fontti1,luku, PD_TAUSTABUFFER, x+3+vali+16, my);my+=12;
-	my+=10;
+    if (map->stage < 0)
+        map->stage = 0;
 
-	nuoli = Level_Editor_Piirra_Nuolet2(x+108,my,i);
-	if (nuoli == 2 && kartta->aika > 0)
-		kartta->aika -= 10;
-	if (nuoli == 1)
-		kartta->aika += 10;
-	
-	if (kartta->aika < 0)
-		kartta->aika = 0;
+    itoa(map->stage, luku, 10);
+    vali = PisteDraw_Font_Write(font1, "level:", PD_BACKBUFFER, x + 3, my);
+    PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + 3 + vali + 16, my);
+    my += 12;
+    my += 10;
 
-	int min = kartta->aika / 60,
-		sek = kartta->aika % 60;
+    nuoli = Level_Editor_Piirra_Nuolet2(x + 108, my, i);
+    if (nuoli == 2 && map->time > 0)
+        map->time -= 10;
+    if (nuoli == 1)
+        map->time += 10;
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"time:", PD_TAUSTABUFFER, x+3, my);
-	if (min<10)
-		vali += PisteDraw_Font_Kirjoita(fontti1,"0", PD_TAUSTABUFFER, x+3+vali+16, my);
-	itoa(min,luku,10);	
-	vali += PisteDraw_Font_Kirjoita(fontti1,luku, PD_TAUSTABUFFER, x+3+vali+16, my);
+    if (map->time < 0)
+        map->time = 0;
 
-	if (sek<10)
-		vali += PisteDraw_Font_Kirjoita(fontti1,":0", PD_TAUSTABUFFER, x+3+vali+16, my);	
-	else
-		vali += PisteDraw_Font_Kirjoita(fontti1,":", PD_TAUSTABUFFER, x+3+vali+16, my);
-	
-	itoa(sek,luku,10);	
-	vali += PisteDraw_Font_Kirjoita(fontti1,luku, PD_TAUSTABUFFER, x+3+vali+16, my);	
-	
-	my+=16;
-	
-	
-	char tausta[100];
+    int min = map->time / 60, sek = map->time % 60;
 
-	switch(kartta->tausta)
-	{
-	case TAUSTA_STAATTINEN				: strcpy(tausta,"no scrolling  ");break;
-	case TAUSTA_PALLARX_HORI			: strcpy(tausta,"left and right");break;
-	case TAUSTA_PALLARX_VERT			: strcpy(tausta,"up and down   ");break;
-	case TAUSTA_PALLARX_VERT_JA_HORI	: strcpy(tausta,"free scrolling");break;
-	default								: break;
-	}
-	
-	vali = PisteDraw_Font_Kirjoita(fontti1,"background scrolling:", PD_TAUSTABUFFER, x+3, my);
-	if (Level_Editor_Nappi(tausta,x+3+vali+16,my,i))
-	{
-		kartta->tausta++;
-		kartta->tausta %= 4;
-	}
-	my+=16;
+    vali = PisteDraw_Font_Write(font1, "time:", PD_BACKBUFFER, x + 3, my);
+    if (min < 10)
+        vali += PisteDraw_Font_Write(font1, "0", PD_BACKBUFFER, x + 3 + vali + 16, my);
+    itoa(min, luku, 10);
+    vali += PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + 3 + vali + 16, my);
 
-	switch(kartta->ilma)
-	{
-	case ILMA_NORMAALI					: strcpy(tausta,"normal       ");break;
-	case ILMA_SADE						: strcpy(tausta,"rain         ");break;
-	case ILMA_METSA						: strcpy(tausta,"leaves       ");break;
-	case ILMA_SADEMETSA					: strcpy(tausta,"rain + leaves");break;
-	case ILMA_LUMISADE					: strcpy(tausta,"snow         ");break;
-	default								: break;
-	}
+    if (sek < 10)
+        vali += PisteDraw_Font_Write(font1, ":0", PD_BACKBUFFER, x + 3 + vali + 16, my);
+    else
+        vali += PisteDraw_Font_Write(font1, ":", PD_BACKBUFFER, x + 3 + vali + 16, my);
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"special:", PD_TAUSTABUFFER, x+3, my);
-	if (Level_Editor_Nappi(tausta,x+3+vali+16,my,i))
-	{
-		kartta->ilma++;
-		kartta->ilma %= 5;
-	}
-	
-	my+=19;	
+    itoa(sek, luku, 10);
+    vali += PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + 3 + vali + 16, my);
 
-	/* Kartan ikoni */
-	vali = PisteDraw_Font_Kirjoita(fontti1,"map icon:", PD_TAUSTABUFFER, x+3, my);
-	itoa(kartta->ikoni+1,luku,10);	
-	PisteDraw_Font_Kirjoita(fontti1, luku, PD_TAUSTABUFFER, x+3+vali+16, my);	
-	
-	nuoli = Level_Editor_Piirra_Nuolet2(x+118,my,i);
-	if (nuoli == 1)
-		kartta->ikoni++;
-	if (nuoli == 2)
-		kartta->ikoni--;
-	
-	if (kartta->ikoni < 0)
-		kartta->ikoni = 0;
+    my += 16;
 
-	my+=16;
 
-	/* Kartan x-kordinaatti */
-	vali = PisteDraw_Font_Kirjoita(fontti1,"map x:", PD_TAUSTABUFFER, x+3, my);
-	itoa(kartta->x,luku,10);	
-	PisteDraw_Font_Kirjoita(fontti1, luku, PD_TAUSTABUFFER, x+vali+9, my);	
-	nuoli = Level_Editor_Piirra_Nuolet2(x+100,my,i);
-	if (nuoli == 1)	kartta->x+= 15;
-	if (nuoli == 2)	kartta->x-= 15;
-	if (kartta->x < 0) kartta->x = 0;
-	if (kartta->x > 620) kartta->x = 620;
+    char tausta[100];
 
-	vali = PisteDraw_Font_Kirjoita(fontti1,"map y:", PD_TAUSTABUFFER, x+3+150, my);
-	itoa(kartta->y,luku,10);	
-	PisteDraw_Font_Kirjoita(fontti1, luku, PD_TAUSTABUFFER, x+vali+9+150, my);	
-	nuoli = Level_Editor_Piirra_Nuolet2(x+100+150,my,i);
-	if (nuoli == 1)	kartta->y+=15;
-	if (nuoli == 2)	kartta->y-=15;
-	if (kartta->y < 0) kartta->y = 0;
-	if (kartta->y > 620) kartta->y = 620;
+    switch (map->background) {
+        case BACKGROUND_STATIC                :
+            strcpy(tausta, "no scrolling  ");
+            break;
+        case BACKGROUND_PARALLAX_HORI            :
+            strcpy(tausta, "left and right");
+            break;
+        case BACKGROUND_PARALLAX_VERT            :
+            strcpy(tausta, "up and down   ");
+            break;
+        case BACKGROUND_PARALLAX_VERT_AND_HORI    :
+            strcpy(tausta, "free scrolling");
+            break;
+        default                                :
+            break;
+    }
 
-	my+=9;	
-	
-	/*
-	vali = PisteDraw_Font_Kirjoita(fontti1,"block palette:", PD_TAUSTABUFFER, x+3, my);
-	PisteDraw_Font_Kirjoita(fontti1,kartta->nimi, PD_TAUSTABUFFER, x+3+vali+16, my);my+=9;
+    vali = PisteDraw_Font_Write(font1, "background scrolling:", PD_BACKBUFFER, x + 3, my);
+    if (Level_Editor_Nappi(tausta, x + 3 + vali + 16, my, i)) {
+        map->background++;
+        map->background %= 4;
+    }
+    my += 16;
+
+    switch (map->climate) {
+        case WEATHER_NORMAL                    :
+            strcpy(tausta, "normal       ");
+            break;
+        case WEATHER_RAIN                        :
+            strcpy(tausta, "rain         ");
+            break;
+        case WEATHER_FOREST                        :
+            strcpy(tausta, "leaves       ");
+            break;
+        case WEATHER_RAIN_FOREST                    :
+            strcpy(tausta, "rain + leaves");
+            break;
+        case WEATHER_SNOW                    :
+            strcpy(tausta, "snow         ");
+            break;
+        default                                :
+            break;
+    }
+
+    vali = PisteDraw_Font_Write(font1, "special:", PD_BACKBUFFER, x + 3, my);
+    if (Level_Editor_Nappi(tausta, x + 3 + vali + 16, my, i)) {
+        map->climate++;
+        map->climate %= 5;
+    }
+
+    my += 19;
+
+    /* Kartan icon */
+    vali = PisteDraw_Font_Write(font1, "map icon:", PD_BACKBUFFER, x + 3, my);
+    itoa(map->icon + 1, luku, 10);
+    PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + 3 + vali + 16, my);
+
+    nuoli = Level_Editor_Piirra_Nuolet2(x + 118, my, i);
+    if (nuoli == 1)
+        map->icon++;
+    if (nuoli == 2)
+        map->icon--;
+
+    if (map->icon < 0)
+        map->icon = 0;
+
+    my += 16;
+
+    /* Kartan x-kordinaatti */
+    vali = PisteDraw_Font_Write(font1, "map x:", PD_BACKBUFFER, x + 3, my);
+    itoa(map->x, luku, 10);
+    PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + vali + 9, my);
+    nuoli = Level_Editor_Piirra_Nuolet2(x + 100, my, i);
+    if (nuoli == 1) map->x += 15;
+    if (nuoli == 2) map->x -= 15;
+    if (map->x < 0) map->x = 0;
+    if (map->x > 620) map->x = 620;
+
+    vali = PisteDraw_Font_Write(font1, "map y:", PD_BACKBUFFER, x + 3 + 150, my);
+    itoa(map->y, luku, 10);
+    PisteDraw_Font_Write(font1, luku, PD_BACKBUFFER, x + vali + 9 + 150, my);
+    nuoli = Level_Editor_Piirra_Nuolet2(x + 100 + 150, my, i);
+    if (nuoli == 1) map->y += 15;
+    if (nuoli == 2) map->y -= 15;
+    if (map->y < 0) map->y = 0;
+    if (map->y > 620) map->y = 620;
+
+    my += 9;
+
+    /*
+	vali = PisteDraw_Font_Kirjoita(font1,"block palette:", PD_BACKBUFFER, x+3, my);
+	PisteDraw_Font_Write(font1,map->name, PD_BACKBUFFER, x+3+vali+16, my);my+=9;
 	*/
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Tools(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16;
+int Level_Editor_Menu_Tools(int i) {
+    int x = menut[i].x, y = menut[i].y + 16;
 
-	//PisteDraw_Font_Kirjoita(fontti1,"", PD_TAUSTABUFFER, x+3, y+3);
+    //PisteDraw_Font_Write(font1,"", PD_BACKBUFFER, x+3, y+3);
 
-	//Level_Editor_Kysy(karttatiedosto/*kartta->nimi*/,x+3,y+15,12, KENTTA_FILE);
+    //Level_Editor_Kysy(karttatiedosto/*map->name*/,x+3,y+15,12, KENTTA_FILE);
 
-	if (Level_Editor_Nappi("clear sprites",x+10,y+10,i)){
-		if (i==aktiivinen_menu){
-			Level_Editor_Kartta_Varmista();
-			Level_Editor_Prototyyppi_Tyhjenna();
-		}
-	}
+    if (Level_Editor_Nappi("clear sprites", x + 10, y + 10, i)) {
+        if (i == aktiivinen_menu) {
+            Level_Editor_Kartta_Varmista();
+            Level_Editor_Prototyyppi_Tyhjenna();
+        }
+    }
 
-	y += 25;
+    y += 25;
 
-	if (Level_Editor_Nappi("clear unused sprites",x+10,y+10,i)){
-		if (i==aktiivinen_menu){
-			Level_Editor_Kartta_Varmista();
-			Level_Editor_Prototyyppi_Poista_Turhat();
-			menu_spritet_eka = 0;
-			//Level_Editor_Prototyyppi_Tyhjenna();
-		}
-	}
+    if (Level_Editor_Nappi("clear unused sprites", x + 10, y + 10, i)) {
+        if (i == aktiivinen_menu) {
+            Level_Editor_Kartta_Varmista();
+            Level_Editor_Prototyyppi_Poista_Turhat();
+            menu_spritet_eka = 0;
+            //Level_Editor_Prototyyppi_Tyhjenna();
+        }
+    }
 
-	y += 25;
+    y += 25;
 
-	if (Level_Editor_Nappi("clear all",x+10,y+10,i)){
-		if (i==aktiivinen_menu){
-			Level_Editor_Kartta_Varmista();
-			Level_Editor_Kartta_Alusta();
-		}
-	}
+    if (Level_Editor_Nappi("clear all", x + 10, y + 10, i)) {
+        if (i == aktiivinen_menu) {
+            Level_Editor_Kartta_Varmista();
+            Level_Editor_Kartta_Alusta();
+        }
+    }
 
-	y += 25;
+    y += 25;
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Loki(int i)
-{
-	int x = menut[i].x,
-		y = menut[i].y+16;
+int Level_Editor_Menu_Loki(int i) {
+    int x = menut[i].x, y = menut[i].y + 16;
 
-	int yl = 0;
+    int yl = 0;
 
-	for (int l=0;l<MAX_LOKIMERKINTOJA;l++){
+    for (int l = 0; l < MAX_LOKIMERKINTOJA; l++) {
 
-		if (loki[l].tyyppi == LOKI_VIRHE){
-			PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, x+3, y+3+l*9+3, x+7, y+7+l*9+3, 20+64);
-		}
-		
-		if (loki[l].tyyppi == LOKI_INFO){
-			PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, x+3, y+3+l*9+3, x+7, y+7+l*9+3, 20+96);
-		}
-		
-		PisteDraw_Font_Kirjoita(fontti1,loki[l].teksti, PD_TAUSTABUFFER, x+3+8, y+3+l*9);
-		
-	}
+        if (loki[l].tyyppi == LOKI_VIRHE) {
+            PisteDraw_Buffer_Clear(PD_BACKBUFFER, x + 3, y + 3 + l * 9 + 3, x + 7, y + 7 + l * 9 + 3, 20 + 64);
+        }
+
+        if (loki[l].tyyppi == LOKI_INFO) {
+            PisteDraw_Buffer_Clear(PD_BACKBUFFER, x + 3, y + 3 + l * 9 + 3, x + 7, y + 7 + l * 9 + 3, 20 + 96);
+        }
+
+        PisteDraw_Font_Write(font1, loki[l].teksti, PD_BACKBUFFER, x + 3 + 8, y + 3 + l * 9);
+
+    }
 
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menu_Piirra(int index, bool tayta, UCHAR vari)
-{
-	int leveys = menut[index].leveys;
-	int korkeus = menut[index].korkeus;
+int Level_Editor_Menu_Piirra(int index, bool tayta, unsigned char vari) {
+    int leveys = menut[index].leveys;
+    int korkeus = menut[index].korkeus;
 
-	leveys = leveys - 14;
+    leveys = leveys - 14;
 
-	//PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, menut[index].x-1, menut[index].y-1, 
-	//					   menut[index].x+menut[index].leveys+1, menut[index].y+16+korkeus, 0);
+    //PisteDraw_Buffer_Clear(PD_BACKBUFFER, menut[index].x-1, menut[index].y-1,
+    //					   menut[index].x+menut[index].width+1, menut[index].y+16+height, 0);
 
-	Level_Editor_Piirra_Nelio(menut[index].x-1, menut[index].y-1, 
-							  menut[index].x+menut[index].leveys+1, menut[index].y+16+korkeus, 0);
+    Level_Editor_Piirra_Nelio(menut[index].x - 1, menut[index].y - 1, menut[index].x + menut[index].leveys + 1,
+                              menut[index].y + 16 + korkeus, 0);
 
-	if (tayta)
-	{
-		double kork = menut[index].korkeus/6.0;
-		double ky = 0;
-		for (int c=0;c<6;c++)	
-		{
-			PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, menut[index].x, menut[index].y+15+int(ky), 
-							   menut[index].x+menut[index].leveys,  menut[index].y+15+int(ky+kork), 6-c+vari);
-			ky += kork;
-		}
-	}
+    if (tayta) {
+        double kork = menut[index].korkeus / 6.0;
+        double ky = 0;
+        for (int c = 0; c < 6; c++) {
+            PisteDraw_Buffer_Clear(PD_BACKBUFFER, menut[index].x, menut[index].y + 15 + int(ky),
+                                   menut[index].x + menut[index].leveys, menut[index].y + 15 + int(ky + kork),
+                                   6 - c + vari);
+            ky += kork;
+        }
+    }
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER, menut[index].x, menut[index].y, 
-								1, 1, 5, 16);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, menut[index].x, menut[index].y, 1, 1, 5, 16);
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER, menut[index].x+4, menut[index].y, 
-								6, 1, 6+leveys, 16);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, menut[index].x + 4, menut[index].y, 6, 1, 6 + leveys,
+                               16);
 
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER, menut[index].x+2+leveys, menut[index].y, 
-								311, 1, 323, 16);
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, menut[index].x + 2 + leveys, menut[index].y, 311, 1, 323,
+                               16);
 
-	if (index == aktiivinen_menu)
-		PisteDraw_Font_Kirjoita(fontti1,menut[index].otsikko,PD_TAUSTABUFFER,menut[index].x+5,menut[index].y+3);
-	else
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,menut[index].otsikko,PD_TAUSTABUFFER,menut[index].x+5,menut[index].y+3,50);
-	
+    if (index == aktiivinen_menu)
+        PisteDraw_Font_Write(font1, menut[index].otsikko, PD_BACKBUFFER, menut[index].x + 5, menut[index].y + 3);
+    else
+        PisteDraw_Font_Write_Transparent(font1, menut[index].otsikko, PD_BACKBUFFER, menut[index].x + 5,
+                                         menut[index].y + 3, 50);
+
 /*
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER, menut[index].x, menut[index].y+15, 
-						   menut[index].x+menut[index].leveys, menut[index].y+16+korkeus, 0);
+	PisteDraw_Buffer_Clear(PD_BACKBUFFER, menut[index].x, menut[index].y+15,
+						   menut[index].x+menut[index].width, menut[index].y+16+height, 0);
 */
 
-	switch(index)
-	{
-		case MENU_HELP		: Level_Editor_Menu_Help(index);break;
-		case MENU_KARTTA	: Level_Editor_Menu_Kartta(index);break;
-		case MENU_PALIKAT	: Level_Editor_Menu_Palikat(index);break;
-		case MENU_SPRITET	: Level_Editor_Menu_Spritet(index);break;
-		case MENU_TIEDOSTOT	: Level_Editor_Menu_Tiedostot(index);break;
-		case MENU_SAVE		: Level_Editor_Menu_Tallenna(index);break;
-		case MENU_INFO		: Level_Editor_Menu_Tiedot(index);break;
-		case MENU_TOOLS		: Level_Editor_Menu_Tools(index);break;
-		case MENU_LOKI		: Level_Editor_Menu_Loki(index);break;
-		case MENU_EXIT		: Level_Editor_Menu_Lopetus(index);break;
-		//case MENU_TYOKALUT	: Level_Editor_Menu_Tyokalut(index);break;
-		default				: break;
-	}
+    switch (index) {
+        case MENU_HELP        :
+            Level_Editor_Menu_Help(index);
+            break;
+        case MENU_KARTTA    :
+            Level_Editor_Menu_Kartta(index);
+            break;
+        case MENU_PALIKAT    :
+            Level_Editor_Menu_Palikat(index);
+            break;
+        case MENU_SPRITET    :
+            Level_Editor_Menu_Spritet(index);
+            break;
+        case MENU_TIEDOSTOT    :
+            Level_Editor_Menu_Tiedostot(index);
+            break;
+        case MENU_SAVE        :
+            Level_Editor_Menu_Tallenna(index);
+            break;
+        case MENU_INFO        :
+            Level_Editor_Menu_Tiedot(index);
+            break;
+        case MENU_TOOLS        :
+            Level_Editor_Menu_Tools(index);
+            break;
+        case MENU_LOKI        :
+            Level_Editor_Menu_Loki(index);
+            break;
+        case MENU_EXIT        :
+            Level_Editor_Menu_Lopetus(index);
+            break;
+            //case MENU_TYOKALUT	: Level_Editor_Menu_Tyokalut(index);break;
+        default                :
+            break;
+    }
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Menut_Piirra(void)
-{
-	for (int i=0;i<MAX_MENUJA;i++)
-	{
-		if (!menut[i].piilota && i != aktiivinen_menu)
-			Level_Editor_Menu_Piirra(i, true, VARI_SININEN);
-	}
+int Level_Editor_Menut_Piirra(void) {
+    for (int i = 0; i < MAX_MENUJA; i++) {
+        if (!menut[i].piilota && i != aktiivinen_menu)
+            Level_Editor_Menu_Piirra(i, true, COLOR_BLUE);
+    }
 
-	if (aktiivinen_menu != MENU_EI && aktiivinen_menu < MAX_MENUJA)
-		Level_Editor_Menu_Piirra(aktiivinen_menu, true, VARI_SININEN);	
+    if (aktiivinen_menu != MENU_EI && aktiivinen_menu < MAX_MENUJA)
+        Level_Editor_Menu_Piirra(aktiivinen_menu, true, COLOR_BLUE);
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Piirra_Spritet(void)
-{
-	int proto;
+int Level_Editor_Piirra_Spritet(void) {
+    int proto;
 
-	for (int x=0;x<RUUDUN_LEVEYS/32;x++)
-	{
-		for (int y=0;y<RUUDUN_KORKEUS/32;y++)
-		{
-			proto = kartta->spritet[x+kartta_x+(y+kartta_y)*PK2KARTTA_KARTTA_LEVEYS];
-			
-			if (proto != 255 && protot[proto].tyyppi != TYYPPI_EI_MIKAAN)
-			{
-				protot[proto].Piirra(x*32+16-protot[proto].leveys/2,y*32-protot[proto].korkeus+32,0);
-			}
-		}
-	}	
-	return 0;
+    for (int x = 0; x < SCREEN_WIDTH / 32; x++) {
+        for (int y = 0; y < SCREEN_HEIGHT / 32; y++) {
+            proto = map->sprites[x + kartta_x + (y + kartta_y) * MAP_WIDTH];
+
+            if (proto != 255 && prototypes[proto].type != TYPE_NOTHING) {
+                prototypes[proto].Draw(x * 32 + 16 - prototypes[proto].width / 2,
+                                       y * 32 - prototypes[proto].height + 32, 0);
+            }
+        }
+    }
+    return 0;
 }
 
-int Level_Editor_Piirra_Kartta(void)
-{
-	/*
+int Level_Editor_Piirra_Kartta(void) {
+    /*
 	int palikka;
 	int px = 0,
 		py = 0;*/
 
-	//PisteDraw_Aseta_Klipperi(PD_TAUSTABUFFER,0,0,640,480);
+    //PisteDraw_SetClipper(PD_BACKBUFFER,0,0,640,480);
 
-	if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_TAUSTA)
-		kartta->Piirra_Taustat(kartta_x*32, kartta_y*32, animaatio_paalla);
+    if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_TAUSTA)
+        map->Draw_Backgrounds(kartta_x * 32, kartta_y * 32, animaatio_paalla);
 
-	Level_Editor_Piirra_Spritet();
+    Level_Editor_Piirra_Spritet();
 
-	if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-		kartta->Piirra_Seinat(kartta_x*32, kartta_y*32, animaatio_paalla);
+    if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
+        map->Draw_Walls(kartta_x * 32, kartta_y * 32, animaatio_paalla);
 
-	//PisteDraw_Aseta_Klipperi(PD_TAUSTABUFFER,0,0,RUUDUN_LEVEYS,RUUDUN_KORKEUS);
+    //PisteDraw_SetClipper(PD_BACKBUFFER,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-	return 0;
+    return 0;
 }
 
-/* T�ss� editoidaan kartan tausta ja seina taulukoita */
+/* T�ss� editoidaan kartan background ja seina taulukoita */
 
-int Level_Editor_Edit_Kartta(void)
-{
-	int x = kartta_x + hiiri_x / 32;
-	int y = kartta_y + hiiri_y / 32;
+int Level_Editor_Edit_Kartta(void) {
+    int x = kartta_x + mouse_x / 32;
+    int y = kartta_y + mouse_y / 32;
 
-	if (y > 223)
-		y = 223;
+    if (y > 223)
+        y = 223;
 
-	if (edit_tila == EDIT_SPRITE || edit_tila == EDIT_KARTTA)
-	{
-		if (!PisteInput_Hiiri_Vasen() && !PisteInput_Hiiri_Oikea())
-			piirto_aloitettu = false;
+    if (edit_tila == EDIT_SPRITE || edit_tila == EDIT_KARTTA) {
+        if (!PisteInput_Mouse_Left() && !PisteInput_Mouse_Right())
+            piirto_aloitettu = false;
 
-		if ((PisteInput_Hiiri_Vasen() || PisteInput_Hiiri_Oikea()) && piirto_aloitettu == false)
-		{
-			piirto_aloitettu = true;
-			Level_Editor_Kartta_Varmista();
-		}
-	}
-	else
-		piirto_aloitettu = false;
+        if ((PisteInput_Mouse_Left() || PisteInput_Mouse_Right()) && piirto_aloitettu == false) {
+            piirto_aloitettu = true;
+            Level_Editor_Kartta_Varmista();
+        }
+    } else
+        piirto_aloitettu = false;
 
 
-	if (edit_tila == EDIT_KARTTA)
-	{
-		focustile_etu  = kartta->seinat[x+y*PK2KARTTA_KARTTA_LEVEYS];
-		focustile_taka = kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS];
+    if (edit_tila == EDIT_KARTTA) {
+        focustile_etu = map->walls[x + y * MAP_WIDTH];
+        focustile_taka = map->backgrounds[x + y * MAP_WIDTH];
 
-		if (PisteInput_Hiiri_Vasen() && key_delay == 0)
-		{
-			
-			if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-			{
-				kartta->seinat[x+y*PK2KARTTA_KARTTA_LEVEYS] = edit_palikka;
-			}
+        if (PisteInput_Mouse_Left() && key_delay == 0) {
 
-			if (edit_kerros == EDIT_KERROS_TAUSTA)
-			{
-				kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS] = edit_palikka;
-			}
+            if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT) {
+                map->walls[x + y * MAP_WIDTH] = edit_palikka;
+            }
 
-			Level_Editor_Kartta_Paivita();
-			strcpy(viesti,"map was updated.");
-			key_delay = 5;
-		}
-		
-		if (PisteInput_Hiiri_Oikea() && key_delay == 0)
-		{
-		
-			
-			if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-			{
-				kartta->seinat[x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-			}
+            if (edit_kerros == EDIT_KERROS_TAUSTA) {
+                map->backgrounds[x + y * MAP_WIDTH] = edit_palikka;
+            }
 
-			if (edit_kerros == EDIT_KERROS_TAUSTA)
-			{
-				kartta->taustat[x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-			}
+            Level_Editor_Kartta_Paivita();
+            strcpy(message, "map was updated.");
+            key_delay = 5;
+        }
 
-			//Level_Editor_Lista_Nayta(leikepoyta_lista, hiiri_x, hiiri_y);
+        if (PisteInput_Mouse_Right() && key_delay == 0) {
 
-			Level_Editor_Kartta_Paivita();
-			strcpy(viesti,"map was updated.");
-			key_delay = 5;
-		}
-		
-	}
 
-	if (edit_tila == EDIT_SPRITE)
-	{
-		focussprite    = kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS];
+            if (edit_kerros == EDIT_KERROS_SEINAT || edit_kerros == EDIT_KERROS_VAIN_SEINAT) {
+                map->walls[x + y * MAP_WIDTH] = 255;
+            }
 
-		if (PisteInput_Hiiri_Vasen() && key_delay == 0)
-		{
-			kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS] = proto_valittu;
-			Level_Editor_Kartta_Paivita();
-			strcpy(viesti,"map was updated.");
-			key_delay = 5;
-		}
-		
-		if (PisteInput_Hiiri_Oikea() && key_delay == 0)
-		{
-			kartta->spritet[x+y*PK2KARTTA_KARTTA_LEVEYS] = 255;
-			Level_Editor_Kartta_Paivita();
-			strcpy(viesti,"map was updated.");
-			key_delay = 5;
-		}
-	}
+            if (edit_kerros == EDIT_KERROS_TAUSTA) {
+                map->backgrounds[x + y * MAP_WIDTH] = 255;
+            }
 
-	return 0;
+            //Level_Editor_Lista_Nayta(leikepoyta_lista, mouse_x, mouse_y);
+
+            Level_Editor_Kartta_Paivita();
+            strcpy(message, "map was updated.");
+            key_delay = 5;
+        }
+
+    }
+
+    if (edit_tila == EDIT_SPRITE) {
+        focussprite = map->sprites[x + y * MAP_WIDTH];
+
+        if (PisteInput_Mouse_Left() && key_delay == 0) {
+            map->sprites[x + y * MAP_WIDTH] = proto_valittu;
+            Level_Editor_Kartta_Paivita();
+            strcpy(message, "map was updated.");
+            key_delay = 5;
+        }
+
+        if (PisteInput_Mouse_Right() && key_delay == 0) {
+            map->sprites[x + y * MAP_WIDTH] = 255;
+            Level_Editor_Kartta_Paivita();
+            strcpy(message, "map was updated.");
+            key_delay = 5;
+        }
+    }
+
+    return 0;
 }
 
-int Level_Editor_Piirra_Infoa(void)
-{
-	int vali = 0;
-	char luku[40];
+int Level_Editor_Piirra_Infoa(void) {
+    int vali = 0;
+    char luku[40];
 
-	if (edit_tila == EDIT_KARTTA)
-	{
-		vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"x: ",PD_TAUSTABUFFER,2+vali,2,65);
-	
-		itoa(kartta_x+hiiri_x/32,luku,10);
-	
-		vali += 8+PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,2+vali,2,65);
-	
-		vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"y: ",PD_TAUSTABUFFER,2+vali,2,65);
-	
-		itoa(kartta_y+hiiri_y/32,luku,10);	
-	
-		vali += 10 + PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,2+vali,2,65);
+    if (edit_tila == EDIT_KARTTA) {
+        vali += PisteDraw_Font_Write_Transparent(font1, "x: ", PD_BACKBUFFER, 2 + vali, 2, 65);
 
-		
-		if (focustile_etu != 255)
-			itoa(focustile_etu+1,luku,10);
-		else 
-			strcpy(luku,"n/a");
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"foreground tile: ",PD_TAUSTABUFFER,2,14,65);
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,150,14,65);
+        itoa(kartta_x + mouse_x / 32, luku, 10);
 
-		if (focustile_taka != 255)
-			itoa(focustile_taka+1,luku,10);
-		else 
-			strcpy(luku,"n/a");
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"background tile: ",PD_TAUSTABUFFER,2,24,65);
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,150,24,65);
+        vali += 8 + PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 2 + vali, 2, 65);
 
-	}
+        vali += PisteDraw_Font_Write_Transparent(font1, "y: ", PD_BACKBUFFER, 2 + vali, 2, 65);
 
-	if (edit_tila == EDIT_SPRITE)
-	{	
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"sprite: ",PD_TAUSTABUFFER,2,14,65);
-		if (focussprite != 255)
-			PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,protot[focussprite].nimi,PD_TAUSTABUFFER,90,14,65);		
-		else
-			PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"n/a",PD_TAUSTABUFFER,90,14,65);	
-	}
+        itoa(kartta_y + mouse_y / 32, luku, 10);
 
-	vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,kartta->nimi,PD_TAUSTABUFFER,2+vali,2,65);
+        vali += 10 + PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 2 + vali, 2, 65);
 
-	PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,viesti,PD_TAUSTABUFFER,320,2,65);
 
-	if (edit_kerros == EDIT_KERROS_SEINAT)
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"layer: both",PD_TAUSTABUFFER,320,12,65);
-	if (edit_kerros == EDIT_KERROS_TAUSTA)
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"layer: only background",PD_TAUSTABUFFER,320,12,65);
-	if (edit_kerros == EDIT_KERROS_VAIN_SEINAT)
-		PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"layer: only foreground",PD_TAUSTABUFFER,320,12,65);
-	
-	PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"f1=help, f2=map, f3=tiles, f4=sprites, f5=files, f6=save map, f7=map info, f8=tools, f9=log, esc=exit",PD_TAUSTABUFFER,2,RUUDUN_KORKEUS-10,75);
+        if (focustile_etu != 255)
+            itoa(focustile_etu + 1, luku, 10);
+        else
+            strcpy(luku, "n/movement_x");
+        PisteDraw_Font_Write_Transparent(font1, "foreground tile: ", PD_BACKBUFFER, 2, 14, 65);
+        PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 150, 14, 65);
 
-	//PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,tyohakemisto,PD_TAUSTABUFFER,2,RUUDUN_KORKEUS-25,65);
-	PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,PK2Kartta::pk2_hakemisto,PD_TAUSTABUFFER,2,RUUDUN_KORKEUS-25,65);
-	
-	vali = PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"sprites: ",PD_TAUSTABUFFER,640,2,65);
-	itoa(spriteja,luku,10);
-	vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,640+vali,2,65);
-	vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,"/",PD_TAUSTABUFFER,640+vali,2,65);
-	itoa(MAX_SPRITEJA,luku,10);
-	vali += PisteDraw_Font_Kirjoita_Lapinakyva(fontti1,luku,PD_TAUSTABUFFER,640+vali,2,65);
-	/*
-	if (Level_Editor_Nappi("help (f1)",20,RUUDUN_KORKEUS-20))
-		menut[MENU_HELP].piilota = !menut[MENU_HELP].piilota;
+        if (focustile_taka != 255)
+            itoa(focustile_taka + 1, luku, 10);
+        else
+            strcpy(luku, "n/movement_x");
+        PisteDraw_Font_Write_Transparent(font1, "background tile: ", PD_BACKBUFFER, 2, 24, 65);
+        PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 150, 24, 65);
 
-	if (Level_Editor_Nappi("map (f2)",110,RUUDUN_KORKEUS-20))
-		menut[MENU_KARTTA].piilota = !menut[MENU_KARTTA].piilota;
+    }
+
+    if (edit_tila == EDIT_SPRITE) {
+        PisteDraw_Font_Write_Transparent(font1, "sprite: ", PD_BACKBUFFER, 2, 14, 65);
+        if (focussprite != 255)
+            PisteDraw_Font_Write_Transparent(font1, prototypes[focussprite].name, PD_BACKBUFFER, 90, 14, 65);
+        else
+            PisteDraw_Font_Write_Transparent(font1, "n/movement_x", PD_BACKBUFFER, 90, 14, 65);
+    }
+
+    vali += PisteDraw_Font_Write_Transparent(font1, map->name, PD_BACKBUFFER, 2 + vali, 2, 65);
+
+    PisteDraw_Font_Write_Transparent(font1, message, PD_BACKBUFFER, 320, 2, 65);
+
+    if (edit_kerros == EDIT_KERROS_SEINAT)
+        PisteDraw_Font_Write_Transparent(font1, "layer: both", PD_BACKBUFFER, 320, 12, 65);
+    if (edit_kerros == EDIT_KERROS_TAUSTA)
+        PisteDraw_Font_Write_Transparent(font1, "layer: only background", PD_BACKBUFFER, 320, 12, 65);
+    if (edit_kerros == EDIT_KERROS_VAIN_SEINAT)
+        PisteDraw_Font_Write_Transparent(font1, "layer: only foreground", PD_BACKBUFFER, 320, 12, 65);
+
+    PisteDraw_Font_Write_Transparent(font1,
+                                     "f1=help, f2=map, f3=tiles, f4=sprites, f5=files, f6=save map, f7=map info, f8=tools, f9=log, esc=exit",
+                                     PD_BACKBUFFER, 2, SCREEN_HEIGHT - 10, 75);
+
+    //PisteDraw_Font_Write_Transparent(font1,working_directory,PD_BACKBUFFER,2,SCREEN_HEIGHT-25,65);
+    PisteDraw_Font_Write_Transparent(font1, PK2Map::pk2_directory, PD_BACKBUFFER, 2, SCREEN_HEIGHT - 25, 65);
+
+    vali = PisteDraw_Font_Write_Transparent(font1, "sprites: ", PD_BACKBUFFER, 640, 2, 65);
+    itoa(spriteja, luku, 10);
+    vali += PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 640 + vali, 2, 65);
+    vali += PisteDraw_Font_Write_Transparent(font1, "/", PD_BACKBUFFER, 640 + vali, 2, 65);
+    itoa(MAX_SPRITES, luku, 10);
+    vali += PisteDraw_Font_Write_Transparent(font1, luku, PD_BACKBUFFER, 640 + vali, 2, 65);
+    /*
+	if (Level_Editor_Nappi("help (f1)",20,SCREEN_HEIGHT-20))
+		menut[MENU_HELP].is_hidden = !menut[MENU_HELP].is_hidden;
+
+	if (Level_Editor_Nappi("map (f2)",110,SCREEN_HEIGHT-20))
+		menut[MENU_KARTTA].is_hidden = !menut[MENU_KARTTA].is_hidden;
 */
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Piirra_Kursori(void)
-{
-	int x,y;
-	x = (hiiri_x/32)*32;
-	y = (hiiri_y/32)*32;
+int Level_Editor_Piirra_Kursori(void) {
+    int x, y;
+    x = (mouse_x / 32) * 32;
+    y = (mouse_y / 32) * 32;
 
-	if (x>RUUDUN_LEVEYS-32)
-		x=RUUDUN_LEVEYS-32;
-	if (y>RUUDUN_KORKEUS-32)
-		y=RUUDUN_KORKEUS-32;
-		
-	int px = ((edit_palikka%10)*32);
-	int py = ((edit_palikka/10)*32);
-		
-	if (edit_tila == EDIT_KARTTA)
-	{
-		Level_Editor_Piirra_Nelio(x+1, y+1, x+33, y+33, 0);
-		PisteDraw_Buffer_Flip_Nopea(kartta->palikat_buffer,PD_TAUSTABUFFER, x, y, px, py, px+32, py+32);
-		Level_Editor_Piirra_Nelio(x, y, x+32, y+32, 57);
-	}
+    if (x > SCREEN_WIDTH - 32)
+        x = SCREEN_WIDTH - 32;
+    if (y > SCREEN_HEIGHT - 32)
+        y = SCREEN_HEIGHT - 32;
 
-	if (edit_tila == EDIT_SPRITE)
-	{
-		protot[proto_valittu].Piirra(x+16-protot[proto_valittu].leveys/2,y-protot[proto_valittu].korkeus+32,0);
-		//protot[proto_valittu].Piirra(x,y-protot[proto_valittu].korkeus+32,0);
-	}
-	
-	PisteDraw_Buffer_Flip_Nopea(kuva_editori,PD_TAUSTABUFFER,hiiri_x, hiiri_y, 1, 33, 19, 51);
+    int px = ((edit_palikka % 10) * 32);
+    int py = ((edit_palikka / 10) * 32);
 
-	return 0;
+    if (edit_tila == EDIT_KARTTA) {
+        Level_Editor_Piirra_Nelio(x + 1, y + 1, x + 33, y + 33, 0);
+        PisteDraw_Buffer_Flip_Fast(map->block_buffer, PD_BACKBUFFER, x, y, px, py, px + 32, py + 32);
+        Level_Editor_Piirra_Nelio(x, y, x + 32, y + 32, 57);
+    }
+
+    if (edit_tila == EDIT_SPRITE) {
+        prototypes[proto_valittu].Draw(x + 16 - prototypes[proto_valittu].width / 2,
+                                       y - prototypes[proto_valittu].height + 32, 0);
+        //prototypes[proto_valittu].Draw(x,y-prototypes[proto_valittu].height+32,0);
+    }
+
+    PisteDraw_Buffer_Flip_Fast(kuva_editori, PD_BACKBUFFER, mouse_x, mouse_y, 1, 33, 19, 51);
+
+    return 0;
 }
 
-int Level_Editor_Piirra(void)
-{
-	int kytkin_anim;
-	
-	if (!animaatio_paalla)
-	{
-		if (palikka_animaatio < 64)
-			kytkin_anim = palikka_animaatio;
-		else
-			kytkin_anim = KYTKIN_ALOITUSARVO-64;
+int Level_Editor_Piirra(void) {
+    int kytkin_anim;
 
-		PK2Kartta_Animoi(degree,palikka_animaatio/20,KYTKIN_ALOITUSARVO-kytkin_anim,KYTKIN_ALOITUSARVO-kytkin_anim,KYTKIN_ALOITUSARVO-kytkin_anim,true);
-	}
-	else
-		PK2Kartta_Animoi(degree,palikka_animaatio/20,0,0,0,false);
+    if (!animaatio_paalla) {
+        if (block_animation < 64)
+            kytkin_anim = block_animation;
+        else
+            kytkin_anim = SWITCH_START_VALUE - 64;
 
-	palikka_animaatio = 1 + palikka_animaatio%99;//100
+        Map_Animate(degree, block_animation / 20, SWITCH_START_VALUE - kytkin_anim,
+                    SWITCH_START_VALUE - kytkin_anim, SWITCH_START_VALUE - kytkin_anim, true);
+    } else
+        Map_Animate(degree, block_animation / 20, 0, 0, 0, false);
 
-	PisteDraw_Buffer_Tayta(PD_TAUSTABUFFER,37);
+    block_animation = 1 + block_animation % 99;//100
 
-	//if (kartta_ladattu)
-   //PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,0);
+    PisteDraw_Buffer_Clear(PD_BACKBUFFER, 37);
 
-	switch(kartta->tausta)
-	{
-	case TAUSTA_STAATTINEN				: PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,0);
-										  break;
-	case TAUSTA_PALLARX_HORI			: PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,0);
-										  PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,640,0);
-										  break;
-	case TAUSTA_PALLARX_VERT			: PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,0);
-										  PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,480);
-										  break;
-	case TAUSTA_PALLARX_VERT_JA_HORI	: PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,0);
-										  PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,640,0);
-										  PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,0,480);
-										  PisteDraw_Buffer_Flip_Nopea(kartta->taustakuva_buffer,PD_TAUSTABUFFER,640,480);
-										  break;
-	default								: break;
-	}
+    //if (kartta_ladattu)
+    //PisteDraw_Buffer_Flip_Fast(map->background_image_buffer,PD_BACKBUFFER,0,0);
 
-	Level_Editor_Piirra_Kartta();
+    switch (map->background) {
+        case BACKGROUND_STATIC                :
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 0);
+            break;
+        case BACKGROUND_PARALLAX_HORI            :
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 0);
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 640, 0);
+            break;
+        case BACKGROUND_PARALLAX_VERT            :
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 0);
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 480);
+            break;
+        case BACKGROUND_PARALLAX_VERT_AND_HORI    :
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 0);
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 640, 0);
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 0, 480);
+            PisteDraw_Buffer_Flip_Fast(map->background_image_buffer, PD_BACKBUFFER, 640, 480);
+            break;
+        default                                :
+            break;
+    }
 
-	Level_Editor_Menut_Piirra();
+    Level_Editor_Piirra_Kartta();
 
-	Level_Editor_Piirra_Infoa();
+    Level_Editor_Menut_Piirra();
 
-	Level_Editor_Leikepoyta_Piirra();
+    Level_Editor_Piirra_Infoa();
 
-	if (leikepoyta_lista.nakyva)
-		Level_Editor_Lista(leikepoyta_lista);
+    Level_Editor_Leikepoyta_Piirra();
 
-	Level_Editor_Piirra_Kursori();
+    if (leikepoyta_lista.nakyva)
+        Level_Editor_Lista(leikepoyta_lista);
 
-	if (aktiivinen_menu == MENU_EI)
-		Level_Editor_Edit_Kartta();
-	
-	PisteWait_Wait(10);
+    Level_Editor_Piirra_Kursori();
 
-	PisteDraw_Paivita_Naytto();
+    if (aktiivinen_menu == MENU_EI)
+        Level_Editor_Edit_Kartta();
 
-	PisteWait_Start();
+    PisteWait_Wait(10);
 
-	//Level_Editor_Loki_Tallenna("Piirtorutiinit on suoritettu.");
+    PisteDraw_UpdateScreen();
 
-	return 0;
+    PisteWait_Start();
+
+    //Level_Editor_Loki_Tallenna("Piirtorutiinit on suoritettu.");
+
+    return 0;
 }
 
 /* MUUT RUTIINIT -------------------------------------------------------*/
 
 
-int Level_Editor_Menut(void)
-{
-	
+int Level_Editor_Menut(void) {
+
 //	aktiivinen_menu = MENU_EI;
-	bool aktiivisia = false;
+    bool aktiivisia = false;
 
-	//if (PisteInput_Lue_Nappaimisto())
-	//	aktiivinen_menu 
+    //if (PisteInput_Read_Keyboard())
+    //	aktiivinen_menu
 
-	for (int i=0; i < MAX_MENUJA; i++)
-	{
-		if (PisteInput_Keydown(menut[i].pika) && key_delay == 0)
-		{
-			if (menut[i].piilota)
-				menut[i].piilota = false;
-			else
-				menut[i].piilota = true;
+    for (int i = 0; i < MAX_MENUJA; i++) {
+        if (PisteInput_KeyDown(menut[i].pika) && key_delay == 0) {
+            if (menut[i].piilota)
+                menut[i].piilota = false;
+            else
+                menut[i].piilota = true;
 
-			key_delay = 15;
-		}
-		
-		if (menut[i].x < 0)
-			menut[i].x = 0;
+            key_delay = 15;
+        }
 
-		if (menut[i].x + menut[i].leveys > RUUDUN_LEVEYS)
-			menut[i].x -= (menut[i].x + menut[i].leveys) - RUUDUN_LEVEYS;
+        if (menut[i].x < 0)
+            menut[i].x = 0;
 
-		if (menut[i].y < 0)
-			menut[i].y = 0;
+        if (menut[i].x + menut[i].leveys > SCREEN_WIDTH)
+            menut[i].x -= (menut[i].x + menut[i].leveys) - SCREEN_WIDTH;
 
-		if (menut[i].y + menut[i].korkeus+16 > RUUDUN_KORKEUS)
-			menut[i].y -= (menut[i].y + 16 + menut[i].korkeus) - RUUDUN_KORKEUS;		
+        if (menut[i].y < 0)
+            menut[i].y = 0;
 
-		if (aktiivinen_menu == i)
-		{
-			/*
-			if (PisteInput_Hiiri_Vasen())
+        if (menut[i].y + menut[i].korkeus + 16 > SCREEN_HEIGHT)
+            menut[i].y -= (menut[i].y + 16 + menut[i].korkeus) - SCREEN_HEIGHT;
+
+        if (aktiivinen_menu == i) {
+            /*
+			if (PisteInput_Mouse_Left())
 				liikuta_ikkunaa = true;
 			else
 				liikuta_ikkunaa = false;*/
 
-			if ((hiiri_x > menut[i].x) && (hiiri_x < menut[i].x + menut[i].leveys) &&
-				(hiiri_y > menut[i].y) && (hiiri_y < menut[i].y + 16) && PisteInput_Hiiri_Vasen())
-			{
-				//menut[i].x += PisteInput_Hiiri_X(0);
-				//menut[i].y += PisteInput_Hiiri_Y(0);
-				liikuta_ikkunaa = true;
-				//menut[i].x 
-			}
+            if ((mouse_x > menut[i].x) && (mouse_x < menut[i].x + menut[i].leveys) && (mouse_y > menut[i].y) &&
+                (mouse_y < menut[i].y + 16) && PisteInput_Mouse_Left()) {
+                //menut[i].x += PisteInput_Mouse_X(0);
+                //menut[i].y += PisteInput_Mouse_Y(0);
+                liikuta_ikkunaa = true;
+                //menut[i].x
+            }
 
-			if (!PisteInput_Hiiri_Vasen())
-				liikuta_ikkunaa = false;
+            if (!PisteInput_Mouse_Left())
+                liikuta_ikkunaa = false;
 
-			if (liikuta_ikkunaa)
-			{
-				menut[i].x += PisteInput_Hiiri_X(0);
-				menut[i].y += PisteInput_Hiiri_Y(0);
-				aktiivisia = true;
-				//liikuta_ikkunaa = true;
-				//menut[i].x 
-			}			
+            if (liikuta_ikkunaa) {
+                menut[i].x += PisteInput_Mouse_X(0);
+                menut[i].y += PisteInput_Mouse_Y(0);
+                aktiivisia = true;
+                //liikuta_ikkunaa = true;
+                //menut[i].x
+            }
 
-			if ((hiiri_x > menut[i].x+menut[i].leveys-10) && (hiiri_x < menut[i].x + menut[i].leveys) &&
-				(hiiri_y > menut[i].y) && (hiiri_y < menut[i].y + 16) && PisteInput_Hiiri_Vasen())
-			{
-				menut[i].piilota = true;
-				key_delay = 15;
-			}
-		
-		}
+            if ((mouse_x > menut[i].x + menut[i].leveys - 10) && (mouse_x < menut[i].x + menut[i].leveys) &&
+                (mouse_y > menut[i].y) && (mouse_y < menut[i].y + 16) && PisteInput_Mouse_Left()) {
+                menut[i].piilota = true;
+                key_delay = 15;
+            }
 
-		if ((hiiri_x > menut[i].x) && (hiiri_x < menut[i].x + menut[i].leveys) &&
-			(hiiri_y > menut[i].y) && (hiiri_y < menut[i].y + menut[i].korkeus+16) && !menut[i].piilota
-			&& (aktiivinen_menu == MENU_EI || i == aktiivinen_menu))
-		{
-			aktiivinen_menu = i;
-			aktiivisia = true;
-		}
+        }
 
-	}
+        if ((mouse_x > menut[i].x) && (mouse_x < menut[i].x + menut[i].leveys) && (mouse_y > menut[i].y) &&
+            (mouse_y < menut[i].y + menut[i].korkeus + 16) && !menut[i].piilota &&
+            (aktiivinen_menu == MENU_EI || i == aktiivinen_menu)) {
+            aktiivinen_menu = i;
+            aktiivisia = true;
+        }
 
-	if (!aktiivisia)
-	{
-		aktiivinen_menu = MENU_EI;
-		liikuta_ikkunaa = false;
-	}
+    }
 
-	if (aktiivinen_menu != MENU_EI)
-	{
-		edit_tila = EDIT_MENU;
-	}
-	else
-	{
-		if (proto_valittu == MAX_PROTOTYYPPEJA)
-			edit_tila = EDIT_KARTTA;
-		else
-			edit_tila = EDIT_SPRITE;
+    if (!aktiivisia) {
+        aktiivinen_menu = MENU_EI;
+        liikuta_ikkunaa = false;
+    }
 
-	}
+    if (aktiivinen_menu != MENU_EI) {
+        edit_tila = EDIT_MENU;
+    } else {
+        if (proto_valittu == MAX_PROTOTYPES)
+            edit_tila = EDIT_KARTTA;
+        else
+            edit_tila = EDIT_SPRITE;
 
-	return 0;
+    }
+
+    return 0;
 }
 
-int Level_Editor_Kursori(void)
-{
-	hiiri_x = PisteInput_Hiiri_X(hiiri_x);
-	hiiri_y = PisteInput_Hiiri_Y(hiiri_y);
-	
-	if (hiiri_x > RUUDUN_LEVEYS)
-		hiiri_x = RUUDUN_LEVEYS;
+int Level_Editor_Kursori(void) {
+    mouse_x = PisteInput_Mouse_X(mouse_x);
+    mouse_y = PisteInput_Mouse_Y(mouse_y);
 
-	if (hiiri_x < 0)
-		hiiri_x = 0;
+    if (mouse_x > SCREEN_WIDTH)
+        mouse_x = SCREEN_WIDTH;
 
-	if (hiiri_y > RUUDUN_KORKEUS)
-		hiiri_y = RUUDUN_KORKEUS;
+    if (mouse_x < 0)
+        mouse_x = 0;
 
-	if (hiiri_y < 0)
-		hiiri_y = 0;
+    if (mouse_y > SCREEN_HEIGHT)
+        mouse_y = SCREEN_HEIGHT;
 
-	return 0;
+    if (mouse_y < 0)
+        mouse_y = 0;
+
+    return 0;
 }
 
-int Level_Editor_Reunat(void)
-{
+int Level_Editor_Reunat(void) {
 
-	if (hiiri_x < 2)
-		kartta_x -= 1;
+    if (mouse_x < 2)
+        kartta_x -= 1;
 
-	if (hiiri_x > RUUDUN_LEVEYS-2)
-		kartta_x += 1;	
+    if (mouse_x > SCREEN_WIDTH - 2)
+        kartta_x += 1;
 
-	if (hiiri_y < 2)
-		kartta_y -= 1;
+    if (mouse_y < 2)
+        kartta_y -= 1;
 
-	if (hiiri_y > RUUDUN_KORKEUS-2)
-		kartta_y += 1;	
+    if (mouse_y > SCREEN_HEIGHT - 2)
+        kartta_y += 1;
 
-	if (!editoi_tekstia)
-	{
-		if (PisteInput_Keydown(DIK_LEFT) && key_delay == 0)
-		{
-			kartta_x--;
-			key_delay = 5;
-		}
+    if (!editoi_tekstia) {
+        if (PisteInput_KeyDown(DIK_LEFT) && key_delay == 0) {
+            kartta_x--;
+            key_delay = 5;
+        }
 
-		if (PisteInput_Keydown(DIK_RIGHT) && key_delay == 0)
-		{
-			kartta_x++;
-			key_delay = 5;
-		}
-	}
+        if (PisteInput_KeyDown(DIK_RIGHT) && key_delay == 0) {
+            kartta_x++;
+            key_delay = 5;
+        }
+    }
 
-	if (PisteInput_Keydown(DIK_UP) && key_delay == 0)
-	{
-		kartta_y--;
-		key_delay = 5;
-	}
+    if (PisteInput_KeyDown(DIK_UP) && key_delay == 0) {
+        kartta_y--;
+        key_delay = 5;
+    }
 
-	if (PisteInput_Keydown(DIK_DOWN) && key_delay == 0)
-	{
-		kartta_y++;
-		key_delay = 5;
-	}
+    if (PisteInput_KeyDown(DIK_DOWN) && key_delay == 0) {
+        kartta_y++;
+        key_delay = 5;
+    }
 
-	if (kartta_x < 0)
-		kartta_x = 0;
+    if (kartta_x < 0)
+        kartta_x = 0;
 
-	if (kartta_x > PK2KARTTA_KARTTA_LEVEYS  - RUUDUN_LEVEYS/32)
-		kartta_x = PK2KARTTA_KARTTA_LEVEYS  - RUUDUN_LEVEYS/32;
+    if (kartta_x > MAP_WIDTH - SCREEN_WIDTH / 32)
+        kartta_x = MAP_WIDTH - SCREEN_WIDTH / 32;
 
-	if (kartta_y < 0)
-		kartta_y = 0;
+    if (kartta_y < 0)
+        kartta_y = 0;
 
-	if (kartta_y > PK2KARTTA_KARTTA_KORKEUS - RUUDUN_KORKEUS/32)
-		kartta_y = PK2KARTTA_KARTTA_KORKEUS - RUUDUN_KORKEUS/32;
+    if (kartta_y > MAP_HEIGHT - SCREEN_HEIGHT / 32)
+        kartta_y = MAP_HEIGHT - SCREEN_HEIGHT / 32;
 
-	return 0;
+    return 0;
 }
 
-int Level_Editor_Main(void)
-{
-	if (window_closed)
-		return(0);
+int Level_Editor_Main(void) {
+    if (window_closed)
+        return (0);
 
-	/* HAETAAN N�PP�IMIST�N, HIIREN JA PELIOHJAINTEN T�M�NHETKISET TILAT */
+    /* HAETAAN N�PP�IMIST�N, HIIREN JA PELIOHJAINTEN T�M�NHETKISET TILAT */
 
-	// N�pp�imist� 
-	if (!PisteInput_Hae_Nappaimet())		//Haetaan n�pp�inten tilat
-		DirectX_virhe = true;
-	
-	// Hiirulainen
-	if (!PisteInput_Hae_Hiiri())			//Haetaan hiiren tila
-		DirectX_virhe = true;	
+    // N�pp�imist�
+    if (!PisteInput_Update_Keyboard())        //Haetaan n�pp�inten tilat
+        DirectX_virhe = true;
 
-	//editoi_tekstia = false;
+    // Hiirulainen
+    if (!PisteInput_Update_Mouse())            //Haetaan hiiren tila
+        DirectX_virhe = true;
 
-	Level_Editor_Kursori();
+    //editoi_tekstia = false;
 
-	Level_Editor_Reunat();
+    Level_Editor_Kursori();
 
-	editoi_tekstia = false;
+    Level_Editor_Reunat();
 
-	Level_Editor_Piirra();
+    editoi_tekstia = false;
 
-	Level_Editor_Menut();
+    Level_Editor_Piirra();
 
-	if (key_delay > 0)
-		key_delay--;
+    Level_Editor_Menut();
 
-	degree = 1 + degree%359;
+    if (key_delay > 0)
+        key_delay--;
 
-	if (PisteInput_Keydown(DIK_RALT))
-	{
-		if (!aseta_leikepoyta_alue)
-		{
-			leikepoyta_alue.left = (hiiri_x/32)+kartta_x;
-			leikepoyta_alue.top  = (hiiri_y/32)+kartta_y;
-			aseta_leikepoyta_alue = true;
-		}
+    degree = 1 + degree % 359;
 
-		leikepoyta_alue.right  = (hiiri_x/32)+kartta_x;
-		leikepoyta_alue.bottom = (hiiri_y/32)+kartta_y;
+    if (PisteInput_KeyDown(DIK_RALT)) {
+        if (!aseta_leikepoyta_alue) {
+            leikepoyta_alue.left = (mouse_x / 32) + kartta_x;
+            leikepoyta_alue.top = (mouse_y / 32) + kartta_y;
+            aseta_leikepoyta_alue = true;
+        }
 
-		long vaihto;
+        leikepoyta_alue.right = (mouse_x / 32) + kartta_x;
+        leikepoyta_alue.bottom = (mouse_y / 32) + kartta_y;
 
-		if (leikepoyta_alue.right < leikepoyta_alue.left)
-		{
-			vaihto = leikepoyta_alue.right;
-			leikepoyta_alue.right = leikepoyta_alue.left;
-			leikepoyta_alue.left = vaihto;
-		}
+        long vaihto;
 
-		if (leikepoyta_alue.bottom < leikepoyta_alue.top)
-		{
-			vaihto = leikepoyta_alue.top;
-			leikepoyta_alue.top = leikepoyta_alue.bottom;
-			leikepoyta_alue.bottom = vaihto;
-		}
+        if (leikepoyta_alue.right < leikepoyta_alue.left) {
+            vaihto = leikepoyta_alue.right;
+            leikepoyta_alue.right = leikepoyta_alue.left;
+            leikepoyta_alue.left = vaihto;
+        }
 
-	}
-	else
-	{
-		if (aseta_leikepoyta_alue)
-		{
-			aseta_leikepoyta_alue = false;
-			//Level_Editor_Lista_Nayta(leikepoyta_lista,hiiri_x,hiiri_y);
-		}
-	}
+        if (leikepoyta_alue.bottom < leikepoyta_alue.top) {
+            vaihto = leikepoyta_alue.top;
+            leikepoyta_alue.top = leikepoyta_alue.bottom;
+            leikepoyta_alue.bottom = vaihto;
+        }
+
+    } else {
+        if (aseta_leikepoyta_alue) {
+            aseta_leikepoyta_alue = false;
+            //Level_Editor_Lista_Nayta(leikepoyta_lista,mouse_x,mouse_y);
+        }
+    }
 
 
-	if (key_delay == 0 && !editoi_tekstia)
-	{
-		if (PisteInput_Keydown(DIK_LCONTROL))
-		{
-			//Level_Editor_Kartta_Varmista();
-			
-			if (PisteInput_Keydown(DIK_C))
-			{			
-			
-				Level_Editor_Leikepoyta_Kopioi(leikepoyta_alue);
-				key_delay = 20;
-			}
-			if (PisteInput_Keydown(DIK_V))
-			{			
-			
-				Level_Editor_Leikepoyta_Liita(leikepoyta_alue);
-				key_delay = 20;
-			}
-			if (PisteInput_Keydown(DIK_X))
-			{			
-			
-				Level_Editor_Leikepoyta_Leikkaa(leikepoyta_alue);
-				key_delay = 20;
-			}
-			if (PisteInput_Keydown(DIK_B))
-			{			
-				RECT temp = {hiiri_x/32+kartta_x,hiiri_y/32+kartta_y,hiiri_x/32+kartta_x,hiiri_y/32+kartta_y};
-				Level_Editor_Leikepoyta_Liita_Koko(temp);
-				key_delay = 20;
-			}
-		}
-/*		
+    if (key_delay == 0 && !editoi_tekstia) {
+        if (PisteInput_KeyDown(DIK_LCONTROL)) {
+            //Level_Editor_Kartta_Varmista();
+
+            if (PisteInput_KeyDown(DIK_C)) {
+
+                Level_Editor_Leikepoyta_Kopioi(leikepoyta_alue);
+                key_delay = 20;
+            }
+            if (PisteInput_KeyDown(DIK_V)) {
+
+                Level_Editor_Leikepoyta_Liita(leikepoyta_alue);
+                key_delay = 20;
+            }
+            if (PisteInput_KeyDown(DIK_X)) {
+
+                Level_Editor_Leikepoyta_Leikkaa(leikepoyta_alue);
+                key_delay = 20;
+            }
+            if (PisteInput_KeyDown(DIK_B)) {
+                RECT temp = {mouse_x / 32 + kartta_x, mouse_y / 32 + kartta_y, mouse_x / 32 + kartta_x,
+                             mouse_y / 32 + kartta_y};
+                Level_Editor_Leikepoyta_Liita_Koko(temp);
+                key_delay = 20;
+            }
+        }
+/*
 		if (PisteInput_Keydown(DIK_F9))
 		{
 			Level_Editor_Kartta_Varmista();
@@ -4070,7 +3863,7 @@ int Level_Editor_Main(void)
 			key_delay = 20;
 		}
 /*
-		if (PisteInput_Keydown(DIK_F8))
+		if (PisteInput_KeyDown(DIK_F8))
 		{
 			Level_Editor_Kartta_Varmista();
 			Level_Editor_Kartta_Alusta();
@@ -4078,73 +3871,71 @@ int Level_Editor_Main(void)
 		}
 */
 
-		if (PisteInput_Keydown(DIK_S))
-		{
-			Level_Editor_Kartta_Tallenna();
-			key_delay = 20;
-		}
+        if (PisteInput_KeyDown(DIK_S)) {
+            Level_Editor_Kartta_Tallenna();
+            key_delay = 20;
+        }
 
-		if (PisteInput_Keydown(DIK_A))
-		{
-			animaatio_paalla = !animaatio_paalla;
-			key_delay = 20;
-		}
+        if (PisteInput_KeyDown(DIK_A)) {
+            animaatio_paalla = !animaatio_paalla;
+            key_delay = 20;
+        }
 
-		if (PisteInput_Keydown(DIK_U)) 
-		{
-			Level_Editor_Kartta_Undo();
-			Level_Editor_Kartta_Paivita();
-			key_delay = 20;
-		}
+        if (PisteInput_KeyDown(DIK_U)) {
+            Level_Editor_Kartta_Undo();
+            Level_Editor_Kartta_Paivita();
+            key_delay = 20;
+        }
 
-		if (PisteInput_Keydown(DIK_RSHIFT))
-		{
-			switch(edit_kerros)
-			{
-			case EDIT_KERROS_SEINAT:		edit_kerros = EDIT_KERROS_VAIN_SEINAT;break;
-			case EDIT_KERROS_VAIN_SEINAT:	edit_kerros = EDIT_KERROS_TAUSTA;break;
-			case EDIT_KERROS_TAUSTA:		edit_kerros = EDIT_KERROS_SEINAT;break;
-			default:						break;
-			}
+        if (PisteInput_KeyDown(DIK_RSHIFT)) {
+            switch (edit_kerros) {
+                case EDIT_KERROS_SEINAT:
+                    edit_kerros = EDIT_KERROS_VAIN_SEINAT;
+                    break;
+                case EDIT_KERROS_VAIN_SEINAT:
+                    edit_kerros = EDIT_KERROS_TAUSTA;
+                    break;
+                case EDIT_KERROS_TAUSTA:
+                    edit_kerros = EDIT_KERROS_SEINAT;
+                    break;
+                default:
+                    break;
+            }
 
-			key_delay = 20;
-		}
+            key_delay = 20;
+        }
 
-	}
-	
-	if (exit_editor) 
-	{
-		exit_editor = true;
-	}
+    }
 
-	if (exit_editor && PisteDraw_Fade_Paletti_Valmis())
-	{
-		SendMessage(ikkunan_kahva, WM_CLOSE,0,0);
-		window_closed = true;
-	}
+    if (exit_editor) {
+        exit_editor = true;
+    }
 
-	return 0;
+    if (exit_editor && PisteDraw_Fade_Palette_Done()) {
+        SendMessage(window_handle, WM_CLOSE, 0, 0);
+        window_closed = true;
+    }
+
+    return 0;
 }
 
 
-int Level_Editor_Quit(void)
-{
+int Level_Editor_Quit(void) {
 
-	//delete kartta;
-	//delete undo;
-	
-	PisteDraw_Lopeta();
-	PisteInput_Lopeta();
+    //delete map;
+    //delete undo;
 
-	if (DirectX_virhe)
-	{
-		strcpy(virheviesti,PisteDraw_Virheilmoitus());
-		MessageBox(ikkunan_kahva, virheviesti,"PK2 LevelEditor", MB_OK | MB_ICONEXCLAMATION);
-	}
+    PisteDraw_Quit();
+    PisteInput_Quit();
 
-	Level_Editor_Asetukset_Tallenna();
+    if (DirectX_virhe) {
+        strcpy(virheviesti, PisteDraw_GetError());
+        MessageBox(window_handle, virheviesti, "PK2 LevelEditor", MB_OK | MB_ICONEXCLAMATION);
+    }
 
-	return 0;
+    Level_Editor_Asetukset_Tallenna();
+
+    return 0;
 }
 
 
@@ -4153,153 +3944,182 @@ int Level_Editor_Quit(void)
 // Seuraa ikkuna-koodia. Allaoleva on ikkunan "tapahtumakuuntelija".
 
 
-LRESULT CALLBACK WindowProc(HWND hwnd, 
-						    UINT msg, 
-                            WPARAM wparam, 
-                            LPARAM lparam)
+LRESULT CALLBACK
+WindowProc(HWND
+hwnd,
+UINT msg, WPARAM
+wparam,
+LPARAM lparam
+)
 {
-	PAINTSTRUCT		ps;		
-	HDC				hdc;	
-	char			backupfile[_MAX_PATH];
+PAINTSTRUCT ps;
+HDC hdc;
+char backupfile[_MAX_PATH];
 
 
-	switch(msg)
-	{	
-		case WM_ACTIVATE: 
-	    {
-			if (((BOOL) HIWORD(wparam) != 0 ||
-				 LOWORD(wparam) == WA_INACTIVE) && !exit_editor) {
-				
-				if (kartta != NULL) {
-					strcpy(karttatiedosto,"backup.map");
-					/*
+switch(msg)
+{
+case WM_ACTIVATE:
+{
+if (((BOOL)
+HIWORD(wparam)
+!= 0 ||
+LOWORD(wparam)
+== WA_INACTIVE) && !exit_editor) {
+
+if (map != NULL) {
+strcpy(karttatiedosto,
+"backup.map");
+
+/*
 					strcpy(backupfile,"");
 					strcpy(backupfile,editor_hakemisto);
 					strcat(backupfile,"\\backup2.mop");
-					kartta->Tallenna(backupfile);
+					map->Save(backupfile);
 					*/
-					Level_Editor_Kartta_Tallenna();
-					PostQuitMessage(0);
-					window_closed = true;
-				}
-			}
+Level_Editor_Kartta_Tallenna();
 
-			if (((BOOL) HIWORD(wparam) != 0 ||
-				 LOWORD(wparam) == WA_INACTIVE) && exit_editor) {
-				
-				if (kartta != NULL) {
-					strcpy(backupfile,"");
-					strcpy(backupfile,editor_hakemisto);
-					strcat(backupfile,"\\backup.mop");
-					kartta->Tallenna(backupfile);
-					PostQuitMessage(0);
-					window_closed = true;
-				}
-			}
-		}
+PostQuitMessage(0);
+window_closed = true;
+}}
 
-		case WM_CREATE: 
-	    {
-		
-			return(0);
-		}	break;
-   
-		case WM_PAINT: 
-		{
+if (((BOOL)
+HIWORD(wparam)
+!= 0 ||
+LOWORD(wparam)
+== WA_INACTIVE) && exit_editor) {
 
-			hdc = BeginPaint(hwnd,&ps);	 
+if (map != NULL) {
+strcpy(backupfile,
+"");
+strcpy(backupfile, editor_hakemisto
+);
+strcat(backupfile,
+"\\backup.mop");
+map->
+Tallenna(backupfile);
+PostQuitMessage(0);
+window_closed = true;
+}}}
 
-			EndPaint(hwnd,&ps);
+case WM_CREATE:
+{
 
-			return(0);
-		}	break;
+return(0);
+}    break;
 
-		case WM_DESTROY: 
-		{
+case WM_PAINT:
+{
 
-			PostQuitMessage(0);
-			return(0);
-		}	break;
+hdc = BeginPaint(hwnd, &ps);
 
-		default:break;
+EndPaint(hwnd, &ps
+);
 
-    } 
+return(0);
+}    break;
 
-	return (DefWindowProc(hwnd, msg, wparam, lparam));
+case WM_DESTROY:
+{
 
-} 
+PostQuitMessage(0);
+return(0);
+}    break;
+
+default:break;
+
+}
+
+return (
+DefWindowProc(hwnd, msg, wparam, lparam
+));
+
+}
 
 // Kaiken alku ja juuri: WinMain. T�st� se kaikki alkaa ja t�m�n sis�ll� peli py�rii.
 
-int WINAPI WinMain(	HINSTANCE hinstance,
-					HINSTANCE hprevinstance,
-					LPSTR lpcmdline,
-					int ncmdshow)
+int WINAPI
+WinMain(    HINSTANCE
+hinstance,
+HINSTANCE hprevinstance, LPSTR
+lpcmdline,
+int ncmdshow
+)
 {
 
-	WNDCLASSEX winclass; 
-	HWND	   hwnd;	 
-	MSG		   msg;		 
+WNDCLASSEX winclass;
+HWND hwnd;
+MSG msg;
 
-	winclass.cbSize         = sizeof(WNDCLASSEX);
-	winclass.style			= CS_DBLCLKS | CS_OWNDC | 
-							  CS_HREDRAW | CS_VREDRAW;
-	winclass.lpfnWndProc	= WindowProc;
-	winclass.cbClsExtra		= 0;
-	winclass.cbWndExtra		= 0;
-	winclass.hInstance		= hinstance;
-	winclass.hIcon			= LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1));
-	winclass.hCursor		= LoadCursor(hinstance, MAKEINTRESOURCE(IDC_CURSOR1)); 
-	winclass.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
-	winclass.lpszMenuName	= NULL;
-	winclass.lpszClassName	= WINDOW_CLASS_NAME;
-	winclass.hIconSm        = LoadIcon(NULL, IDI_APPLICATION);
+winclass.
+cbSize = sizeof(WNDCLASSEX);
+winclass.
+style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+winclass.
+lpfnWndProc = WindowProc;
+winclass.
+cbClsExtra = 0;
+winclass.
+cbWndExtra = 0;
+winclass.
+hInstance = hinstance;
+winclass.
+hIcon = LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1));
+winclass.
+hCursor = LoadCursor(hinstance, MAKEINTRESOURCE(IDC_CURSOR1));
+winclass.
+hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
+winclass.
+lpszMenuName = NULL;
+winclass.
+lpszClassName = WINDOW_CLASS_NAME;
+winclass.
+hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
 
-	hinstance_app = hinstance;
+hinstance_app = hinstance;
 
-	if (!RegisterClassEx(&winclass))
-		return(0);
+if (!
+RegisterClassEx(&winclass)
+)
+return(0);
 
-	if (!(hwnd = CreateWindowEx(NULL,                  
-		                        WINDOW_CLASS_NAME,     
-							    GAME_NAME, 
-							    WS_POPUP | WS_VISIBLE,
-						 	    0,0,	  
-							    RUUDUN_LEVEYS, RUUDUN_KORKEUS,  
-							    NULL,	   
-							    NULL,	  
-							    hinstance,
-							    NULL)))	
-		return(0);
+if (!(
+hwnd = CreateWindowEx(NULL, WINDOW_CLASS_NAME, GAME_NAME, WS_POPUP | WS_VISIBLE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                      NULL, NULL, hinstance, NULL)
+))
+return(0);
 
-	ikkunan_kahva = hwnd;
+window_handle = hwnd;
 
-	Level_Editor_Init();
+Level_Editor_Init();
 
-	ShowCursor(FALSE);
+ShowCursor(FALSE);
 
-	while(!DirectX_virhe)
-	{
-    
-		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
-		{ 
-	   
-			if (msg.message == WM_QUIT)
-				break;
-	   
-			TranslateMessage(&msg);
+while(!DirectX_virhe)
+{
 
-			DispatchMessage(&msg);
-		} 
-    
-		Level_Editor_Main();
-	} 
+if (
+PeekMessage(&msg,
+NULL,0,0,PM_REMOVE))
+{
 
-	Level_Editor_Quit();
+if (msg.message == WM_QUIT)
+break;
 
-	ShowCursor(TRUE);
+TranslateMessage(&msg);
 
-	return(msg.wParam);
+DispatchMessage(&msg);
+}
+
+Level_Editor_Main();
+
+}
+
+Level_Editor_Quit();
+
+ShowCursor(TRUE);
+
+return(msg.wParam);
 } 
 

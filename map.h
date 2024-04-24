@@ -1,136 +1,146 @@
 #ifndef PK2MAP
 #define PK2MAP
 
-typedef unsigned short USHORT;
-typedef unsigned short WORD; 
-typedef unsigned long  DWORD;
-typedef unsigned char  UCHAR;
-typedef unsigned char  BYTE;
+#include "../old_headers.h"
 
-const char PK2KARTTA_VIIMEISIN_VERSIO[4] = "1.3";
+const char LATEST_MAP_VERSION[4] = "1.3";
 
-const DWORD PK2KARTTA_KARTTA_LEVEYS  = 256; 
-const DWORD PK2KARTTA_KARTTA_KORKEUS = 224;
-const DWORD PK2KARTTA_KARTTA_KOKO	 = PK2KARTTA_KARTTA_LEVEYS * PK2KARTTA_KARTTA_KORKEUS;
-const DWORD PK2KARTTA_PALIKKA_PALETTI_LEVEYS  = 320;
-const DWORD PK2KARTTA_PALIKKA_PALETTI_KORKEUS = 480;
-const UCHAR PK2KARTTA_TAUSTAKUVA_EI	 = 0;
-const UCHAR PK2KARTTA_EXTRA_EI		 = 0;
+const unsigned long MAP_WIDTH = 256;
+const unsigned long MAP_HEIGHT = 224;
+const unsigned long MAP_SIZE = MAP_WIDTH * MAP_HEIGHT;
+const unsigned long BLOCK_PALETTE_WIDTH = 320;
+const unsigned long BLOCK_PALETTE_HEIGHT = 480;
+const unsigned char NO_BACKGROUND_IMAGE = 0;
+const unsigned char NO_EXTRA = 0;
 
-const DWORD PK2KARTTA_KARTTA_MAX_PROTOTYYPPEJA = 100;
+const unsigned long MAX_MAP_PROTOTYPES = 100;
 
-const UCHAR PALIKKA_ESTO_ALAS		= 40;
-const UCHAR PALIKKA_HISSI_HORI		= 41;
-const UCHAR PALIKKA_HISSI_VERT		= 42;
-const UCHAR PALIKKA_KYTKIN2_YLOS	= 43;
-const UCHAR PALIKKA_KYTKIN2_ALAS	= 45;
-const UCHAR PALIKKA_KYTKIN3_OIKEALLE = 44;
-const UCHAR PALIKKA_KYTKIN3_VASEMMALLE = 46;
-const UCHAR PALIKKA_LUKKO			= 47;
-const UCHAR PALIKKA_KALLOSEINA		= 48;
-const UCHAR PALIKKA_KALLOTAUSTA		= 49;
-const UCHAR PALIKKA_ANIM1			= 60;
-const UCHAR PALIKKA_ANIM2			= 65;
-const UCHAR PALIKKA_ANIM3			= 70;
-const UCHAR PALIKKA_ANIM4			= 75;
-const UCHAR PALIKKA_VIRTA_VASEMMALLE= 140;
-const UCHAR PALIKKA_VIRTA_OIKEALLE	= 141;
-const UCHAR PALIKKA_VIRTA_YLOS		= 142;
-const UCHAR PALIKKA_PIILO			= 143;
-const UCHAR PALIKKA_TULI			= 144;
-const UCHAR PALIKKA_KYTKIN1			= 145;
-const UCHAR PALIKKA_KYTKIN2			= 146;
-const UCHAR PALIKKA_KYTKIN3			= 147;
-const UCHAR PALIKKA_ALOITUS			= 148;
-const UCHAR PALIKKA_LOPETUS			= 149;
+const unsigned char BLOCK_RESTRICTION_DOWN = 40;
+const unsigned char BLOCK_ELEVATOR_HORI = 41;
+const unsigned char BLOCK_ELEVATOR_VERT = 42;
+const unsigned char BLOCK_SWITCH2_UP = 43;
+const unsigned char BLOCK_SWITCH2_DOWN = 45;
+const unsigned char BLOCK_SWITCH3_RIGHT = 44;
+const unsigned char BLOCK_SWITCH3_LEFT = 46;
+const unsigned char BLOCK_LOCK = 47;
+const unsigned char BLOCK_SKULL_WALL = 48;
+const unsigned char BLOCK_SKULL_BACKGROUND = 49;
+const unsigned char PALIKKA_ANIM1 = 60;
+const unsigned char PALIKKA_ANIM2 = 65;
+const unsigned char PALIKKA_ANIM3 = 70;
+const unsigned char PALIKKA_ANIM4 = 75;
+const unsigned char BLOCK_CURRENT_LEFT = 140;
+const unsigned char BLOCK_CURRENT_RIGHT = 141;
+const unsigned char BLOCK_CURRENT_UP = 142;
+const unsigned char BLOCK_HIDDEN = 143;
+const unsigned char BLOCK_FIRE = 144;
+const unsigned char BLOCK_SWITCH1 = 145;
+const unsigned char BLOCK_SWITCH2 = 146;
+const unsigned char BLOCK_SWITCH3 = 147;
+const unsigned char BLOCK_START = 148;
+const unsigned char BLOCK_FINISH = 149;
 
-const int KYTKIN_ALOITUSARVO		= 2000;
+const int SWITCH_START_VALUE = 2000;
 
-const UCHAR ILMA_NORMAALI			= 0;
-const UCHAR ILMA_SADE				= 1;
-const UCHAR ILMA_METSA				= 2;
-const UCHAR ILMA_SADEMETSA			= 3;
-const UCHAR ILMA_LUMISADE			= 4;
+const unsigned char WEATHER_NORMAL = 0;
+const unsigned char WEATHER_RAIN = 1;
+const unsigned char WEATHER_FOREST = 2;
+const unsigned char WEATHER_RAIN_FOREST = 3;
+const unsigned char WEATHER_SNOW = 4;
 
-const UCHAR TAUSTA_STAATTINEN			= 0;
-const UCHAR TAUSTA_PALLARX_VERT			= 1;
-const UCHAR TAUSTA_PALLARX_HORI			= 2;
-const UCHAR TAUSTA_PALLARX_VERT_JA_HORI	= 3;
+const unsigned char BACKGROUND_STATIC = 0;
+const unsigned char BACKGROUND_PARALLAX_VERT = 1;
+const unsigned char BACKGROUND_PARALLAX_HORI = 2;
+const unsigned char BACKGROUND_PARALLAX_VERT_AND_HORI = 3;
 
-void PK2Kartta_Cos_Sin(double *cost, double *sint);
-void PK2Kartta_Animoi(int degree, int anim, int aika1, int aika2, int aika3, bool keys);
-void PK2Kartta_Aseta_Ruudun_Mitat(int leveys, int korkeus);
+void Map_Cos_Sin(double *cos_value, double *sin_value);
 
-class PK2Kartta
-{
-	public:
+void Map_Animate(int degree, int anim, int time1, int time2, int time3, bool keys);
 
-	/* Atribuutit ------------------------*/
+void Map_Set_Screen_Dimensions(int width, int height);
 
-	char		versio[5];			// kartan versio esim. "12.3"
-	char		palikka_bmp[13];	// .BMP -tiedosto, jossa on palikkapaletti
-	char		taustakuva[13];		// .BMP -tiedosto, josta ladataan kartan taustakuva. 
-	char		musiikki[13];		// tiedoston nimi, jossa on taustamusiikki
+class PK2Map {
+public:
 
-	char		nimi[40];			// kartan nimi
-	char		tekija[40];			// kartan tekij‰
+    /* Attributes ------------------------*/
 
-	int			jakso;				// monesko jakso episodissa
-	int			ilma;				// kartan ilmasto
-	int			aika;				// aikaraja
-	UCHAR		extra;				// erikoisasetus. ei m‰‰ritelty
-	UCHAR		tausta;				// tieto miten taustakuva esitet‰‰n. ei m‰‰ritelty
-	DWORD		kytkin1_aika;		// kuinka pitk‰‰n kytkin 1 pysyy alhaalla
-	DWORD		kytkin2_aika;		// kuinka pitk‰‰n kytkin 2 pysyy alhaalla
-	DWORD		kytkin3_aika;		// kuinka pitk‰‰n kytkin 3 pysyy alhaalla
-	int			pelaaja_sprite;		// mist‰ prototyypist‰ tehd‰‰n pelaajasprite
+    char version[5];            // map version, e.g. "12.3"
+    char block_bmp[13];    // .BMP file containing block palette
+    char background_image[13];        // .BMP file for loading map background image
+    char music[13];        // filename of the background music
 
-	UCHAR		taustat[PK2KARTTA_KARTTA_KOKO];	// kartan kaikki taustat 256*224
-	UCHAR		seinat [PK2KARTTA_KARTTA_KOKO];	// kartan kaikki seinat  256*224 
-	UCHAR		spritet[PK2KARTTA_KARTTA_KOKO];	// kartan kaikki spritet 256*224
-	char		protot [PK2KARTTA_KARTTA_MAX_PROTOTYYPPEJA][13]; // karttaan liittyv‰t spritejen prototyypit (tiedosto.spr)
-	bool		reunat [PK2KARTTA_KARTTA_KOKO];
-	
-	int			palikat_buffer;		// indeksi bufferiin, jossa on kartassa k‰ytett‰v‰t palikat.
-	int			taustakuva_buffer;	// indeksi bufferiin, jossa on kartan taustakuva.
-	int			palikat_vesi_buffer; // indeksi bufferiin, jossa on vesipalikoiden alkuper‰iset kuvat
+    char name[40];            // map name
+    char author[40];            // map creator
 
-	int	  x,y;						// Kartan ikonin sijainti karttaruudulla.
-	int	  ikoni;					// Ikonin numero, joka n‰kyy karttaruudulla (icons.bmp kuvasta)
+    int stage;                // which stage in the episode
+    int climate;                // map climate
+    int time;                // time_limit
+    unsigned char extra;                // special setting, not defined
+    unsigned char background;                // information on how the background image is displayed, not defined
+    unsigned long switch1_time;        // how long switch 1 stays down
+    unsigned long switch2_time;        // how long switch 2 stays down
+    unsigned long switch3_time;        // how long switch 3 stays down
+    int player_sprite;        // which prototype the player sprite is made from
 
-	static char	pk2_hakemisto[256]; // PK2.exe:n sis‰lt‰v‰ hakemisto
+    unsigned char backgrounds[MAP_SIZE];    // all map backgrounds 256*224
+    unsigned char walls[MAP_SIZE];    // all map walls 256*224
+    unsigned char sprites[MAP_SIZE];    // all map sprites 256*224
+    char protos[MAX_MAP_PROTOTYPES][13]; // map-related sprite prototypes (file.spr)
+    bool edges[MAP_SIZE];
 
-	/* Metodit --------------------------*/
+    int block_buffer;        // index buffer containing blocks used in the map
+    int background_image_buffer;    // index buffer containing map background image
+    int water_block_buffer; // index buffer containing original images of water blocks
 
-	PK2Kartta();						// Oletusmuodostin
-	PK2Kartta(const PK2Kartta &kartta);	// Kopiointimuodostin
-	~PK2Kartta();						// Hajoitin
-	
-	PK2Kartta &operator = (const PK2Kartta &kartta);	//Sijoitusoperaattori
+    int x, y;                        // Map icon location on map screen
+    int icon;                    // Icon number displayed on map screen (from icons.bmp image)
 
-	int Lataa(char *polku, char *nimi);		// Lataa kartta
-	int Lataa_Pelkat_Tiedot(char *polku, char *nimi);	// Lataa kartta ilman grafiikoita
-	int LataaVersio01(char *filename);	// Lataa kartta versio 0.1
-	int LataaVersio10(char *filename);	// Lataa kartta versio 1.0
-	int LataaVersio11(char *filename);	// Lataa kartta versio 1.1
-	int LataaVersio12(char *filename);  // Lataa kartta versio 1.2
-	int LataaVersio13(char *filename);  // Lataa kartta versio 1.3
-	int Tallenna(char *filename);	// Tallenna kartta (uusimpana versiona)
-	void Tyhjenna();				// Tyhjenna kartta
-	RECT LaskeTallennusAlue(UCHAR *lahde, UCHAR *&kohde);
-	RECT LaskeTallennusAlue(UCHAR *alue);
-	void LueTallennusAlue(UCHAR *lahde, RECT alue, int kohde);
-	int Lataa_Taustakuva(char *polku, char *filename);
-	int Lataa_PalikkaPaletti(char *polku, char *filename);
-	int Lataa_TaustaMusiikki(char *filename);
-	int Piirra_Taustat(int, int, bool);
-	int Piirra_Seinat (int, int, bool);
-	void Kopioi(PK2Kartta &kartta);
-	void Animoi_Tuli(void);
-	void Animoi_Vesiputous(void);
-	void Animoi_Virta_Ylos(void);
-	void Animoi_Vedenpinta(void);
-	void Animoi_Vesi(void);
+    static char pk2_directory[256]; // Directory containing PK2.exe
+
+    /* Methods --------------------------*/
+
+    PK2Map();                        // Default constructor
+    PK2Map(const PK2Map &map);    // Copy constructor
+    ~PK2Map();                        // Destructor
+
+    PK2Map &operator=(const PK2Map &map);    // Assignment operator
+
+    int Load(char *path, char *name);        // Load map
+    int Load_Only_Data(char *path, char *name);    // Load map without graphics
+    int LoadVersion01(char *filename);    // Load map version 0.1
+    int LoadVersion10(char *filename);    // Load map version 1.0
+    int LoadVersion11(char *filename);    // Load map version 1.1
+    int LoadVersion12(char *filename);  // Load map version 1.2
+    int LoadVersion13(char *filename);  // Load map version 1.3
+    int Save(char *filename);    // Save map (latest version)
+    void Clear();                // Clear map
+    RECT CalculateSaveArea(unsigned char *source, unsigned char *&target);
+
+    RECT CalculateSaveArea(unsigned char *area);
+
+    void ReadSaveArea(unsigned char *source, RECT area, int target);
+
+    int Load_Background_Image(char *path, char *filename);
+
+    int Load_Block_Palette(char *path, char *filename);
+
+    int Load_Background_Music(char *filename);
+
+    int Draw_Backgrounds(int, int, bool);
+
+    int Draw_Walls(int, int, bool);
+
+    void Copy(PK2Map &map);
+
+    void Animate_Fire(void);
+
+    void Animate_Waterfall(void);
+
+    void Animate_Current_Up(void);
+
+    void Animate_Water_Surface(void);
+
+    void Animate_Water(void);
 };
 
 #endif

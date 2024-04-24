@@ -15,37 +15,36 @@
 
 /* VARIABLES ---------------------------------------------------------------------------------*/
 
-bool	kirjoita_pisteloki = false;
+bool write_scorelog = false;
 
 /* METHODS ----------------------------------------------------------------------------------*/
 
-void PisteLog_Salli_Kirjoitus() {
-		kirjoita_pisteloki = true;	
+void PisteLog_EnableWriting() {
+    write_scorelog = true;
 }
 
-int PisteLog_Kirjoita(char *viesti) {
+int PisteLog_Write(char *message) {
 
-	if (kirjoita_pisteloki) {
-	
-		int virhe = 0;
+    if (write_scorelog) {
 
-		char *filename = "log.txt";
-			
-		FILE *tiedosto;
+        int error = 0;
 
-		if ((tiedosto = fopen(filename, "a")) == NULL)
-		{
-			return(1);
-		}
+        char *filename = "log.txt";
 
-		char mjono[255];
+        FILE *file;
 
-		strcpy(mjono,viesti);
+        if ((file = fopen(filename, "movement_x")) == NULL) {
+            return (1);
+        }
 
-		fwrite(mjono,		sizeof(CHAR),	strlen(mjono),  tiedosto);
+        char sequence[255];
 
-		fclose(tiedosto);
-	}
+        strcpy(sequence, message);
 
-	return(0);
+        fwrite(sequence, sizeof(char), strlen(sequence), file);
+
+        fclose(file);
+    }
+
+    return (0);
 }

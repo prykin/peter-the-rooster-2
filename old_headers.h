@@ -10,12 +10,64 @@
 using namespace std;
 
 const int _MAX_PATH = 32768;
+const int _MAX_DIR = 256;
 
 #define DECLARE_HANDLE(name) struct name##__{int unused;}; typedef struct name##__ *name
 DECLARE_HANDLE(HWND);
 DECLARE_HANDLE(HINSTANCE);
 DECLARE_HANDLE(HDC);
 //DECLARE_HANDLE(RECT);
+
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+
+unsigned long GetTickCount();
+
+typedef struct IDirectSoundBuffer   *LPDIRECTSOUNDBUFFER;
+typedef struct IDirectSound         *LPDIRECTSOUND;
+
+typedef struct tWAVEFORMATEX {
+    unsigned int  wFormatTag;
+    unsigned int  nChannels;
+    unsigned long nSamplesPerSec;
+    unsigned long nAvgBytesPerSec;
+    unsigned int  nBlockAlign;
+    unsigned int  wBitsPerSample;
+    unsigned int  cbSize;
+} WAVEFORMATEX, *PWAVEFORMATEX, *NPWAVEFORMATEX, *LPWAVEFORMATEX;
+
+typedef unsigned long FOURCC;
+typedef HWND HMMIO;
+
+typedef struct _MMCKINFO {
+    FOURCC ckid;
+    unsigned long  cksize;
+    FOURCC fccType;
+    unsigned long  dwDataOffset;
+    unsigned long  dwFlags;
+} MMCKINFO, *PMMCKINFO, *NPMMCKINFO, *LPMMCKINFO;
+
+typedef struct _GUID {
+    unsigned long  Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[8];
+} GUID;
+
+typedef struct DSBUFFERDESC {
+    unsigned long dwSize;
+    unsigned long dwFlags;
+    unsigned long dwBufferBytes;
+    unsigned long dwReserved;
+    LPWAVEFORMATEX lpwfxFormat;
+    GUID guid3DAlgorithm;
+} DSBUFFERDESC;
+
+typedef struct tagPALETTEENTRY {
+    unsigned char peRed;
+    unsigned char peGreen;
+    unsigned char peBlue;
+    unsigned char peFlags;
+} PALETTEENTRY, *PPALETTEENTRY, *LPPALETTEENTRY;
 
 int _findclose(intptr_t handle);
 char strlwr(string);
@@ -30,6 +82,32 @@ typedef struct tagRECT {
     long right;
     long bottom;
 } RECT, *PRECT, *NPRECT, *LPRECT;
+
+intptr_t _findfirst(
+   const char *filespec,
+   struct _finddata_t *fileinfo
+);
+
+int _chdir(
+   const char *dirname
+);
+
+int _findnext(
+   intptr_t handle,
+   struct _finddata_t *fileinfo
+);
+
+typedef	unsigned long	_fsize_t;
+
+struct _finddata_t
+{
+    unsigned	attrib;		/* Attributes, see constants above. */
+    time_t		time_create;
+    time_t		time_access;	/* always midnight local time */
+    time_t		time_write;
+    _fsize_t	size;
+    char		name[FILENAME_MAX];	/* may include spaces. */
+};
 
 typedef enum Keyboard_Device
 {
@@ -54,6 +132,7 @@ typedef enum Keyboard_Device
     DIK_B,
     DIK_BACK,
     DIK_BACKSLASH,
+    DIK_BACKSPACE,
     DIK_C,
     DIK_CALCULATOR,
     DIK_CAPITAL,
@@ -96,6 +175,7 @@ typedef enum Keyboard_Device
     DIK_KANA,
     DIK_KANJI,
     DIK_L,
+    DIK_LALT,
     DIK_LBRACKET,
     DIK_LCONTROL,
     DIK_LEFT,
@@ -139,6 +219,7 @@ typedef enum Keyboard_Device
     DIK_PRIOR,
     DIK_Q,
     DIK_R,
+    DIK_RALT,
     DIK_RBRACKET,
     DIK_RCONTROL,
     DIK_RETURN,

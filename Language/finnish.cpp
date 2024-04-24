@@ -1,35 +1,33 @@
-#define WIN32_LEAN_AND_MEAN  
+#define WIN32_LEAN_AND_MEAN
 #define INITGUID
 
 #include <string.h>
 //#include <istream.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <iostream.h>
+#include <iostream>
 #include "language.h"
 
-int main()
-{
-	PisteLanguage *kieli = new PisteLanguage();
+int main() {
+    PisteLanguage *language = new PisteLanguage();
 
-	if (!kieli->Lue_Tiedosto("suomi.lng"))
-		cout<<"tiedoston luku ep�onnistui!\n";
-	else
-		cout<<"tiedoston luku onnistui!\n";
+    if (!language->Read_File("suomi.lng"))
+        cout << "Failed to read the file!\n";
+    else
+        cout << "File read successfully!\n";
 
-	int teksti = 0;
+    int text_index = 0;
 
-	teksti = kieli->Hae_Indeksi("testi2");
-	cout<<"indeksi: "<<teksti<<" teksti: |"<<kieli->Hae_Teksti(teksti)<<"|\n";	
+    text_index = language->Get_Index("testi2");
+    cout << "Index: " << text_index << " text: |" << language->Get_Text(text_index) << "|\n";
 
-	for (int i=0;i<10;i++)
-	{
-		cout<<"indeksi: "<<i<<" teksti: |"<<kieli->Hae_Teksti(i)<<"|\n";
-		teksti++;
-	}
-	cin;
+    for (int i = 0; i < 10; i++) {
+        cout << "Index: " << i << " text: |" << language->Get_Text(i) << "|\n";
+        text_index++;
+    }
+    cin;
 
-	delete kieli;
+    delete language;
 
-	return 0;
+    return 0;
 }

@@ -3,7 +3,7 @@ PisteEngine - PisteFont 1.1
 09.12.2001	Janne Kivilahti / Piste Gamez
 
 Muutokset:
-11.04.2004  Fontin parametrien lataus tiedostosta - LataaTiedostosta(char *file)
+11.04.2004  Fontin parametrien charge_time tiedostosta - LoadFromFile(char *file)
 */
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
@@ -22,582 +22,537 @@ Muutokset:
 #include <string.h>
 /* DEFINES -----------------------------------------------------------------------------------*/
 
-/* TYPE DEFINITIONS --------------------------------------------------------------------------*/
-
-typedef unsigned short USHORT;
-typedef unsigned short WORD;
-typedef unsigned char  UCHAR;
-typedef unsigned char  BYTE;
-
 /* VARIABLES ---------------------------------------------------------------------------------*/
 
 /* PROTOTYPES --------------------------------------------------------------------------------*/
 
 /* METHODS -----------------------------------------------------------------------------------*/
 
-int Loki_Kirjoita(char *viesti)
-{
-	
-	return(0);
+int Log_Write(char *message) {
 
-	
-		int virhe = 0;
+    return (0);
 
-		char *filename = "fonttiloki.txt";
-			
-		FILE *tiedosto;
+    int error = 0;
 
-		if ((tiedosto = fopen(filename, "a")) == NULL)
-		{
-			return(1);
-		}
+    char *filename = "fontlog.txt";
 
-		char mjono[255];
+    FILE *file;
 
-		//memset(mjono,' ',sizeof(mjono));
-		//mjono[60] = '\n';
+    if ((file = fopen(filename, "a")) == NULL) {
+        return (1);
+    }
 
-		strcpy(mjono,viesti);
+    char sequence[255];
 
-		fwrite(mjono,		sizeof(CHAR),	strlen(mjono),  tiedosto);
+    //memset(sequence,' ',sizeof(sequence));
+    //sequence[60] = '\n';
 
-		fclose(tiedosto);
+    strcpy(sequence, message);
 
-	return(0);
+    fwrite(sequence, sizeof(char), strlen(sequence), file);
+
+    fclose(file);
+
+    return (0);
 }
 
-PisteFont::PisteFont(int korkeus, int leveys, int lkm)
-{
-	tiedosto = NULL;
+PisteFont::PisteFont(int height, int width, int count) {
+    file_name = NULL;
 
-	font_korkeus = korkeus;
-	font_leveys  = leveys;
-	font_lkm	 = lkm;
-	font_bitmap  = (UCHAR *)malloc(korkeus * leveys * lkm);
-	font_buffer	 = PisteDraw_Buffer_Uusi(leveys*lkm,korkeus,true,255);
+    font_height = height;
+    font_width = width;
+    font_count = count;
+    font_bitmap = (unsigned char *) malloc(height * width * count);
+    font_buffer = PisteDraw_Buffer_Create(width * count, height, true, 255);
 
-	this->Init_fonts();
+    this->InitFonts();
 }
 
-PisteFont::PisteFont()
-{
-	tiedosto = NULL;
-	Loki_Kirjoita("PisteFont()\n");
+PisteFont::PisteFont() {
+    file_name = NULL;
+    Log_Write("PisteFont()\n");
 
-	font_korkeus = 0;
-	font_leveys  = 0;
-	font_lkm	 = 0;
+    font_height = 0;
+    font_width = 0;
+    font_count = 0;
 }
 
-int PisteFont::LataaTiedostosta(char *polku, char *file)
-{
-	Loki_Kirjoita("LataaTiedostosta(char *polku, char *file)\n");
-	Loki_Kirjoita(polku);
-	Loki_Kirjoita(file);
-	Loki_Kirjoita("\n");
-	
-	tiedosto = new PisteLanguage();
-	Loki_Kirjoita("tiedosto = new PisteLanguage();");
+int PisteFont::LoadFromFile(char *path, char *file) {
+    Log_Write("LoadFromFile(char *path, char *file_name)\n");
+    Log_Write(path);
+    Log_Write(file);
+    Log_Write("\n");
 
-	char xfile[_MAX_PATH];
-	strcpy(xfile,polku);
-	strcat(xfile,file);
+    file_name = new PisteLanguage();
+    Log_Write("file_name = new PisteLanguage();");
 
-	Loki_Kirjoita("1.\n");
+    char xfile[_MAX_PATH];
+    strcpy(xfile, path);
+    strcat(xfile, file);
 
-	tiedosto = new PisteLanguage();
+    Log_Write("1.\n");
 
-	Loki_Kirjoita("2.\n");
+    file_name = new PisteLanguage();
 
-	if (!tiedosto->Lue_Tiedosto(xfile)) 
-		return -1;
+    Log_Write("2.\n");
 
-	Loki_Kirjoita("3.\n");
+    if (!file_name->Read_File(xfile))
+        return -1;
 
-	int ind = 0;
-	
-	//leveys
-	ind = tiedosto->Hae_Indeksi("letter width");
-	if (ind != -1)
-		font_leveys = atoi(tiedosto->Hae_Teksti(ind));
-	else
-		return -1;
+    Log_Write("3.\n");
 
-	Loki_Kirjoita("4.\n");
+    int index = 0;
 
-	//korkeus
-	ind = tiedosto->Hae_Indeksi("letter height");
-	if (ind != -1)
-		font_korkeus = atoi(tiedosto->Hae_Teksti(ind));
-	else
-		return -1;
+    //width
+    index = file_name->Get_Index("letter width");
+    if (index != -1)
+        font_width = atoi(file_name->Get_Text(index));
+    else
+        return -1;
 
-	Loki_Kirjoita("5.\n");
+    Log_Write("4.\n");
 
-	//lkm
-	ind = tiedosto->Hae_Indeksi("letters");
-	if (ind != -1)
-		font_lkm = strlen(tiedosto->Hae_Teksti(ind));
-	else
-		return -1;
+    //height
+    index = file_name->Get_Index("letter height");
+    if (index != -1)
+        font_height = atoi(file_name->Get_Text(index));
+    else
+        return -1;
 
-	Loki_Kirjoita("6.\n");
+    Log_Write("5.\n");
 
-	int buf_x, buf_y, buf_width;
+    //letters count
+    index = file_name->Get_Index("letters");
+    if (index != -1)
+        font_count = strlen(file_name->Get_Text(index));
+    else
+        return -1;
 
-	//kuvatiedoston leveys
-	ind = tiedosto->Hae_Indeksi("image width");
-	if (ind != -1)
-		buf_width = atoi(tiedosto->Hae_Teksti(ind));
-	else
-		buf_width = 640;
+    Log_Write("6.\n");
 
-	//buffer x
-	ind = tiedosto->Hae_Indeksi("image x");
-	if (ind != -1)
-		buf_x = atoi(tiedosto->Hae_Teksti(ind));
-	else
-		return -1;	
+    int buf_x, buf_y, buf_width;
 
-	Loki_Kirjoita("7.\n");
+    //kuvatiedoston width
+    index = file_name->Get_Index("image width");
+    if (index != -1)
+        buf_width = atoi(file_name->Get_Text(index));
+    else
+        buf_width = 640;
 
-	//buffer y
-	ind = tiedosto->Hae_Indeksi("image y");
-	if (ind != -1)
-		buf_y = atoi(tiedosto->Hae_Teksti(ind));
-	else
-		return -1;
+    //buffer x
+    index = file_name->Get_Index("image x");
+    if (index != -1)
+        buf_x = atoi(file_name->Get_Text(index));
+    else
+        return -1;
 
-	Loki_Kirjoita("8.\n");
+    Log_Write("7.\n");
 
-	if (buf_x < 0 || buf_x > 640 || buf_y < 0 || buf_y > 480)
-		return -1;
+    //buffer y
+    index = file_name->Get_Index("image y");
+    if (index != -1)
+        buf_y = atoi(file_name->Get_Text(index));
+    else
+        return -1;
 
-	Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("letter width")));
-	Loki_Kirjoita(" ");
-	Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("letter height")));
-	Loki_Kirjoita(" ");
-	Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("letters")));
-	Loki_Kirjoita(" ");
-	Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("image x")));
-	Loki_Kirjoita(" ");
-	Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("image y")));
-	Loki_Kirjoita(" ");
-	char teksti[255];
-	itoa(font_lkm,teksti,10);
-	Loki_Kirjoita(teksti);
-	Loki_Kirjoita("\n");
+    Log_Write("8.\n");
 
-	//kuvatiedosto
-	ind = tiedosto->Hae_Indeksi("image");
+    if (buf_x < 0 || buf_x > 640 || buf_y < 0 || buf_y > 480)
+        return -1;
 
-	if (ind != -1) {
+    Log_Write(file_name->Get_Text(file_name->Get_Index("letter width")));
+    Log_Write(" ");
+    Log_Write(file_name->Get_Text(file_name->Get_Index("letter height")));
+    Log_Write(" ");
+    Log_Write(file_name->Get_Text(file_name->Get_Index("letters")));
+    Log_Write(" ");
+    Log_Write(file_name->Get_Text(file_name->Get_Index("image x")));
+    Log_Write(" ");
+    Log_Write(file_name->Get_Text(file_name->Get_Index("image y")));
+    Log_Write(" ");
+    char text[255];
+    itoa(font_count, text, 10);
+    Log_Write(text);
+    Log_Write("\n");
 
-		Loki_Kirjoita("9.\n");
-		Loki_Kirjoita(tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("image")));
-		Loki_Kirjoita(" ");
+    //image_file
+    index = file_name->Get_Index("image");
 
-		int temp_kuva = PisteDraw_Buffer_Uusi(buf_width,480,true,255);
+    if (index != -1) {
 
-		Loki_Kirjoita("10.\n");
+        Log_Write("9.\n");
+        Log_Write(file_name->Get_Text(file_name->Get_Index("image")));
+        Log_Write(" ");
 
-		strcpy(xfile,polku);
-		strcat(xfile,tiedosto->Hae_Teksti(ind));
+        int temp_image = PisteDraw_Buffer_Create(buf_width, 480, true, 255);
 
-		Loki_Kirjoita("11. ");Loki_Kirjoita(xfile);
+        Log_Write("10.\n");
 
-		if (PisteDraw_Lataa_Kuva(temp_kuva,xfile, true) == PD_VIRHE) {
-			PisteDraw_Buffer_Tuhoa(temp_kuva);
-			return -1;
-		}
+        strcpy(xfile, path);
+        strcat(xfile, file_name->Get_Text(index));
 
-		Loki_Kirjoita("12.\n");
+        Log_Write("11. ");
+        Log_Write(xfile);
 
-		font_bitmap  = (UCHAR *)malloc(font_korkeus * font_leveys * font_lkm);
-		font_buffer	 = PisteDraw_Buffer_Uusi(font_leveys * font_lkm,font_korkeus,true,255);
+        if (PisteDraw_Image_Load(temp_image, xfile, true) == PD_ERROR) {
+            PisteDraw_Buffer_Destroy(temp_image);
+            return -1;
+        }
 
-		Loki_Kirjoita("13.\n");
+        Log_Write("12.\n");
 
-		UCHAR *buffer = NULL;
-		DWORD ruudun_leveys;			
-			
-		if (PisteDraw_Piirto_Aloita(temp_kuva, *&buffer, (DWORD &) ruudun_leveys) == PD_VIRHE)
-			return -1;
+        font_bitmap = (unsigned char *) malloc(font_height * font_width * font_count);
+        font_buffer = PisteDraw_Buffer_Create(font_width * font_count, font_height, true, 255);
 
-		Loki_Kirjoita("14. ruudun leveys");
-		itoa(ruudun_leveys,teksti,10);
-		Loki_Kirjoita(teksti);
+        Log_Write("13.\n");
 
-		Loki_Kirjoita("\n15.");
-		Get_bitmap(buf_x,buf_y,ruudun_leveys,buffer);
+        unsigned char *buffer = NULL;
+        unsigned long screen_width;
 
-		Loki_Kirjoita("16.\n");
+        if (PisteDraw_Draw_Begin(temp_image, *&buffer, (unsigned long &) screen_width) == PD_ERROR)
+            return -1;
 
-		PisteDraw_Piirto_Lopeta(temp_kuva);
+        Log_Write("14. screen width");
+        itoa(screen_width, text, 10);
+        Log_Write(text);
 
-		Loki_Kirjoita("17.");
+        Log_Write("\n15.");
+        GetBitmap(buf_x, buf_y, screen_width, buffer);
 
-		PisteDraw_Buffer_Tuhoa(temp_kuva);
+        Log_Write("16.\n");
 
-		Loki_Kirjoita("18.");
-	}
-	else
-		return -1;
+        PisteDraw_Draw_End(temp_image);
 
-	//this->Init_fonts_tiedosto();
-	this->Init_fonts_tiedosto();
+        Log_Write("17.");
 
-	return 0;
+        PisteDraw_Buffer_Destroy(temp_image);
+
+        Log_Write("18.");
+    } else
+        return -1;
+
+    //this->InitFontsFromFile();
+    this->InitFontsFromFile();
+
+    return 0;
 }
 
 
-PisteFont::~PisteFont()
-{
-	free(font_bitmap);
-	PisteDraw_Buffer_Tuhoa(font_buffer);
+PisteFont::~PisteFont() {
+    free(font_bitmap);
+    PisteDraw_Buffer_Destroy(font_buffer);
 
-	if (tiedosto != NULL)
-		delete tiedosto;
+    if (file_name != NULL)
+        delete file_name;
 }
 
-int PisteFont::Init_fonts_tiedosto(void)
-{
-	Loki_Kirjoita("\nInit_fonts_tiedosto(void)\n");
-	
-	int font_index[256];
-	char kirjaimet[MAX_TEKSTIN_PITUUS];
-	int i;
-	
-	for (i=0;i<256;i++)
-		font_table[i]=-1;
+int PisteFont::InitFontsFromFile(void) {
+    Log_Write("\nInit_fonts_tiedosto(void)\n");
 
-	Loki_Kirjoita("\n1\n");
+    int font_index[256];
+    char kirjaimet[MAX_TEXT_LENGTH];
+    int i;
 
-	strcpy(kirjaimet,tiedosto->Hae_Teksti(tiedosto->Hae_Indeksi("letters")));
+    for (i = 0; i < 256; i++)
+        font_table[i] = -1;
 
-	Loki_Kirjoita("\n2\n");
-	
-	for (i=0;i<font_lkm;i++){
-		font_index[i] = i * font_leveys;
-	}
+    Log_Write("\n1\n");
 
-	Loki_Kirjoita("\n3\n");
+    strcpy(kirjaimet, file_name->Get_Text(file_name->Get_Index("letters")));
 
-	for (i=0;i<font_lkm;i++){
-		font_table[(UCHAR)toupper(kirjaimet[i])] = font_index[i];
-	}
-	
-	Loki_Kirjoita("\n4\n");
+    Log_Write("\n2\n");
 
-	return(0);
+    for (i = 0; i < font_count; i++) {
+        font_index[i] = i * font_width;
+    }
+
+    Log_Write("\n3\n");
+
+    for (i = 0; i < font_count; i++) {
+        font_table[(unsigned char) toupper(kirjaimet[i])] = font_index[i];
+    }
+
+    Log_Write("\n4\n");
+
+    return (0);
 }
 
-int PisteFont::Init_fonts(void)
-{
-	Loki_Kirjoita("\nInit_fonts(void)\n");
+int PisteFont::InitFonts(void) {
+    Log_Write("\nInit_fonts(void)\n");
 
-	int font_index[256];
-	int i;
-	
-	for (i=0;i<256;i++)
-		font_table[i]=-1;
-	
-	for (i=0;i<font_lkm;i++)
-		font_index[i] = i * font_leveys;
+    int font_index[256];
+    int i;
 
-	font_table[(UCHAR)'A'] = font_index[0];
-	font_table[(UCHAR)'B'] = font_index[1];
-	font_table[(UCHAR)'C'] = font_index[2];
-	font_table[(UCHAR)'D'] = font_index[3];
-	font_table[(UCHAR)'E'] = font_index[4];
-	font_table[(UCHAR)'F'] = font_index[5];
-	font_table[(UCHAR)'G'] = font_index[6]; 
-	font_table[(UCHAR)'H'] = font_index[7];
-	font_table[(UCHAR)'I'] = font_index[8];
-	font_table[(UCHAR)'J'] = font_index[9];
-	font_table[(UCHAR)'K'] = font_index[10];
-	font_table[(UCHAR)'L'] = font_index[11];
-	font_table[(UCHAR)'M'] = font_index[12];
-	font_table[(UCHAR)'N'] = font_index[13];
-	font_table[(UCHAR)'O'] = font_index[14];
-	font_table[(UCHAR)'P'] = font_index[15];
-	font_table[(UCHAR)'Q'] = font_index[16];
-	font_table[(UCHAR)'R'] = font_index[17];
-	font_table[(UCHAR)'S'] = font_index[18];
-	font_table[(UCHAR)'T'] = font_index[19];
-	font_table[(UCHAR)'U'] = font_index[20];
-	font_table[(UCHAR)'V'] = font_index[21];
-	font_table[(UCHAR)'W'] = font_index[22];
-	font_table[(UCHAR)'X'] = font_index[23];
-	font_table[(UCHAR)'Y'] = font_index[24];
-	font_table[(UCHAR)'Z'] = font_index[25];
-	font_table[(UCHAR)toupper('�')] = font_index[26];
-	font_table[(UCHAR)toupper('�')] = font_index[27];
-	font_table[(UCHAR)toupper('�')] = font_index[28];
-	font_table[(UCHAR)'0'] = font_index[29];
-	font_table[(UCHAR)'1'] = font_index[30];
-	font_table[(UCHAR)'2'] = font_index[31];
-	font_table[(UCHAR)'3'] = font_index[32];
-	font_table[(UCHAR)'4'] = font_index[33];
-	font_table[(UCHAR)'5'] = font_index[34];
-	font_table[(UCHAR)'6'] = font_index[35];
-	font_table[(UCHAR)'7'] = font_index[36];
-	font_table[(UCHAR)'8'] = font_index[37];
-	font_table[(UCHAR)'9'] = font_index[38];
-	font_table[(UCHAR)'.'] = font_index[39];
-	font_table[(UCHAR)'!'] = font_index[40];
-	font_table[(UCHAR)'?'] = font_index[41];
-	font_table[(UCHAR)':'] = font_index[42];
-	font_table[(UCHAR)'-'] = font_index[43];
-	font_table[(UCHAR)','] = font_index[44];
-	font_table[(UCHAR)'+'] = font_index[45];
-	font_table[(UCHAR)'='] = font_index[46];
-	font_table[(UCHAR)'('] = font_index[47];
-	font_table[(UCHAR)')'] = font_index[48];
-	font_table[(UCHAR)'/'] = font_index[49];
-	font_table[(UCHAR)'#'] = font_index[50];
-	font_table[(UCHAR)'\\']= font_index[51];
-	font_table[(UCHAR)'_']= font_index[52];
-	font_table[(UCHAR)'%']= font_index[53];
-	return(0);
+    for (i = 0; i < 256; i++)
+        font_table[i] = -1;
+
+    for (i = 0; i < font_count; i++)
+        font_index[i] = i * font_width;
+
+    font_table[(unsigned char) 'A'] = font_index[0];
+    font_table[(unsigned char) 'B'] = font_index[1];
+    font_table[(unsigned char) 'C'] = font_index[2];
+    font_table[(unsigned char) 'D'] = font_index[3];
+    font_table[(unsigned char) 'E'] = font_index[4];
+    font_table[(unsigned char) 'F'] = font_index[5];
+    font_table[(unsigned char) 'G'] = font_index[6];
+    font_table[(unsigned char) 'H'] = font_index[7];
+    font_table[(unsigned char) 'I'] = font_index[8];
+    font_table[(unsigned char) 'J'] = font_index[9];
+    font_table[(unsigned char) 'K'] = font_index[10];
+    font_table[(unsigned char) 'L'] = font_index[11];
+    font_table[(unsigned char) 'M'] = font_index[12];
+    font_table[(unsigned char) 'N'] = font_index[13];
+    font_table[(unsigned char) 'O'] = font_index[14];
+    font_table[(unsigned char) 'P'] = font_index[15];
+    font_table[(unsigned char) 'Q'] = font_index[16];
+    font_table[(unsigned char) 'R'] = font_index[17];
+    font_table[(unsigned char) 'S'] = font_index[18];
+    font_table[(unsigned char) 'T'] = font_index[19];
+    font_table[(unsigned char) 'U'] = font_index[20];
+    font_table[(unsigned char) 'V'] = font_index[21];
+    font_table[(unsigned char) 'W'] = font_index[22];
+    font_table[(unsigned char) 'X'] = font_index[23];
+    font_table[(unsigned char) 'Y'] = font_index[24];
+    font_table[(unsigned char) 'Z'] = font_index[25];
+    font_table[(unsigned char) toupper('�')] = font_index[26];
+    font_table[(unsigned char) toupper('�')] = font_index[27];
+    font_table[(unsigned char) toupper('�')] = font_index[28];
+    font_table[(unsigned char) '0'] = font_index[29];
+    font_table[(unsigned char) '1'] = font_index[30];
+    font_table[(unsigned char) '2'] = font_index[31];
+    font_table[(unsigned char) '3'] = font_index[32];
+    font_table[(unsigned char) '4'] = font_index[33];
+    font_table[(unsigned char) '5'] = font_index[34];
+    font_table[(unsigned char) '6'] = font_index[35];
+    font_table[(unsigned char) '7'] = font_index[36];
+    font_table[(unsigned char) '8'] = font_index[37];
+    font_table[(unsigned char) '9'] = font_index[38];
+    font_table[(unsigned char) '.'] = font_index[39];
+    font_table[(unsigned char) '!'] = font_index[40];
+    font_table[(unsigned char) '?'] = font_index[41];
+    font_table[(unsigned char) ':'] = font_index[42];
+    font_table[(unsigned char) '-'] = font_index[43];
+    font_table[(unsigned char) ','] = font_index[44];
+    font_table[(unsigned char) '+'] = font_index[45];
+    font_table[(unsigned char) '='] = font_index[46];
+    font_table[(unsigned char) '('] = font_index[47];
+    font_table[(unsigned char) ')'] = font_index[48];
+    font_table[(unsigned char) '/'] = font_index[49];
+    font_table[(unsigned char) '#'] = font_index[50];
+    font_table[(unsigned char) '\\'] = font_index[51];
+    font_table[(unsigned char) '_'] = font_index[52];
+    font_table[(unsigned char) '%'] = font_index[53];
+    return (0);
 }
 
-int PisteFont::Get_bitmap(int buffer_x, int buffer_y, int ruudun_leveys, UCHAR *buffer)
-{
-	int font_bitmap_leveys = font_lkm * font_leveys;
+int PisteFont::GetBitmap(int buffer_x, int buffer_y, int screen_width, unsigned char *buffer) {
+    int font_bitmap_leveys = font_count * font_width;
 
-	Loki_Kirjoita("\nGet_bitmap\n");
+    Log_Write("\nGet_bitmap\n");
 
-	UCHAR *fbuffer = NULL;
-	DWORD f_leveys;
-	UCHAR vari;
+    unsigned char *fbuffer = NULL;
+    unsigned long f_width;
+    unsigned char color;
 
-	Loki_Kirjoita("\n1\n");
+    Log_Write("\n1\n");
 
-	if (PisteDraw_Piirto_Aloita(font_buffer, *&fbuffer, (DWORD &) f_leveys) == PD_VIRHE)
-		return PD_VIRHE;
+    if (PisteDraw_Draw_Begin(font_buffer, *&fbuffer, (unsigned long &) f_width) == PD_ERROR)
+        return PD_ERROR;
 
-	Loki_Kirjoita("\n2\n");
+    Log_Write("\n2\n");
 
-	for (int y=0;y<this->font_korkeus;y++)
-		for (int x=0;x<font_bitmap_leveys-1;x++)
-		{
-			vari = buffer[buffer_x+x+(buffer_y+y)*ruudun_leveys];
-			fbuffer[x+y*f_leveys] =	vari;
-			if (vari != 255)
-				vari %= 32;
-			font_bitmap[x+y*font_bitmap_leveys] = vari;
-			
-		}
+    for (int y = 0; y < this->font_height; y++)
+        for (int x = 0; x < font_bitmap_leveys - 1; x++) {
+            color = buffer[buffer_x + x + (buffer_y + y) * screen_width];
+            fbuffer[x + y * f_width] = color;
+            if (color != 255)
+                color %= 32;
+            font_bitmap[x + y * font_bitmap_leveys] = color;
 
-	Loki_Kirjoita("\n3\n");
+        }
 
-	if (PisteDraw_Piirto_Lopeta(font_buffer) == PD_VIRHE)
-		return PD_VIRHE;
+    Log_Write("\n3\n");
 
-	Loki_Kirjoita("\n4\n");
+    if (PisteDraw_Draw_End(font_buffer) == PD_ERROR)
+        return PD_ERROR;
 
-	return(0);
+    Log_Write("\n4\n");
+
+    return (0);
 }
 
-int PisteFont::Piirra_merkkijono(int font_x, int font_y, int lPitch, char *merkkijono,
-								 UCHAR *back_buffer, bool loop)
-{
-	int i = 0, i2;
-	int x, y, ix, fx, fy, x2;
-	UCHAR color;
-	char merkki = '0';
-	int font_bitmap_leveys = font_lkm * font_leveys;
-	UCHAR *buffer;
+int PisteFont::DrawString(int font_x, int font_y, int buffer_width, char *text, unsigned char *back_buffer, bool loop) {
+    int i = 0, i2;
+    int x, y, ix, fx, fy, x2;
+    unsigned char color;
+    char character = '0';
+    int font_bitmap_width = font_count * font_width;
+    unsigned char *buffer;
 
-	while (merkki != '\0')
-	{
-		merkki = merkkijono[i];
-		ix = font_table[(UCHAR)toupper(merkki)];
-		i2 = i * font_leveys;
-		
-		if (ix > -1)
-		{
-			for (x=0;x<font_leveys;x++)
-			{
-				fx = font_x + x + i2;
-				x2 = ix+x;
-				buffer = back_buffer + fx;
+    while (character != '\0') {
+        character = text[i];
+        ix = font_table[(unsigned char) toupper(character)];
+        i2 = i * font_width;
 
-				for (y=0;y<font_korkeus;y++)
-				{
-					if ((color = font_bitmap[x2 + y * font_bitmap_leveys]) != 255)
-					{
-						fy = font_y + y;
-						buffer[fy * lPitch] = color;
-					}
-				}
-			}
-		}
-		i++;
-	}
-	return((i-1)*font_leveys);
+        if (ix > -1) {
+            for (x = 0; x < font_width; x++) {
+                fx = font_x + x + i2;
+                x2 = ix + x;
+                buffer = back_buffer + fx;
+
+                for (y = 0; y < font_height; y++) {
+                    if ((color = font_bitmap[x2 + y * font_bitmap_width]) != 255) {
+                        fy = font_y + y;
+                        buffer[fy * buffer_width] = color;
+                    }
+                }
+            }
+        }
+        i++;
+    }
+    return ((i - 1) * font_width);
 }
 
-int PisteFont::Piirra_merkkijono(char *merkkijono, int font_x, int font_y, int kohde_buffer)
-{
-	int i = 0, i2;
-	int ix;
-	char merkki = '0';
+int PisteFont::DrawString(char *text, int font_x, int font_y, int target_buffer) {
+    int i = 0, i2;
+    int ix;
+    char merkki = '0';
 
-	while (merkki != '\0')
-	{
-		merkki = merkkijono[i];
-		ix = font_table[(UCHAR)toupper(merkki)];
-		i2 = i * font_leveys;
-		
-		if (ix > -1)
-			PisteDraw_Buffer_Flip_Nopea(font_buffer,kohde_buffer,font_x+i2,font_y,ix,0,ix+font_leveys,font_korkeus);
+    while (merkki != '\0') {
+        merkki = text[i];
+        ix = font_table[(unsigned char) toupper(merkki)];
+        i2 = i * font_width;
 
-		i++;
-	}
+        if (ix > -1)
+            PisteDraw_Buffer_Flip_Fast(font_buffer, target_buffer, font_x + i2, font_y, ix, 0, ix + font_width,
+                                       font_height);
 
-	return((i-1)*font_leveys);
+        i++;
+    }
+
+    return ((i - 1) * font_width);
 }
 
-int PisteFont::Piirra_merkkijono_led(int font_x, int font_y, int lPitch, char *merkkijono,//[], 
-									 UCHAR *back_buffer)
-{
-	int i = 0, i2;
-	int x, y, ix, fx, fy, x2;
-	UCHAR color;
-	char merkki = '0';
-	int font_bitmap_leveys = font_lkm * font_leveys;
+int PisteFont::DrawStringLed(int font_x, int font_y, int buffer_width, char *text,//[],
+                                     unsigned char *back_buffer) {
+    int i = 0, i2;
+    int x, y, ix, fx, fy, x2;
+    unsigned char color;
+    char character = '0';
+    int font_bitmap_width = font_count * font_width;
 
-	while (merkki != '\0')
-	{
-		merkki = merkkijono[i];
-		ix = font_table[(UCHAR)toupper(merkki)];
-		i2 = i * font_leveys;
-		if (ix > -1)
-		{
-			for (x=0;x<font_leveys;x++)
-			{
-				fx = font_x + x;
-				x2 = ix+x;
-				for (y=0;y<font_korkeus;y++)
-				{
-					color = font_bitmap[x2+y*font_bitmap_leveys];
-					if (color == 11 || color == 31)
-					{
-						fy = font_y + y;
-						fy %= 470;
-						color++;
-						back_buffer[fx + i2 + fy * lPitch] = color;					
-					}
-				}
-			}
-		}
-		i++;
-	}
-	return((i-1)*font_leveys);
+    while (character != '\0') {
+        character = text[i];
+        ix = font_table[(unsigned char) toupper(character)];
+        i2 = i * font_width;
+        if (ix > -1) {
+            for (x = 0; x < font_width; x++) {
+                fx = font_x + x;
+                x2 = ix + x;
+                for (y = 0; y < font_height; y++) {
+                    color = font_bitmap[x2 + y * font_bitmap_width];
+                    if (color == 11 || color == 31) {
+                        fy = font_y + y;
+                        fy %= 470;
+                        color++;
+                        back_buffer[fx + i2 + fy * buffer_width] = color;
+                    }
+                }
+            }
+        }
+        i++;
+    }
+    return ((i - 1) * font_width);
 }
 
-int PisteFont::Piirra_merkkijono_lapinakyva(int font_x, int font_y, int lPitch, RECT klipperi, char *merkkijono,
-							  UCHAR *back_buffer, bool loop, int pros)
-{
-	int i = 0;
-	int x, y, ix, fx, fy, p1, p2;
-	UCHAR color, color2, color3;
-	char merkki = '0';
+int PisteFont::DrawStringTransparent(int font_x, int font_y, int buffer_width, RECT clipper, char *text,
+                                     unsigned char *back_buffer, bool loop, int transparency) {
+    int i = 0;
+    int x, y, ix, fx, fy, p1, p2;
+    unsigned char color, color2, color3;
+    char character = '0';
 
-	int font_bitmap_leveys = font_lkm * font_leveys;
+    int font_bitmap_width = font_count * font_width;
 
-	if (pros>100)
-		pros = 100;
-	
-	p1 = pros;
-	p2 = 100 - pros;
+    if (transparency > 100)
+        transparency = 100;
 
-	while (merkki != '\0')
-	{
-		merkki = merkkijono[i];
-		ix = font_table[(UCHAR)toupper(merkki)];
-		if (ix > -1)
-		{
-			for (x=0;x<font_leveys;x++)
-			{
-				fx = font_x + x + i * font_leveys;
-				//if (loop) fx %= 480;
-				//x2 = ix + x;
+    p1 = transparency;
+    p2 = 100 - transparency;
 
-				if (fx >= klipperi.left && fx <= klipperi.right)
-					for (y=0;y<font_korkeus;y++)
-					{
-						color = font_bitmap[ix+x+y*font_bitmap_leveys];
-						
-						if (color!=255)
-						{
-							fy = font_y + y;
-							
-							if (fy >= klipperi.top && fy < klipperi.bottom)
-							{
-								//fy %= 470;
-								fy *= lPitch;
-								fy += fx;
-								color2  = back_buffer[fy];
-								/*
-								color3  = color2;
-								color2 %= 32;
-								color3 -= color2;
-		*/
-								color3  = (color2>>5)<<5;
-								color2 -= color3;
+    while (character != '\0') {
+        character = text[i];
+        ix = font_table[(unsigned char) toupper(character)];
+        if (ix > -1) {
+            for (x = 0; x < font_width; x++) {
+                fx = font_x + x + i * font_width;
+                //if (loop) fx %= 480;
+                //x2 = ix + x;
 
-								color   = (color * p1 + color2 * p2)/100;
-								back_buffer[fy] = color + color3;
-							}
-						}
-					}
-			}
-		}
-		i++;
-	}
-	return((i-1)*font_leveys);
+                if (fx >= clipper.left && fx <= clipper.right)
+                    for (y = 0; y < font_height; y++) {
+                        color = font_bitmap[ix + x + y * font_bitmap_width];
+
+                        if (color != 255) {
+                            fy = font_y + y;
+
+                            if (fy >= clipper.top && fy < clipper.bottom) {
+                                //fy %= 470;
+                                fy *= buffer_width;
+                                fy += fx;
+                                color2 = back_buffer[fy];
+                                /*
+                                color3  = color2;
+                                color2 %= 32;
+                                color3 -= color2;
+        */
+                                color3 = (color2 >> 5) << 5;
+                                color2 -= color3;
+
+                                color = (color * p1 + color2 * p2) / 100;
+                                back_buffer[fy] = color + color3;
+                            }
+                        }
+                    }
+            }
+        }
+        i++;
+    }
+    return ((i - 1) * font_width);
 }
 
-int PisteFont::Piirra_merkkijono_varillinen(int font_x, int font_y, int lPitch, char *merkkijono,
-							  UCHAR *back_buffer, bool loop, UCHAR color2)
-{
-	int i = 0, i2;
-	int x, y, ix, fx, fy, x2;
-	UCHAR color;
-	char merkki = '0';
-	int font_bitmap_leveys = font_lkm * font_leveys;
+int PisteFont::DrawStringColored(int font_x, int font_y, int buffer_width, char *text, unsigned char *back_buffer,
+                                 bool loop, unsigned char color2) {
+    int i = 0, i2;
+    int x, y, ix, fx, fy, x2;
+    unsigned char color;
+    char character = '0';
+    int font_bitmap_width = font_count * font_width;
 
-	while (merkki != '\0')
-	{
-		merkki = merkkijono[i];
-		ix = font_table[(UCHAR)toupper(merkki)];
-		i2 = i * font_leveys;
-		if (ix > -1)
-		{
-			for (x=0;x<font_leveys;x++)
-			{
-				fx = font_x + x + i2;
-				if (loop) fx %= 480;
-				x2 = ix+x;
-				for (y=0;y<font_korkeus;y++)
-				{
-					color = font_bitmap[x2+y*font_bitmap_leveys];
-					
-					if (color!=255)
-					{
-						fy = font_y + y;
-						fy %= 470;
-						color /= 2;
-						back_buffer[fx + fy * lPitch] = color + color2;
-					}
-				}
-			}
-		}
-		i++;
-	}
-	return((i-1)*font_leveys);
+    while (character != '\0') {
+        character = text[i];
+        ix = font_table[(unsigned char) toupper(character)];
+        i2 = i * font_width;
+        if (ix > -1) {
+            for (x = 0; x < font_width; x++) {
+                fx = font_x + x + i2;
+                if (loop) fx %= 480;
+                x2 = ix + x;
+                for (y = 0; y < font_height; y++) {
+                    color = font_bitmap[x2 + y * font_bitmap_width];
+
+                    if (color != 255) {
+                        fy = font_y + y;
+                        fy %= 470;
+                        color /= 2;
+                        back_buffer[fx + fy * buffer_width] = color + color2;
+                    }
+                }
+            }
+        }
+        i++;
+    }
+    return ((i - 1) * font_width);
 }
 
