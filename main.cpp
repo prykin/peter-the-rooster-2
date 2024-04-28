@@ -608,29 +608,29 @@ void Initialize_Episode_Scores() {
 }
 
 int Compare_Episode_Scores(int episode, unsigned long scores, unsigned long time, bool final_scores) {
-    int paluu = 0; //TODO: count? return?
+    int count = 0;
     if (!final_scores) {
         if (scores > episode_scores.scores[episode]) {
             strcpy(episode_scores.top_players[episode], player_name);
             episode_scores.scores[episode] = scores;
             stage_new_record = true;
-            paluu++;
+            count++;
         }
-        if ((time < episode_scores.times[episode] || episode_scores.times[stage] == 0) && map->duration > 0) { //TODO: time?
+        if ((time < episode_scores.times[episode] || episode_scores.times[stage] == 0) && map->time > 0) {
             strcpy(episode_scores.fastest_players[episode], player_name);
             episode_scores.times[episode] = time;
             stage_new_record_time = true;
-            paluu++;
+            count++;
         }
     } else {
         if (scores > episode_scores.episode_top_scores) {
             episode_scores.episode_top_scores = scores;
             strcpy(episode_scores.episode_top_player, player_name);
             episode_new_record = true;
-            paluu++;
+            count++;
         }
     }
-    return paluu;
+    return count;
 }
 
 int Load_Episode_Scores(char *filename) {
@@ -960,7 +960,7 @@ int Midas_Stop() {
 int Midas_Play() {
     if (settings.music) {
         if (!music_playing) {
-            playHandle = MIDASplayModule(module, TRUE);
+            playHandle = MIDASplayModule(module, true);
             music_playing = true;
         }
     }
@@ -988,7 +988,7 @@ int Midas_Load_Music(char *filename) {
                 PisteLog_Write("  - Loading file failed! \n");
                 return 1;
             }
-            playHandle = MIDASplayModule(module, TRUE);
+            playHandle = MIDASplayModule(module, true);
             module_loaded = true;
             music_playing = true;
             if (!(MIDASsetMusicVolume(playHandle, music_max_volume))) {
@@ -1024,7 +1024,7 @@ void New_Game() {
 }
 
 void New_Level() {
-    game_time = map->duration; //TODO: time?
+    game_time = map->time;
     if (game_time > 0)
         time_limit = true;
     else
@@ -1510,21 +1510,21 @@ void Set_Bounds(void) {
 // TODO: continue
 int Blur_Image(int buffer, unsigned long width, int height) {
     unsigned char *temp_buffer = NULL;
-    unsigned long leveys; //TODO: width
+    unsigned long temp_width;
     unsigned char color,/* color2, color3,*/ color32;
     unsigned long x, mx, my;
     int y;
     double factor;
-    if (PisteDraw_Draw_Begin(buffer, *&temp_buffer, (unsigned long &)leveys) == 1)
+    if (PisteDraw_Draw_Begin(buffer, *&temp_buffer, (unsigned long &)temp_width) == 1)
         return 1;
-    if (width > leveys)
-        width = leveys;
+    if (width > temp_width)
+        width = temp_width;
     height -= 2;
     width -= 2;
     factor = 3;//2.25;//2
     //for (y=0;y<height;y++)
     for (y = 35; y < height - 30; y++) {
-        my = (y) * leveys;
+        my = (y) * temp_width;
         //for(x=0;x<width;x++)
         for (x = 30; x < width - 30; x++) {
             mx = x + my;
@@ -1644,7 +1644,6 @@ int Draw_Wave_Text_Slow(char *text, int font, int x, int y) {
     return space;
 }
 
-// TODO: continue
 int Draw_Transparent_Object(int source_buffer, unsigned long source_x, unsigned long source_y, unsigned long source_width, unsigned long source_height, unsigned long target_x, unsigned long target_y, int percent, unsigned char color) {
     target_x += MARGIN_HORI;
     target_y += MARGIN_VERT;
@@ -1711,29 +1710,29 @@ int Draw_Transparent_Object2(int source_buffer, unsigned long source_x, unsigned
     if (percent > 99)
         percent = 99;
 
-    int vasen = target_x, oikea = kohde_x + source_width, yla = target_y, ala = kohde_y + source_height;
+    int left = target_x, right = target_x + source_width, top = target_y, bottom = target_y + source_height;
 
-    if (vasen < 16)
-        vasen = 16;
-    if (oikea > SCREEN_WIDTH - 16)
-        oikea = SCREEN_WIDTH - 16;
-    if (yla < 16)
-        yla = 16;
-    if (ala > SCREEN_HEIGHT - 16)
-        ala = SCREEN_HEIGHT - 16;
+    if (left < 16)
+        left = 16;
+    if (right > SCREEN_WIDTH - 16)
+        right = SCREEN_WIDTH - 16;
+    if (top < 16)
+        top = 16;
+    if (bottom > SCREEN_HEIGHT - 16)
+        bottom = SCREEN_HEIGHT - 16;
 
-    vasen -= target_x;
-    oikea -= target_x;
-    yla -= target_y;
-    ala -= target_y;
+    left -= target_x;
+    right -= target_x;
+    top -= target_y;
+    bottom -= target_y;
 
-    if (vasen < oikea && yla < ala) {
-        unsigned char *buffer_lahde = NULL, *buffer_kohde = NULL;
+    if (left < right && top < bottom) {
+        unsigned char *buffer_source = NULL, *buffer_target = NULL;
         unsigned long source_buffer_width, target_buffer_width;
         int color1, color2, source_cursor, target_cursor, px, py;
-        PisteDraw_Draw_Begin(source_buffer, *&buffer_lahde, (unsigned long &) source_buffer_width);
-        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_kohde, (unsigned long &) target_buffer_width);
-        for (py = yla; py < ala; py++) {
+        PisteDraw_Draw_Begin(source_buffer, *&buffer_source, (unsigned long &) source_buffer_width);
+        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_target, (unsigned long &) target_buffer_width);
+        for (py = top; py < bottom; py++) {
             source_cursor = (py + source_y) * source_buffer_width + source_x;
 
             //source_cursor =  py+source_y;
@@ -1745,10 +1744,10 @@ int Draw_Transparent_Object2(int source_buffer, unsigned long source_x, unsigned
             //target_cursor *= target_buffer_width;
             //target_cursor += target_x;
 
-            for (px = vasen; px < oikea; px++) {
-                color1 = buffer_lahde[px + source_cursor];
+            for (px = left; px < right; px++) {
+                color1 = buffer_source[px + source_cursor];
                 if (color1 != 255) {
-                    color2 = buffer_kohde[px + target_cursor];
+                    color2 = buffer_target[px + target_cursor];
                     color1 %= 32;
                     color2 %= 32;
                     //color1 = color_table_gray[color1];
@@ -1760,7 +1759,7 @@ int Draw_Transparent_Object2(int source_buffer, unsigned long source_x, unsigned
                         color1 = 31;
                     //color1 = color_table31[color1]; // sets color to value 31 if greater than 31
                     //color1 += color;
-                    buffer_kohde[px + target_cursor] = color1 + color;
+                    buffer_target[px + target_cursor] = color1 + color;
                 }
             }
         }
@@ -1779,45 +1778,45 @@ int Draw_Transparent_Object3(int source_buffer, unsigned long source_x, unsigned
     if (percent > 99)
         percent = 99;
 
-    int vasen = target_x, oikea = kohde_x + source_width, yla = target_y, ala = kohde_y + source_height;
+    int left = target_x, right = target_x + source_width, top = target_y, bottom = target_y + source_height;
 
-    if (vasen < 16)
-        vasen = 16;
-    if (oikea > SCREEN_WIDTH - 16)
-        oikea = SCREEN_WIDTH - 16;
+    if (left < 16)
+        left = 16;
+    if (right > SCREEN_WIDTH - 16)
+        right = SCREEN_WIDTH - 16;
 
-    if (yla < 16)
-        yla = 16;
-    if (ala > SCREEN_HEIGHT - 16)
-        ala = SCREEN_HEIGHT - 16;
+    if (top < 16)
+        top = 16;
+    if (bottom > SCREEN_HEIGHT - 16)
+        bottom = SCREEN_HEIGHT - 16;
 
-    vasen -= target_x;
-    oikea -= target_x;
-    yla -= target_y;
-    ala -= target_y;
+    left -= target_x;
+    right -= target_x;
+    top -= target_y;
+    bottom -= target_y;
 
-    if (vasen < oikea && yla < ala && percent > 0) {
-        unsigned char *buffer_lahde = NULL, *buffer_kohde = NULL;
+    if (left < right && top < bottom && percent > 0) {
+        unsigned char *buffer_source = NULL, *buffer_target = NULL;
         unsigned long source_buffer_width, target_buffer_width;
         unsigned char color1, color2;
         unsigned long source_cursor, target_cursor;
         int px, py;
-        PisteDraw_Draw_Begin(source_buffer, *&buffer_lahde, (unsigned long &) source_buffer_width);
-        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_kohde, (unsigned long &) target_buffer_width);
-        for (py = yla; py < ala; py++) {
+        PisteDraw_Draw_Begin(source_buffer, *&buffer_source, (unsigned long &) source_buffer_width);
+        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_target, (unsigned long &) target_buffer_width);
+        for (py = top; py < bottom; py++) {
             source_cursor = (py + source_y) * source_buffer_width + source_x;
             target_cursor = (py + target_y) * target_buffer_width + target_x;
-            for (px = vasen; px < oikea; px++) {
-                color1 = buffer_lahde[px + source_cursor];
+            for (px = left; px < right; px++) {
+                color1 = buffer_source[px + source_cursor];
                 if (color1 != 255) {
-                    color2 = buffer_kohde[px + target_cursor];
+                    color2 = buffer_target[px + target_cursor];
                     //color1 =  color_table_gray[color1];//color1 % 32
                     color1 = color1 % 32;
                     color1 = proc_table[color1][percent];//(color1*percent)/100;
                     //color1 += color_table_gray[color2];//color2 % 32
                     color1 += color2 % 32;
                     color1 = color_table31[color1] + color; // sets color to value 31 if greater than 31
-                    buffer_kohde[px + target_cursor] = color1;
+                    buffer_target[px + target_cursor] = color1;
                 }
             }
         }
@@ -1834,32 +1833,32 @@ int Draw_Transparent_Object4(unsigned long source_x, unsigned long source_y, uns
     target_x += MARGIN_HORI;
     target_y += MARGIN_VERT;
 
-    int vasen = target_x, oikea = kohde_x + source_width, yla = target_y, ala = target_y + source_height;
+    int left = target_x, right = target_x + source_width, top = target_y, bottom = target_y + source_height;
 
     if (percent > 99)
         percent = 99;
-    if (vasen < MARGIN_HORI)
-        vasen = MARGIN_HORI;
-    if (yla < MARGIN_VERT)
-        yla = MARGIN_VERT;
+    if (left < MARGIN_HORI)
+        left = MARGIN_HORI;
+    if (top < MARGIN_VERT)
+        top = MARGIN_VERT;
     if (LIMIT_MAP_DRAWING_AREA) {
-        if (oikea > MAP_DRAWING_WIDTH + MARGIN_HORI)
-            oikea = MAP_DRAWING_WIDTH + MARGIN_HORI;
-        if (ala > MAP_DRAWING_HEIGHT + MARGIN_VERT)
-            ala = MAP_DRAWING_HEIGHT + MARGIN_VERT;
+        if (right > MAP_DRAWING_WIDTH + MARGIN_HORI)
+            right = MAP_DRAWING_WIDTH + MARGIN_HORI;
+        if (bottom > MAP_DRAWING_HEIGHT + MARGIN_VERT)
+            bottom = MAP_DRAWING_HEIGHT + MARGIN_VERT;
     } else {
-        if (oikea > SCREEN_WIDTH)
-            oikea = SCREEN_WIDTH;
-        if (ala > SCREEN_HEIGHT)
-            ala = SCREEN_HEIGHT;
+        if (right > SCREEN_WIDTH)
+            right = SCREEN_WIDTH;
+        if (bottom > SCREEN_HEIGHT)
+            bottom = SCREEN_HEIGHT;
     }
 
-    vasen -= target_x;
-    oikea -= target_x;
-    yla -= target_y;
-    ala -= target_y;
+    left -= target_x;
+    right -= target_x;
+    top -= target_y;
+    bottom -= target_y;
 
-    if (vasen > oikea || yla > ala || percent < 1 || percent > 99)
+    if (left > right || top > bottom || percent < 1 || percent > 99)
         return 1;
 
     unsigned char color1, *pcolor2;
@@ -1867,8 +1866,8 @@ int Draw_Transparent_Object4(unsigned long source_x, unsigned long source_y, uns
     int px, py;
     source_cursor = source_y * source_buffer_width + source_x;
     target_cursor = target_y * target_buffer_width + target_x;
-    for (py = yla; py < ala; py++) {
-        for (px = vasen; px < oikea; px++) {
+    for (py = top; py < bottom; py++) {
+        for (px = left; px < right; px++) {
             color1 = source_buffer[px + source_cursor];
 
             if (color1 != 255) {
@@ -1898,13 +1897,13 @@ int Draw_Transparent_Point(unsigned long target_x, unsigned long target_y, int p
             return 1;
     }
 
-    unsigned char *buffer_kohde = NULL, color1, *color2;
+    unsigned char *buffer_target = NULL, color1, *color2;
     unsigned long target_buffer_width;
 
-    PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_kohde, (unsigned long &) target_buffer_width);
-    color1 = buffer_kohde[target_y * target_buffer_width + target_x];
+    PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_target, (unsigned long &) target_buffer_width);
+    color1 = buffer_target[target_y * target_buffer_width + target_x];
     if (color1 != 255) {
-        color2 = &buffer_kohde[target_y * target_buffer_width + target_x];
+        color2 = &buffer_target[target_y * target_buffer_width + target_x];
         *color2 = color_table[color1][*color2][percent] + color;
     }
     PisteDraw_Draw_End(PD_BACKBUFFER);
@@ -1913,37 +1912,37 @@ int Draw_Transparent_Point(unsigned long target_x, unsigned long target_y, int p
 
 // TODO: continue
 int Draw_Shadow(int source_buffer, unsigned long source_x, unsigned long source_y, unsigned long source_width, unsigned long source_height, unsigned long target_x, unsigned long target_y) {
-    int vasen = target_x, oikea = target_x + source_width, yla = target_y, ala = target_y + source_height;
-    if (vasen < 16)
-        vasen = 16;
-    if (oikea > SCREEN_WIDTH - 16)
-        oikea = SCREEN_WIDTH - 16;
-    if (yla < 16)
-        yla = 16;
-    if (ala > SCREEN_HEIGHT - 16)
-        ala = SCREEN_HEIGHT - 16;
+    int left = target_x, right = target_x + source_width, top = target_y, bottom = target_y + source_height;
+    if (left < 16)
+        left = 16;
+    if (right > SCREEN_WIDTH - 16)
+        right = SCREEN_WIDTH - 16;
+    if (top < 16)
+        top = 16;
+    if (bottom > SCREEN_HEIGHT - 16)
+        bottom = SCREEN_HEIGHT - 16;
 
-    vasen -= target_x;
-    oikea -= target_x;
-    yla -= target_y;
-    ala -= target_y;
+    left -= target_x;
+    right -= target_x;
+    top -= target_y;
+    bottom -= target_y;
 
-    if (vasen < oikea && yla < ala) {
-        unsigned char *buffer_lahde = NULL, *buffer_kohde = NULL;
+    if (left < right && top < bottom) {
+        unsigned char *buffer_source = NULL, *buffer_target = NULL;
         unsigned long source_buffer_width, target_buffer_width;
         int color, source_cursor, target_cursor;
-        PisteDraw_Draw_Begin(source_buffer, *&buffer_lahde, (unsigned long &) source_buffer_width);
-        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_kohde, (unsigned long &) target_buffer_width);
-        for (int py = yla; py < ala; py++) {
+        PisteDraw_Draw_Begin(source_buffer, *&buffer_source, (unsigned long &) source_buffer_width);
+        PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_target, (unsigned long &) target_buffer_width);
+        for (int py = top; py < bottom; py++) {
             source_cursor = (py + source_y) * source_buffer_width + source_x;
             target_cursor = (py + target_y) * target_buffer_width + target_x;
-            for (int px = vasen; px < oikea; px++) {
-                color = buffer_lahde[px + source_cursor];
+            for (int px = left; px < right; px++) {
+                color = buffer_source[px + source_cursor];
                 if (color != 255) {
-                    color = buffer_kohde[px + target_cursor];
+                    color = buffer_target[px + target_cursor];
                     color %= 32;
                     color /= 2;
-                    buffer_kohde[px + target_cursor] = color;
+                    buffer_target[px + target_cursor] = color;
                 }
             }
         }
@@ -2103,12 +2102,12 @@ int Clear_Particles() {
     return 0;
 }
 
-void New_Particle(int type, double x, double y, double a, double b, int time, double weight, int color) {
+void New_Particle(int type, double x, double y, double a, double b, int duration, double weight, int color) {
     if (x < camera_x + SCREEN_WIDTH + 10 && x > camera_x - 10 && y < camera_y + SCREEN_HEIGHT + 10 && y > camera_y - 10) {
         if (particle_index >= MAX_PARTICLES)
             particle_index = 0;
         particles[particle_index].a = a;
-        particles[particle_index].duration = duration; //TODO: ??
+        particles[particle_index].duration = duration;
         particles[particle_index].animation = rand() % 63;
         particles[particle_index].b = b;
         particles[particle_index].type = type;
@@ -2123,18 +2122,18 @@ void New_Particle(int type, double x, double y, double a, double b, int time, do
 // TODO: continue
 int Draw_Particles() {
     int percent;
-    int piirtoleveys, piirtokorkeus;
+    int draw_temp_width, draw_height;
 
     if (LIMIT_MAP_DRAWING_AREA) {
-        piirtoleveys = MAP_DRAWING_WIDTH;
-        piirtokorkeus = MAP_DRAWING_HEIGHT;
+        draw_temp_width = MAP_DRAWING_WIDTH;
+        draw_height = MAP_DRAWING_HEIGHT;
     } else {
-        piirtoleveys = SCREEN_WIDTH;
-        piirtokorkeus = SCREEN_HEIGHT;
+        draw_temp_width = SCREEN_WIDTH;
+        draw_height = SCREEN_HEIGHT;
     }
     for (int i = 0; i < MAX_PARTICLES; i++) {
         if (particles[i].duration > 0) {
-            if (particles[i].x < camera_x + piirtoleveys && particles[i].x > camera_x && particles[i].y < camera_y + piirtokorkeus && particles[i].y > camera_y) {
+            if (particles[i].x < camera_x + draw_temp_width && particles[i].x > camera_x && particles[i].y < camera_y + draw_height && particles[i].y > camera_y) {
                 if (particles[i].duration < 100)
                     percent = particles[i].duration;
                 else
@@ -2461,18 +2460,18 @@ void Create_Effects(unsigned char effect, unsigned long x, unsigned long y) {
 
 // TODO: continue
 int Map_Change_SkullBlocks() {
-    unsigned char seina, tausta;
+    unsigned char wall, background;
     unsigned long x, y;
     for (x = 0; x < MAP_WIDTH; x++)
         for (y = 0; y < MAP_HEIGHT; y++) {
-            seina = map->walls[x + y * MAP_WIDTH];
-            tausta = map->backgrounds[x + y * MAP_WIDTH];
-            if (seina == BLOCK_SKULL_WALL) {
+            wall = map->walls[x + y * MAP_WIDTH];
+            background = map->backgrounds[x + y * MAP_WIDTH];
+            if (wall == BLOCK_SKULL_WALL) {
                 map->walls[x + y * MAP_WIDTH] = 255;
-                if (tausta != BLOCK_SKULL_WALL)
+                if (background != BLOCK_SKULL_WALL)
                     Create_SmokeCloudsEffect(x * 32 + 6, y * 32 + 6);
             }
-            if (tausta == BLOCK_SKULL_BACKGROUND && seina == 255) {
+            if (background == BLOCK_SKULL_BACKGROUND && wall == 255) {
                 map->walls[x + y * MAP_WIDTH] = BLOCK_SKULL_WALL;
             }
         }
@@ -2517,31 +2516,31 @@ int Count_Keys() {
 
 // TODO: continue
 int Find_Start() {
-    double alku_x = 320, alku_y = 196;
-    int alkujen_maara = 0, alku = 0, x, y;
+    double start_x = 320, start_y = 196;
+    int number_of_starts = 0, start = 0, x, y;
 
     for (x = 0; x < MAP_SIZE; x++)
         if (map->walls[x] == BLOCK_START)
-            alkujen_maara++;
+            number_of_starts++;
 
-    if (alkujen_maara > 0) {
-        alku = rand() % alkujen_maara + 1;
-        alkujen_maara = 1;
+    if (number_of_starts > 0) {
+        start = rand() % number_of_starts + 1;
+        number_of_starts = 1;
 
         for (x = 0; x < MAP_WIDTH; x++)
             for (y = 0; y < MAP_HEIGHT; y++)
                 if (map->walls[x + y * MAP_WIDTH] == BLOCK_START) {
-                    if (alkujen_maara == alku) {
-                        alku_x = x * 32;
-                        alku_y = y * 32;
+                    if (number_of_starts == start) {
+                        start_x = x * 32;
+                        start_y = y * 32;
                     }
 
-                    alkujen_maara++;
+                    number_of_starts++;
                 }
     }
 
-    sprites[player_index].x = alku_x + sprites[player_index].type->width / 2;
-    sprites[player_index].y = alku_y - sprites[player_index].type->height / 2;
+    sprites[player_index].x = start_x + sprites[player_index].type->width / 2;
+    sprites[player_index].y = start_y - sprites[player_index].type->height / 2;
 
     camera_x = (int) sprites[player_index].x;
     camera_y = (int) sprites[player_index].y;
@@ -2565,10 +2564,10 @@ void Clear_Prototype() {
 // TODO: continue
 int Load_Prototype_Sound(char *path, char *file) {
     if (strcmp(file, "") != 0) {
-        char aanitiedosto[255];
-        strcpy(aanitiedosto, path);
-        strcat(aanitiedosto, file);
-        int i = PisteSound_SFX_New(aanitiedosto);
+        char audio_file[255];
+        strcpy(audio_file, path);
+        strcat(audio_file, file);
+        int i = PisteSound_SFX_New(audio_file);
         if (i == PS_ERROR) {
             PK2_error = true;
             return -1;
@@ -2581,7 +2580,7 @@ int Load_Prototype_Sound(char *path, char *file) {
 
 int Load_Old_Prototype(char *path, char *file) {
     char sound_path[255];
-    char testipolku[255];
+    char test_path[255];
     strcpy(sound_path, path);
 
     PisteLog_Write("- Loading sprite: ");
@@ -2607,11 +2606,11 @@ int Load_Old_Prototype(char *path, char *file) {
 			PisteLog_Write(prototypes[next_free_proto].sound_files[i]);
 			PisteLog_Write("\n");*/
 
-            strcpy(testipolku, sound_path);
-            strcat(testipolku, "\\");
-            strcat(testipolku, prototypes[next_free_proto].sound_files[i]);
+            strcpy(test_path, sound_path);
+            strcat(test_path, "\\");
+            strcat(test_path, prototypes[next_free_proto].sound_files[i]);
 
-            if (Is_File(testipolku))
+            if (Is_File(test_path))
                 prototypes[next_free_proto].sounds[i] = Load_Prototype_Sound(sound_path, prototypes[next_free_proto].sound_files[i]);
             else {
                 //if (prototypes[next_free_proto].sounds[i] == -1) {
@@ -2619,11 +2618,11 @@ int Load_Old_Prototype(char *path, char *file) {
                 _getcwd(sound_path, _MAX_PATH);
                 strcat(sound_path, "\\sprites\\");
 
-                strcpy(testipolku, sound_path);
-                strcat(testipolku, "\\");
-                strcat(testipolku, prototypes[next_free_proto].sound_files[i]);
+                strcpy(test_path, sound_path);
+                strcat(test_path, "\\");
+                strcat(test_path, prototypes[next_free_proto].sound_files[i]);
 
-                if (Is_File(testipolku))
+                if (Is_File(test_path))
                     prototypes[next_free_proto].sounds[i] = Load_Prototype_Sound(sound_path, prototypes[next_free_proto].sound_files[i]);
             }
         }
@@ -2730,11 +2729,11 @@ void Set_Prototype_Projectile2_Sprite(int i) {
 
 int Load_All_Prototypes() {
     char path[_MAX_PATH];
-    int viimeinen_proto;
+    int final_proto;
 
     for (int i = 0; i < MAX_PROTOTYPES; i++) {
         if (strcmp(map->protos[i], "") != 0) {
-            viimeinen_proto = i;
+            final_proto = i;
             strcpy(path, "");
             Add_Episode_Directory(path);
             //Add_Episode_Directory(path);
@@ -2751,7 +2750,7 @@ int Load_All_Prototypes() {
             next_free_proto++;
     }
 
-    next_free_proto = viimeinen_proto + 1;
+    next_free_proto = final_proto + 1;
 
     for (int i = 0; i < MAX_PROTOTYPES; i++) {
         Set_Prototype_Change_Sprite(i);
@@ -2984,10 +2983,10 @@ Block Examine_Block(int x, int y) {
     unsigned char i = map->walls[x + y * MAP_WIDTH];
     if (i < 150) {
         block = calculated_blocks[i];
-        block.left_bound = x * 32 + calculated_blocks[i].vasen;
-        block.right_bound = x * 32 + 32 + calculated_blocks[i].oikea;
-        block.top_bound = y * 32 + calculated_blocks[i].yla;
-        block.bottom_bound = y * 32 + 32 + calculated_blocks[i].ala;
+        block.left_bound = x * 32 + calculated_blocks[i].left;
+        block.right_bound = x * 32 + 32 + calculated_blocks[i].right;
+        block.top_bound = y * 32 + calculated_blocks[i].up;
+        block.bottom_bound = y * 32 + 32 + calculated_blocks[i].down;
     } else {
         block.code = 255;
         block.background = true;
@@ -4029,7 +4028,7 @@ int Move_Sprite(int i) {
     /* Jump                                                                                  */
     /*****************************************************************************************/
 
-    bool hyppy_maximissa = sprite.jump_timer >= 90;
+    bool jump_maximum = sprite.jump_timer >= 90;
 
     // If we have jumped / in the air:
     if (sprite.jump_timer > 0) {
@@ -4039,7 +4038,7 @@ int Move_Sprite(int i) {
         if (sprite.jump_timer < 10)
             sprite.jump_timer = 10;
 
-        if (!hyppy_maximissa) {
+        if (!jump_maximum) {
             //sprite_b = (sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.0;//-4
             sprite_b = -sin_table[sprite.jump_timer] / 8;//(sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.5;
             if (sprite_b > sprite.type->max_jump) {
@@ -4055,7 +4054,7 @@ int Move_Sprite(int i) {
     if (sprite.jump_timer < 0)
         sprite.jump_timer++;
 
-    if (sprite_b > 0 && !hyppy_maximissa)
+    if (sprite_b > 0 && !jump_maximum)
         sprite.jump_timer = 90;//sprite.type->max_jump*2;
 
     /*****************************************************************************************/
@@ -4416,7 +4415,7 @@ int Move_Sprite(int i) {
         if (sprite_b < 0)
             sprite_b = 0;
 
-        if (!hyppy_maximissa)
+        if (!jump_maximum)
             sprite.jump_timer = 95;//sprite.type->max_jump * 2;
     }
     if (!down) {
@@ -5076,45 +5075,45 @@ int Move_Sprite2(int i) {
             sprite_top += sprite_height / 1.5;
         }
 
-        double a_lisays = 0;
+        double a_addition = 0;
 
         /* MOVING RIGHT */
         if (PisteInput_Read_Controller(control_right)) {
-            a_lisays = 0.04;//0.08;
+            a_addition = 0.04;//0.08;
 
             if (additional_speed) {
                 if (rand() % 20 == 1 && sprite.animation_index == ANIMATION_WALK) //rand()%30
                     New_Particle(PARTICLE_DUST_CLOUD, sprite_x - 8, sprite_bottom - 8, 0.25, -0.25, 40, 0, 0);
-                a_lisays += 0.09;//0.05
+                a_addition += 0.09;//0.05
             }
 
             if (sprite.down)
-                a_lisays /= 1.5;//2.0
+                a_addition /= 1.5;//2.0
 
             sprite.flip_horizontal = false;
         }
 
         /* MOVING LEFT */
         if (PisteInput_Read_Controller(control_left)) {
-            a_lisays = -0.04;
+            a_addition = -0.04;
 
             if (additional_speed) {
                 if (rand() % 20 == 1 && sprite.animation_index == ANIMATION_WALK) {
                     New_Particle(PARTICLE_DUST_CLOUD, sprite_x - 8, sprite_bottom - 8, -0.25, -0.25, 40, 0, 0);
                 }
-                a_lisays -= 0.09;
+                a_addition -= 0.09;
             }
 
             if (sprite.down)    // when the sprite touches the ground, friction affects
-                a_lisays /= 1.5;//2.0
+                a_addition /= 1.5;//2.0
 
             sprite.flip_horizontal = true;
         }
 
         if (sprite.is_crouching)    // the speed slows down when crouching
-            a_lisays /= 10;
+            a_addition /= 10;
 
-        sprite_a += a_lisays;
+        sprite_a += a_addition;
 
         /* JUMPING */
         if (sprite.type->weight > 0) {
@@ -5174,7 +5173,7 @@ int Move_Sprite2(int i) {
                     break;
             }
 
-        /* It won't work if the player is something other than a game characte */
+        /* It won't work if the player is something other than a game character */
         if (sprite.type->type != TYPE_GAME_CHARACTER)
             sprite.health = 0;
     }
@@ -5183,13 +5182,13 @@ int Move_Sprite2(int i) {
     /* Jump                                                                                  */
     /*****************************************************************************************/
 /*
-    vanha hyppy
-	bool hyppy_maximissa = sprite.jump_timer >= sprite.type->max_jump*2;
+    // old jump
+	bool jump_maximum = sprite.jump_timer >= sprite.type->max_jump*2;
 
 	// If we have jumped / in the air:
 	if (sprite.jump_timer > 0)
 	{
-		if (!hyppy_maximissa)
+		if (!jump_maximum)
 		// sprite_b = (sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.0;//-4
 		   sprite_b = (sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.5;
 
@@ -5200,14 +5199,14 @@ int Move_Sprite2(int i) {
 	if (sprite.jump_timer < 0)
 		sprite.jump_timer++;
 
-	if (sprite_b > 0 && !hyppy_maximissa)
+	if (sprite_b > 0 && !jump_maximum)
 		sprite.jump_timer = sprite.type->max_jump*2;
 */
-    bool hyppy_maximissa = sprite.jump_timer >= 45;
+    bool jump_maximum = sprite.jump_timer >= 45;
 
     // If we have jumped / in the air:
     if (sprite.jump_timer > 0) {
-        if (!hyppy_maximissa)
+        if (!jump_maximum)
             //sprite_b = (sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.0;//-4
             sprite_b -= sin_table[sprite.jump_timer] / 3;//(sprite.type->max_jump/2 - sprite.jump_timer/2)/-2.5;
 
@@ -5217,7 +5216,7 @@ int Move_Sprite2(int i) {
 
     if (sprite.jump_timer < 0)
         sprite.jump_timer++;
-    if (sprite_b > 0 && !hyppy_maximissa)
+    if (sprite_b > 0 && !jump_maximum)
         sprite.jump_timer = 45;//sprite.type->max_jump*2;
 
     /*****************************************************************************************/
@@ -5294,7 +5293,7 @@ int Move_Sprite2(int i) {
             for (x = 0; x < blocks_x_count; x++) {
                 p = x + y * blocks_x_count;
 
-/* debuggausta...
+/* debugging...
 				if (i==player_index) {
 					char number[20];
 					itoa(blocks[p].code,number,10);
@@ -5537,7 +5536,7 @@ int Move_Sprite2(int i) {
     if (!up) {
         if (sprite_b < 0)
             sprite_b = 0;
-        if (!hyppy_maximissa)
+        if (!jump_maximum)
             sprite.jump_timer = sprite.type->max_jump * 2;
     }
 
@@ -6516,61 +6515,61 @@ int Initialize_States() {
             //if ((font1 = PisteDraw_Font_Create(game_image,1,456,8,8,52)) == PD_ERROR)
             //	PK2_error = true;
             PisteLog_Write("  - Loading fonts \n");
-            int ind_font = 0, ind_path = 0;
-            ind_path = texts->Get_Index("font path");
-            ind_font = texts->Get_Index("font small font");
-            if (ind_path == -1 || ind_font == -1) {
+            int index_font = 0, index_path = 0;
+            index_path = texts->Get_Index("font path");
+            index_font = texts->Get_Index("font small font");
+            if (index_path == -1 || index_font == -1) {
                 if ((font1 = PisteDraw_Font_Create("language\\fonts\\", "ScandicSmall.txt")) == PD_ERROR) {
                     PK2_error = true;
                 }
             } else {
-                if ((font1 = PisteDraw_Font_Create(texts->Get_Text(ind_path), texts->Get_Text(ind_font))) == PD_ERROR) {
+                if ((font1 = PisteDraw_Font_Create(texts->Get_Text(index_path), texts->Get_Text(index_font))) == PD_ERROR) {
                     PK2_error = true;
                     PisteLog_Write("    - Loading font ");
-                    PisteLog_Write(texts->Get_Text(ind_path));
-                    PisteLog_Write(texts->Get_Text(ind_font));
+                    PisteLog_Write(texts->Get_Text(index_path));
+                    PisteLog_Write(texts->Get_Text(index_font));
                     PisteLog_Write(" failed!\n");
                 }
             }
-            ind_font = texts->Get_Index("font big font normal");
-            if (ind_path == -1 || ind_font == -1) {
+            index_font = texts->Get_Index("font big font normal");
+            if (index_path == -1 || index_font == -1) {
                 if ((font2 = PisteDraw_Font_Create("language\\fonts\\", "ScandicBig1.txt")) == PD_ERROR) {
                     PK2_error = true;
                 }
             } else {
-                if ((font2 = PisteDraw_Font_Create(texts->Get_Text(ind_path), texts->Get_Text(ind_font))) == PD_ERROR) {
+                if ((font2 = PisteDraw_Font_Create(texts->Get_Text(index_path), texts->Get_Text(index_font))) == PD_ERROR) {
                     PK2_error = true;
                     PisteLog_Write("    - Loading font ");
-                    PisteLog_Write(texts->Get_Text(ind_path));
-                    PisteLog_Write(texts->Get_Text(ind_font));
+                    PisteLog_Write(texts->Get_Text(index_path));
+                    PisteLog_Write(texts->Get_Text(index_font));
                     PisteLog_Write(" failed!\n");
                 }
             }
-            ind_font = texts->Get_Index("font big font hilite");
-            if (ind_path == -1 || ind_font == -1) {
+            index_font = texts->Get_Index("font big font hilite");
+            if (index_path == -1 || index_font == -1) {
                 if ((font3 = PisteDraw_Font_Create("language\\fonts\\", "ScandicBig2.txt")) == PD_ERROR) {
                     PK2_error = true;
                 }
             } else {
-                if ((font3 = PisteDraw_Font_Create(texts->Get_Text(ind_path), texts->Get_Text(ind_font))) == PD_ERROR) {
+                if ((font3 = PisteDraw_Font_Create(texts->Get_Text(index_path), texts->Get_Text(index_font))) == PD_ERROR) {
                     PK2_error = true;
                     PisteLog_Write("    - Loading font ");
-                    PisteLog_Write(texts->Get_Text(ind_path));
-                    PisteLog_Write(texts->Get_Text(ind_font));
+                    PisteLog_Write(texts->Get_Text(index_path));
+                    PisteLog_Write(texts->Get_Text(index_font));
                     PisteLog_Write(" failed!\n");
                 }
             }
-            ind_font = texts->Get_Index("font big font shadow");
-            if (ind_path == -1 || ind_font == -1) {
+            index_font = texts->Get_Index("font big font shadow");
+            if (index_path == -1 || index_font == -1) {
                 if ((font4 = PisteDraw_Font_Create("language\\fonts\\", "ScandicBig3.txt")) == PD_ERROR) {
                     PK2_error = true;
                 }
             } else {
-                if ((font4 = PisteDraw_Font_Create(texts->Get_Text(ind_path), texts->Get_Text(ind_font))) == PD_ERROR) {
+                if ((font4 = PisteDraw_Font_Create(texts->Get_Text(index_path), texts->Get_Text(index_font))) == PD_ERROR) {
                     PK2_error = true;
                     PisteLog_Write("    - Loading font ");
-                    PisteLog_Write(texts->Get_Text(ind_path));
-                    PisteLog_Write(texts->Get_Text(ind_font));
+                    PisteLog_Write(texts->Get_Text(index_path));
+                    PisteLog_Write(texts->Get_Text(index_font));
                     PisteLog_Write(" failed!\n");
                 }
             }
@@ -6676,48 +6675,48 @@ int Initialize_States() {
                 }
 
                 PisteLog_Write("  - Loading top scores \n");
-                char topscoretiedosto[_MAX_PATH] = "scores.dat";
-                Load_Episode_Scores(topscoretiedosto);
+                char topscore_file[_MAX_PATH] = "scores.dat";
+                Load_Episode_Scores(topscore_file);
             }
 
-            /* Ladataan kartan background_image ...*/
-            char mapkuva[_MAX_PATH] = "map.bmp";
-            Add_Episode_Directory(mapkuva);
+            /* Loading the map background_image ...*/
+            char map_image[_MAX_PATH] = "map.bmp";
+            Add_Episode_Directory(map_image);
             PisteLog_Write("  - Loading map picture ");
-            PisteLog_Write(mapkuva);
+            PisteLog_Write(map_image);
             PisteLog_Write(" from episode folder \n");
 
-            if (PisteDraw_Image_Load(background_image, mapkuva, true) == PD_ERROR) { // Jos episodilla ei omaa...
+            if (PisteDraw_Image_Load(background_image, map_image, true) == PD_ERROR) { // Jos episodilla ei omaa...
                 PisteLog_Write("  - Loading map picture map.bmp from gfx folder \n");
                 if (PisteDraw_Image_Load(background_image, "gfx\\map.bmp", true) == PD_ERROR) { // ladataan oletuskuva.
                     PisteLog_Write("  - Loading map picture failed!\n");
                 }
             }
 
-            /* Ladataan kartan music ...*/
-            char mapmusa[_MAX_PATH] = "map.xm";
-            Add_Episode_Directory(mapmusa);
+            /* Loading the map music ...*/
+            char map_music[_MAX_PATH] = "map.xm";
+            Add_Episode_Directory(map_music);
 
-            if (!Is_File(mapmusa)) {
-                strcpy(mapmusa, "map.mod");
-                Add_Episode_Directory(mapmusa);
+            if (!Is_File(map_music)) {
+                strcpy(map_music, "map.mod");
+                Add_Episode_Directory(map_music);
 
-                if (!Is_File(mapmusa)) {
-                    strcpy(mapmusa, "map.it");
-                    Add_Episode_Directory(mapmusa);
+                if (!Is_File(map_music)) {
+                    strcpy(map_music, "map.it");
+                    Add_Episode_Directory(map_music);
 
-                    if (!Is_File(mapmusa)) {
-                        strcpy(mapmusa, "map.s3m");
-                        Add_Episode_Directory(mapmusa);
+                    if (!Is_File(map_music)) {
+                        strcpy(map_music, "map.s3m");
+                        Add_Episode_Directory(map_music);
                     }
                 }
             }
 
             PisteLog_Write("  - Loading map music ");
-            PisteLog_Write(mapmusa);
+            PisteLog_Write(map_music);
             PisteLog_Write(" from episode folder \n");
 
-            if (Midas_Load_Music(mapmusa) != 0) {
+            if (Midas_Load_Music(map_music) != 0) {
                 PisteLog_Write("  - Loading map music map.xm from music folder \n");
                 if (Midas_Load_Music("music\\map.xm") != 0) {
                     PisteLog_Write("  - Loading map music failed!\n");
@@ -6731,7 +6730,7 @@ int Initialize_States() {
             PisteWait_Start();
         }
 
-        // MENUJEN ALUSTUS
+        // MENU INITIALIZATION
         if (next_game_state == STATE_MENUS) {
             PisteLog_Write("- Initializing menu screen \n");
             Set_Margins(true, true, 640, 480);
@@ -6767,7 +6766,7 @@ int Initialize_States() {
             PisteLog_Write("- Initializing menu screen completed\n");
         }
 
-        // UUDEN JAKSON ALUSTUS
+        // NEW LEVEL INITIALIZATION
         if (next_game_state == STATE_GAME) {
             PisteLog_Write("- Initializing movement_x new level \n");
             Set_Margins(false, false, 0, 0);
@@ -6812,7 +6811,7 @@ int Initialize_States() {
             PisteLog_Write("- Initializing movement_x new level complete\n");
         }
 
-        // PISTELASKUN ALUSTUS
+        // INITIALIZATION OF SCORE COUNTING
         if (next_game_state == STATE_SCORE_CALCULATION) {
             Set_Margins(true, true, 640, 480);
 
@@ -6829,7 +6828,7 @@ int Initialize_States() {
             stage_new_record_time = false;
             episode_new_record = false;
 
-            // Lasketaan pelaajan kokonaispisteet etuk�teen
+            // Calculate the player's total points in advance
             unsigned long temp_pisteet = 0;
             temp_pisteet += stage_points;
             temp_pisteet += game_time * 5;
@@ -6850,20 +6849,20 @@ int Initialize_States() {
             score_calculation_delay = 30;
             bonus_points = 0, time_points = 0, energy_points = 0, item_points = 0, rescue_points = 0;
 
-            char pisteet_tiedosto[_MAX_PATH] = "scores.dat";
-            int vertailun_tulos;
+            char score_file[_MAX_PATH] = "scores.dat";
+            int comparison_result;
 
-            /* Tutkitaan onko pelaajarikkonut kent�n piste- tai nopeusenn�tyksen */
-            vertailun_tulos = Compare_Episode_Scores(current_stage_index, temp_pisteet, map->duration - game_time,
+            /* Check if the player has broken the level's score or speed record */
+            comparison_result = Compare_Episode_Scores(current_stage_index, temp_pisteet, map->duration - game_time,
                                                      false);
-            if (vertailun_tulos > 0) {
-                Save_Episode_Scores(pisteet_tiedosto);
+            if (comparison_result > 0) {
+                Save_Episode_Scores(score_file);
             }
 
-            /* Tutkitaan onko player rikkonut episodin piste-enn�tyksen */
-            vertailun_tulos = Compare_Episode_Scores(0, points, 0, true);
-            if (vertailun_tulos > 0)
-                Save_Episode_Scores(pisteet_tiedosto);
+            /* Check if the player has broken the episode's score record */
+            comparison_result = Compare_Episode_Scores(0, points, 0, true);
+            if (comparison_result > 0)
+                Save_Episode_Scores(score_file);
 
             music_volume = music_max_volume;
             switch_from_score_to_map = false;
@@ -6871,7 +6870,7 @@ int Initialize_States() {
             PisteWait_Start();
         }
 
-        // INTRON ALUSTUS
+        // INTRO INITIALIZATION
         if (next_game_state == STATE_INTRO) {
             PisteLog_Write("- Initializing intro screen\n");
             Set_Margins(true, true, 640, 480);
@@ -6936,7 +6935,7 @@ int PK_Init(void) {
 		MAP_DRAWING_WIDTH = SCREEN_WIDTH;
 		MAP_DRAWING_HEIGHT = SCREEN_HEIGHT;
 	}
-	//PK2Kartta_Aseta_Ruudun_Mitat(SCREEN_WIDTH,SCREEN_HEIGHT);
+	//PK2Map_Set_Screen_Dimensions(SCREEN_WIDTH,SCREEN_HEIGHT);
 	Map_Set_Screen_Dimensions(MAP_DRAWING_WIDTH,MAP_DRAWING_HEIGHT);
 	if ((PisteSound_Init((HWND &)window_handle, (HINSTANCE &) hinstance_app, SOUNDS_STEREO, SOUNDS_SAMPLERATE, SOUNDS_BITRATE)) == PD_ERROR)
 		PK2_error = true;
@@ -6948,7 +6947,7 @@ int PK_Init(void) {
 	map = new PK2Map();
 	if ((game_image = PisteDraw_Buffer_Uusi(640,480, true, 255)) == PD_ERROR)
 		PK2_error = true;
-	if (PisteDraw_Lataa_Kuva(game_image,"gfx\\pk2stuff.bmp", true) == PD_ERROR)
+	if (PisteDraw_Load_Image(game_image,"gfx\\pk2stuff.bmp", true) == PD_ERROR)
 		PK2_error = true;
 	if ((font1 = PisteDraw_Font_Create(game_image,1,456,8,8,52)) == PD_ERROR)
 		PK2_error = true;
@@ -7273,7 +7272,7 @@ int Draw_Background(void) {
     //	PisteDraw_SetClipper(PD_BACKBUFFER,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 /*
 	if (LIMIT_MAP_DRAWING_AREA)
-		PisteDraw_Aseta_Klipperi(PD_BACKBUFFER,16,16,MAP_DRAWING_WIDTH-16,MAP_DRAWING_HEIGHT-16);
+		PisteDraw_SetClipper(PD_BACKBUFFER,16,16,MAP_DRAWING_WIDTH-16,MAP_DRAWING_HEIGHT-16);
 	else
 		PisteDraw_SetClipper(PD_BACKBUFFER,16,16,SCREEN_WIDTH-16,SCREEN_HEIGHT-16);
 */
@@ -7460,7 +7459,7 @@ int Draw_Game(void) {
     Set_Bounds();
 /*
 	if (LIMIT_MAP_DRAWING_AREA)
-		PisteDraw_Aseta_Klipperi(PD_BACKBUFFER,MARGIN_HORI,MARGIN_VERT,MAP_DRAWING_WIDTH+MARGIN_HORI,MAP_DRAWING_HEIGHT+MARGIN_VERT);
+		PisteDraw_SetClipper(PD_BACKBUFFER,MARGIN_HORI,MARGIN_VERT,MAP_DRAWING_WIDTH+MARGIN_HORI,MAP_DRAWING_HEIGHT+MARGIN_VERT);
 	else
 		PisteDraw_SetClipper(PD_BACKBUFFER,0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
 */
@@ -7764,14 +7763,14 @@ int Draw_Menus_Main_Menu() {
 // TODO: =>
 int Draw_Menus_Name() {
     int my = 0, mx = menu_name_index * 15 + 180 + rand() % 2;
-    char merkki;
-    bool hiiri_alueella = false;
+    char character;
+    bool mouse_in_area = false;
 
     Draw_Menu_Rectangle(90, 150, 640 - 90, 480 - 100, 224);
 
     if (mouse_x > 180 && mouse_x < 180 + 15 * 20 && mouse_y > 255 && mouse_y < 255 + 18)
-        hiiri_alueella = true;
-    if (hiiri_alueella && PisteInput_Mouse_Left() && key_delay == 0) {
+        mouse_in_area = true;
+    if (mouse_in_area && PisteInput_Mouse_Left() && key_delay == 0) {
         name_edit = true;
         menu_name_index = (mouse_x - 180) / 15;
         key_delay = 10;
@@ -7804,22 +7803,22 @@ int Draw_Menus_Name() {
 
     Draw_Wave_Text_Slow(player_name, font2, 180, 255);
     PisteDraw_Font_Write_Transparent(font3, player_name, PD_BACKBUFFER, 180, 255, 15);
-    merkki = PisteInput_Read_Keyboard();
+    character = PisteInput_Read_Keyboard();
 
     if (PisteInput_Controller_Button(PI_CONTROLLER_1, PI_CONTROLLER_BUTTON_1) && key_delay == 0 && name_edit) {
         name_edit = false;
     }
-    if (merkki != '\0' && (merkki != menu_name_prev_char || key_delay == 0) && name_edit) {
-        menu_name_prev_char = merkki;
-        if (merkki == '\n') {
-            merkki = '\0';
+    if (character != '\0' && (character != menu_name_prev_char || key_delay == 0) && name_edit) {
+        menu_name_prev_char = character;
+        if (character == '\n') {
+            character = '\0';
             name_edit = false;
             selected_menu_id = 1;
         }
         key_delay = 15;
-        player_name[menu_name_index] = merkki;
+        player_name[menu_name_index] = character;
         menu_name_index++;
-        //if (hiiri_alueella)
+        //if (mouse_in_area)
         //	mouse_x += 15;
     }
     if (key_delay == 0) {
@@ -7832,7 +7831,7 @@ int Draw_Menus_Name() {
         if (PisteInput_Read_Controller() == PI_KB_BACKSPACE) {
             key_delay = 10;
             menu_name_index--;
-            //if (hiiri_alueella)
+            //if (mouse_in_area)
             //	mouse_x -= 15;
         }
     }
@@ -7865,9 +7864,9 @@ int Draw_Menus_Name() {
 // TODO: =>
 int Draw_Menus_Load() {
     int my = 0, interval = 0;
-    char tpaikka[100];
-    char jaksoc[8];
-    char ind[4];
+    char location[100];
+    char episode[8];
+    char index[4];
 
     Draw_Menu_Rectangle(40, 70, 640 - 40, 410, 70);
 
@@ -7876,11 +7875,11 @@ int Draw_Menus_Load() {
     my = -20;
 
     for (int i = 0; i < MAX_SAVES; i++) {
-        itoa(i + 1, ind, 10);
-        strcpy(tpaikka, ind);
-        strcat(tpaikka, ". ");
-        strcat(tpaikka, saves[i].name);
-        if (Draw_Menus_Selection(tpaikka, 100, 150 + my))
+        itoa(i + 1, index, 10);
+        strcpy(location, index);
+        strcat(location, ". ");
+        strcat(location, saves[i].name);
+        if (Draw_Menus_Selection(location, 100, 150 + my))
             Load_Game(i);
         if (strcmp(saves[i].episode, " ") != 0) {
             interval = 0;
@@ -7888,8 +7887,8 @@ int Draw_Menus_Load() {
             interval += PisteDraw_Font_Write(font1, saves[i].episode, PD_BACKBUFFER, 400 + interval, 150 + my);
             interval = 0;
             interval += PisteDraw_Font_Write(font1, texts->Get_Text(txt_loadgame_level), PD_BACKBUFFER, 400 + interval, 160 + my);
-            itoa(saves[i].stage, jaksoc, 10);
-            interval += PisteDraw_Font_Write(font1, jaksoc, PD_BACKBUFFER, 400 + interval, 160 + my);
+            itoa(saves[i].stage, episode, 10);
+            interval += PisteDraw_Font_Write(font1, episode, PD_BACKBUFFER, 400 + interval, 160 + my);
         }
         my += 22;
     }
@@ -7903,19 +7902,19 @@ int Draw_Menus_Load() {
 // TODO: =>
 int Draw_Menus_Save() {
     int my = 0, interval = 0;
-    char tpaikka[100];
-    char jaksoc[8];
-    char ind[4];
+    char location[100];
+    char episode[8];
+    char index[4];
     Draw_Menu_Rectangle(40, 70, 640 - 40, 410, 224);
     PisteDraw_Font_Write(font2, texts->Get_Text(txt_savegame_title), PD_BACKBUFFER, 50, 90);
     PisteDraw_Font_Write(font1, texts->Get_Text(txt_savegame_info), PD_BACKBUFFER, 50, 110);
     my = -20;
     for (int i = 0; i < MAX_SAVES; i++) {
-        itoa(i + 1, ind, 10);
-        strcpy(tpaikka, ind);
-        strcat(tpaikka, ". ");
-        strcat(tpaikka, saves[i].name);
-        if (Draw_Menus_Selection(tpaikka, 100, 150 + my))
+        itoa(i + 1, index, 10);
+        strcpy(location, index);
+        strcat(location, ". ");
+        strcat(location, saves[i].name);
+        if (Draw_Menus_Selection(location, 100, 150 + my))
             Save_Game(i);
         if (strcmp(saves[i].episode, " ") != 0) {
             interval = 0;
@@ -7923,8 +7922,8 @@ int Draw_Menus_Save() {
             interval += PisteDraw_Font_Write(font1, saves[i].episode, PD_BACKBUFFER, 400 + interval, 150 + my);
             interval = 0;
             interval += PisteDraw_Font_Write(font1, texts->Get_Text(txt_savegame_level), PD_BACKBUFFER, 400 + interval, 160 + my);
-            itoa(saves[i].stage, jaksoc, 10);
-            interval += PisteDraw_Font_Write(font1, jaksoc, PD_BACKBUFFER, 400 + interval, 160 + my);
+            itoa(saves[i].stage, episode, 10);
+            interval += PisteDraw_Font_Write(font1, episode, PD_BACKBUFFER, 400 + interval, 160 + my);
         }
         my += 22;
     }
@@ -8324,11 +8323,11 @@ int Draw_Menus() {
 
 // TODO: =>
 int Draw_Button(int x, int y, int t) {
-    int paluu = 0;
+    int count = 0;
     t = t * 25;
-    int vilkku = 50 + (int) (sin_table[degree % 360] * 2);
-    if (vilkku < 0)
-        vilkku = 0;
+    int blink = 50 + (int) (sin_table[degree % 360] * 2);
+    if (blink < 0)
+        blink = 0;
     //PisteDraw_Buffer_Flip_Fast(game_image,PD_BACKBUFFER,x,y,1+t,58,23+t,80);
     if (mouse_x > x && mouse_x < x + 17 && mouse_y > y && mouse_y < y + 17) {
         if (key_delay == 0 && (PisteInput_Mouse_Left() || PisteInput_KeyDown(DIK_SPACE) || PisteInput_Controller_Button(PI_CONTROLLER_1, PI_CONTROLLER_BUTTON_1))) {
@@ -8341,14 +8340,14 @@ int Draw_Button(int x, int y, int t) {
             Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, x - 4, y - 4, 60, 32);
         if (t == 50)
             Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, x - 4, y - 4, 60, 64);
-        paluu = 1;
+        count = 1;
     }
     if (t == 25)
-        Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, x - 2, y - 2, vilkku, 96);
+        Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, x - 2, y - 2, blink, 96);
     if (((degree / 45) + 1) % 4 == 0 || t == 0)
         PisteDraw_Buffer_Flip_Fast(game_image, PD_BACKBUFFER, x, y, 1 + t, 58, 23 + t, 80);
 
-    return paluu;
+    return count;
 }
 
 // TODO: =>
@@ -8385,44 +8384,44 @@ int Draw_Map() {
         next_game_state = STATE_MENUS;
         current_menu = MENU_MAIN;
     }
-    int nuppi_x = 0, nuppi_y = 0;
-    int tyyppi = 0;
-    int paluu;
+    int button_x = 0, button_y = 0;
+    int type = 0;
+    int count;
     int minutes = 0, seconds = 0;
-    int ikoni;
+    int icon;
     int sinx = 0, cosy = 0;
-    int pekkaframe = 0;
+    int pekka_frame = 0;
 
     for (int i = 0; i <= num_stages; i++) {
         if (strcmp(stages[i].name, "") != 0 && stages[i].order > 0) {
-            tyyppi = 0;                            //0 harmaa
+            type = 0;                            //0 gray
             if (stages[i].order == stage)
-                tyyppi = 1;                        //1 vihre�
+                type = 1;                        //1 green
             if (stages[i].order > stage)
-                tyyppi = 2;                        //2 oranssi
+                type = 2;                        //2 orange
             if (stages[i].completed)
-                tyyppi = 0;
+                type = 0;
 
             if (stages[i].x == 0)
                 stages[i].x = 142 + i * 30;
             if (stages[i].y == 0)
                 stages[i].y = 270;
-            ikoni = stages[i].icon;
+            icon = stages[i].icon;
 
             //PisteDraw_Buffer_Flip_Fast(game_image,PD_BACKBUFFER,stages[i].x-4,stages[i].y-4-30,1+(icon*27),452,27+(icon*27),478);
-            PisteDraw_Buffer_Flip_Fast(game_image, PD_BACKBUFFER, stages[i].x - 9, stages[i].y - 14, 1 + (ikoni * 28), 452, 28 + (ikoni * 28), 479);
-            if (tyyppi == 1) {
+            PisteDraw_Buffer_Flip_Fast(game_image, PD_BACKBUFFER, stages[i].x - 9, stages[i].y - 14, 1 + (icon * 28), 452, 28 + (icon * 28), 479);
+            if (type == 1) {
                 //PisteDraw_Buffer_Flip_Fast(game_image,PD_BACKBUFFER,stages[i].x-30,stages[i].y-4,157,46,181,79);
                 sinx = (int) (sin_table[degree % 360] / 2);
                 cosy = (int) (cos_table[degree % 360] / 2);
-                pekkaframe = 28 * ((degree % 360) / 120);
-                PisteDraw_Buffer_Flip_Fast(game_image, PD_BACKBUFFER, stages[i].x + sinx - 12, stages[i].y - 17 + cosy, 157 + pekkaframe, 46, 181 + pekkaframe, 79);
+                pekka_frame = 28 * ((degree % 360) / 120);
+                PisteDraw_Buffer_Flip_Fast(game_image, PD_BACKBUFFER, stages[i].x + sinx - 12, stages[i].y - 17 + cosy, 157 + pekka_frame, 46, 181 + pekka_frame, 79);
             }
-            paluu = Draw_Button(stages[i].x - 5, stages[i].y - 10, tyyppi);
+            count = Draw_Button(stages[i].x - 5, stages[i].y - 10, type);
 
-            // jos klikattu
-            if (paluu == 2) {
-                if (tyyppi < 2 || (cheats && tyyppi > 0)) {//== 1
+            // if clicked
+            if (count == 2) {
+                if (type < 2 || (cheats && type > 0)) {//== 1
                     strcpy(next_map, stages[i].file);
                     //stage = i;
                     current_stage_index = i;
@@ -8436,7 +8435,7 @@ int Draw_Map() {
             itoa(stages[i].order, number, 10);
             PisteDraw_Font_Write(font1, number, PD_BACKBUFFER, stages[i].x - 12 + 2, stages[i].y - 29 + 2);
             //PisteDraw_Font_Write(font2,number,PD_BACKBUFFER,stages[i].x+3,stages[i].y-27);
-            if (paluu > 0) {
+            if (count > 0) {
                 int info_x = 489 + 3, info_y = 341 - 26;
 /*
 				PisteDraw_Buffer_Tayta(PD_BACKBUFFER,stages[i].x-3, stages[i].y+26,stages[i].x + 130, stages[i].y+26+120,1);
@@ -8483,40 +8482,40 @@ int Draw_Scoreboard() {
     char number[20];
     int interval = 20;
     int my = 0, x, y;
-    int kuutio, aste;
+    int cube, degree;
     int color = 0, factor;
 
     PisteDraw_SetClipper(PD_BACKBUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     PisteDraw_Buffer_Clear(PD_BACKBUFFER, 0);
     PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, 0, 0);
 
-    for (aste = 0; aste < 18; aste++) {
-        factor = (int) (cos_table[(degree + aste * 3) % 180]);
-        x = (int) (sin_table[(degree + aste * 10) % 360] * 2) + factor;
-        y = (int) (cos_table[(degree + aste * 10) % 360] * 2);//10 | 360 | 2
+    for (degree = 0; degree < 18; degree++) {
+        factor = (int) (cos_table[(degree + degree * 3) % 180]);
+        x = (int) (sin_table[(degree + degree * 10) % 360] * 2) + factor;
+        y = (int) (cos_table[(degree + degree * 10) % 360] * 2);//10 | 360 | 2
         //PisteDraw_Buffer_Flip_Fast(game_image,PD_BACKBUFFER,320+x,240+y,157,46,181,79);
-        kuutio = (int) (sin_table[(degree + aste * 3) % 360]);
-        if (kuutio < 0) kuutio = -kuutio;
-        PisteDraw_Buffer_Clear(PD_BACKBUFFER, 320 - x, 240 - y, 320 - x + kuutio, 240 - y + kuutio, COLOR_TURQUOISE + 8);
+        cube = (int) (sin_table[(degree + degree * 3) % 360]);
+        if (cube < 0) cube = -cube;
+        PisteDraw_Buffer_Clear(PD_BACKBUFFER, 320 - x, 240 - y, 320 - x + cube, 240 - y + cube, COLOR_TURQUOISE + 8);
     }
-//	unsigned char *buffer_lahde = NULL,
-//		  *buffer_kohde = NULL;
+//	unsigned char *buffer_source = NULL,
+//		  *buffer_target = NULL;
 //	unsigned long source_buffer_width,
 //		  target_buffer_width;
 
-//	PisteDraw_Draw_Begin(game_image,    *&buffer_lahde, (unsigned long &)source_buffer_width);
-//	PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_kohde, (unsigned long &)target_buffer_width);
-    for (aste = 0; aste < 18; aste++) {
-        x = (int) (sin_table[(degree + aste * 10) % 360] * 3);
-        y = (int) (cos_table[(degree + aste * 10) % 360] * 3);//10 | 360 | 3
+//	PisteDraw_Draw_Begin(game_image,    *&buffer_source, (unsigned long &)source_buffer_width);
+//	PisteDraw_Draw_Begin(PD_BACKBUFFER, *&buffer_target, (unsigned long &)target_buffer_width);
+    for (degree = 0; degree < 18; degree++) {
+        x = (int) (sin_table[(degree + degree * 10) % 360] * 3);
+        y = (int) (cos_table[(degree + degree * 10) % 360] * 3);//10 | 360 | 3
         //PisteDraw_Buffer_Flip_Fast(game_image,PD_BACKBUFFER,320+x,240+y,157,46,181,79);
-        kuutio = (int) (sin_table[(degree + aste * 2) % 360]) + 18;
-        if (kuutio < 0) kuutio = -kuutio;//0;//
-        if (kuutio > 100) kuutio = 100;
-        //PisteDraw_Buffer_Clear(PD_BACKBUFFER,320+x,240+y,320+x+kuutio,240+y+kuutio,COLOR_TURQUOISE+10);
-        Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, 320 + x, 240 + y, kuutio, 32);
-//		Draw_Transparent_Object3(game_image, 247, 1, 25, 25, 320+x, 240+y, kuutio, 32);
-//		Draw_Transparent_Object4(247, 1, 25, 25, 320+x, 240+y, kuutio, 32, buffer_lahde, buffer_kohde, source_buffer_width, target_buffer_width);
+        cube = (int) (sin_table[(degree + degree * 2) % 360]) + 18;
+        if (cube < 0) cube = -cube;//0;//
+        if (cube > 100) cube = 100;
+        //PisteDraw_Buffer_Clear(PD_BACKBUFFER,320+x,240+y,320+x+cube,240+y+cube,COLOR_TURQUOISE+10);
+        Draw_Transparent_Object(game_image_sysmem, 247, 1, 25, 25, 320 + x, 240 + y, cube, 32);
+//		Draw_Transparent_Object3(game_image, 247, 1, 25, 25, 320+x, 240+y, cube, 32);
+//		Draw_Transparent_Object4(247, 1, 25, 25, 320+x, 240+y, cube, 32, buffer_source, buffer_target, source_buffer_width, target_buffer_width);
     }
 //	PisteDraw_Draw_End(PD_BACKBUFFER);
 //	PisteDraw_Draw_End(game_image);
@@ -8624,16 +8623,16 @@ void Draw_Intro_Text(char *text, int font, int x, int y, unsigned long start_tim
 
 // TODO: =>
 int Draw_Intro() {
-    unsigned long pistelogo_alku = 300;
-    unsigned long pistelogo_loppu = pistelogo_alku + 500;
-    unsigned long tekijat_alku = pistelogo_loppu + 80;
-    unsigned long tekijat_loppu = tekijat_alku + 700;
-    unsigned long testaajat_alku = tekijat_loppu + 80;
-    unsigned long testaajat_loppu = testaajat_alku + 700;
-    unsigned long kaantaja_alku = testaajat_loppu + 100;
-    unsigned long kaantaja_loppu = kaantaja_alku + 300;
-    unsigned long midas_alku = kaantaja_loppu + 100;
-    unsigned long midas_loppu = midas_alku + 300;
+    unsigned long score_logo_start = 300;
+    unsigned long score_logo_end = score_logo_start + 500;
+    unsigned long credits_start = score_logo_end + 80;
+    unsigned long credits_end = credits_start + 700;
+    unsigned long testers_start = credits_end + 80;
+    unsigned long testers_end = testers_start + 700;
+    unsigned long translator_start = testers_end + 100;
+    unsigned long translator_end = translator_start + 300;
+    unsigned long midas_start = translator_end + 100;
+    unsigned long midas_end = midas_start + 300;
 
     PisteDraw_SetClipper(PD_BACKBUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     PisteDraw_Buffer_Clear(PD_BACKBUFFER, 0);
@@ -8641,41 +8640,41 @@ int Draw_Intro() {
 
     if ((intro_counter / 10) % 50 == 0)
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, 353, 313, 242, 313, 275, 432);
-    if (intro_counter > pistelogo_alku && intro_counter < pistelogo_loppu) {
-        //int x = intro_counter - pistelogo_alku - 194;
-        int factor = 120 / (intro_counter - pistelogo_alku);
+    if (intro_counter > score_logo_start && intro_counter < score_logo_end) {
+        //int x = intro_counter - score_logo_start - 194;
+        int factor = 120 / (intro_counter - score_logo_start);
         int x = 120 - factor;
         if (x > 120)
             x = 120;
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER,/*120*/x, 230, 37, 230, 194, 442);
-        Draw_Intro_Text(texts->Get_Text(txt_intro_presents), font1, 230, 400, pistelogo_alku, pistelogo_loppu - 20);
+        Draw_Intro_Text(texts->Get_Text(txt_intro_presents), font1, 230, 400, score_logo_start, score_logo_end - 20);
     }
-    if (intro_counter > tekijat_alku) {
-        Draw_Intro_Text(texts->Get_Text(txt_intro_a_game_by), font1, 120, 230, tekijat_alku, tekijat_loppu);
-        Draw_Intro_Text("janne kivilahti", font1, 120, 250, tekijat_alku + 20, tekijat_loppu + 20);
-        Draw_Intro_Text(texts->Get_Text(txt_intro_original), font1, 120, 275, tekijat_alku + 40, tekijat_loppu + 40);
-        Draw_Intro_Text("antti suuronen 1998", font1, 120, 295, tekijat_alku + 50, tekijat_loppu + 50);
+    if (intro_counter > credits_start) {
+        Draw_Intro_Text(texts->Get_Text(txt_intro_a_game_by), font1, 120, 230, credits_start, credits_end);
+        Draw_Intro_Text("janne kivilahti", font1, 120, 250, credits_start + 20, credits_end + 20);
+        Draw_Intro_Text(texts->Get_Text(txt_intro_original), font1, 120, 275, credits_start + 40, credits_end + 40);
+        Draw_Intro_Text("antti suuronen 1998", font1, 120, 295, credits_start + 50, credits_end + 50);
     }
 
-    if (intro_counter > testaajat_alku) {
-        Draw_Intro_Text(texts->Get_Text(txt_intro_tested_by), font1, 120, 230, testaajat_alku, testaajat_loppu);
-        Draw_Intro_Text("antti suuronen", font1, 120, 250, testaajat_alku + 10, testaajat_loppu + 10);
-        Draw_Intro_Text("toni hurskainen", font1, 120, 260, testaajat_alku + 20, testaajat_loppu + 20);
-        Draw_Intro_Text("juho rytk�nen", font1, 120, 270, testaajat_alku + 30, testaajat_loppu + 30);
-        Draw_Intro_Text("annukka korja", font1, 120, 280, testaajat_alku + 40, testaajat_loppu + 40);
-        Draw_Intro_Text(texts->Get_Text(txt_intro_thanks_to), font1, 120, 300, testaajat_alku + 70,
-                        testaajat_loppu + 70);
-        Draw_Intro_Text("oskari raunio", font1, 120, 310, testaajat_alku + 70, testaajat_loppu + 70);
-        Draw_Intro_Text("assembly organization", font1, 120, 320, testaajat_alku + 70, testaajat_loppu + 70);
+    if (intro_counter > testers_start) {
+        Draw_Intro_Text(texts->Get_Text(txt_intro_tested_by), font1, 120, 230, testers_start, testers_end);
+        Draw_Intro_Text("antti suuronen", font1, 120, 250, testers_start + 10, testers_end + 10);
+        Draw_Intro_Text("toni hurskainen", font1, 120, 260, testers_start + 20, testers_end + 20);
+        Draw_Intro_Text("juho rytk�nen", font1, 120, 270, testers_start + 30, testers_end + 30);
+        Draw_Intro_Text("annukka korja", font1, 120, 280, testers_start + 40, testers_end + 40);
+        Draw_Intro_Text(texts->Get_Text(txt_intro_thanks_to), font1, 120, 300, testers_start + 70,
+                        testers_end + 70);
+        Draw_Intro_Text("oskari raunio", font1, 120, 310, testers_start + 70, testers_end + 70);
+        Draw_Intro_Text("assembly organization", font1, 120, 320, testers_start + 70, testers_end + 70);
     }
-    if (intro_counter > kaantaja_alku) {
-        Draw_Intro_Text(texts->Get_Text(txt_intro_translation), font1, 120, 230, kaantaja_alku, kaantaja_loppu);
-        Draw_Intro_Text(texts->Get_Text(txt_intro_translator), font1, 120, 250, kaantaja_alku + 20, kaantaja_loppu + 20);
+    if (intro_counter > translator_start) {
+        Draw_Intro_Text(texts->Get_Text(txt_intro_translation), font1, 120, 230, translator_start, translator_end);
+        Draw_Intro_Text(texts->Get_Text(txt_intro_translator), font1, 120, 250, translator_start + 20, translator_end + 20);
     }
-    if (intro_counter > midas_alku) {
-        Draw_Intro_Text("housemarque sound system", font1, 120, 230, midas_alku, midas_loppu);
-        Draw_Intro_Text("petteri kangaslampi", font1, 120, 250, midas_alku + 20, midas_loppu + 20);
-        Draw_Intro_Text("jarno paananen", font1, 120, 270, midas_alku + 40, midas_loppu + 40);
+    if (intro_counter > midas_start) {
+        Draw_Intro_Text("housemarque sound system", font1, 120, 230, midas_start, midas_end);
+        Draw_Intro_Text("petteri kangaslampi", font1, 120, 250, midas_start + 20, midas_end + 20);
+        Draw_Intro_Text("jarno paananen", font1, 120, 270, midas_start + 40, midas_end + 40);
     }
     PisteWait_Wait(0);
     PisteDraw_UpdateScreen();
@@ -8699,7 +8698,7 @@ int Draw_Ending_Character(int x, int y, int type, int plus, int flutter) {
         }
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, x, y, 1 + frm * 35, 1, 32 + frm * 35, 59);
     }
-    if (type == 2) { // kana (katse right)
+    if (type == 2) { // chicken (looking right)
         frm = 0;
         if ((degree / 10) % 10 == flutter) frm = 1;
         yk = (int) cos_table[((degree + plus) % 360)];
@@ -8710,7 +8709,7 @@ int Draw_Ending_Character(int x, int y, int type, int plus, int flutter) {
         }
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, x, y, 106 + frm * 37, 1, 139 + frm * 37, 38);
     }
-    if (type == 3) { // kana (katse left)
+    if (type == 3) { // chicken (looking left)
         frm = 0;
         if ((degree / 10) % 10 == flutter) frm = 1;
         yk = (int) cos_table[((degree + plus) % 360)];
@@ -8721,7 +8720,7 @@ int Draw_Ending_Character(int x, int y, int type, int plus, int flutter) {
         }
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, x, y, 106 + frm * 37, 41, 139 + frm * 37, 77);
     }
-    if (type == 4) { // pikkukana (katse right)
+    if (type == 4) { // little chicken (looking right)
         frm = 0;
         if ((degree / 10) % 10 == flutter) frm = 1;
         yk = (int) sin_table[(((degree * 2) + plus) % 360)];
@@ -8732,7 +8731,7 @@ int Draw_Ending_Character(int x, int y, int type, int plus, int flutter) {
         }
         PisteDraw_Buffer_Flip_Fast(background_image, PD_BACKBUFFER, x, y, 217 + frm * 29, 1, 243 + frm * 29, 29);
     }
-    if (type == 5) { // pikkukana (katse left)
+    if (type == 5) { // little chicken (looking left)
         frm = 0;
         if ((degree / 10) % 10 == flutter) frm = 1;
         yk = (int) sin_table[(((degree * 2) + plus) % 360)];
@@ -8749,15 +8748,15 @@ int Draw_Ending_Character(int x, int y, int type, int plus, int flutter) {
 
 // TODO: =>
 int Draw_Ending() {
-    unsigned long onnittelut_alku = 300;
-    unsigned long onnittelut_loppu = onnittelut_alku + 1000;
-    unsigned long the_end_alku = onnittelut_loppu + 80;
-    unsigned long the_end_loppu = the_end_alku + 3000;
+    unsigned long congratulations_start = 300;
+    unsigned long congratulations_end = congratulations_start + 1000;
+    unsigned long the_end_start = congratulations_end + 80;
+    unsigned long the_end_end = the_end_start + 3000;
 /*
-	unsigned long testaajat_alku	= tekijat_loppu + 80;
-	unsigned long testaajat_loppu	= testaajat_alku + 700;
-	unsigned long kaantaja_alku		= testaajat_loppu + 100;
-	unsigned long kaantaja_loppu	= kaantaja_alku + 300;
+	unsigned long testers_start	= credits_end + 80;
+	unsigned long testers_end	= testers_start + 700;
+	unsigned long translator_start		= testers_end + 100;
+	unsigned long translator_end	= translator_start + 300;
 */
     PisteDraw_SetClipper(PD_BACKBUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     PisteDraw_Buffer_Clear(PD_BACKBUFFER, 0);
@@ -8771,35 +8770,35 @@ int Draw_Ending() {
     Draw_Ending_Character(270, 284, 2, 20, 1);
     Draw_Ending_Character(360, 284, 5, 60, 2);
 
-    if (end_counter > onnittelut_alku) {
-        Draw_Intro_Text(texts->Get_Text(txt_end_congratulations), font2, 220, 380, onnittelut_alku,
-                        onnittelut_loppu);
-        Draw_Intro_Text(texts->Get_Text(txt_end_chickens_saved), font1, 220, 402, onnittelut_alku + 30,
-                        onnittelut_loppu + 30);
+    if (end_counter > congratulations_start) {
+        Draw_Intro_Text(texts->Get_Text(txt_end_congratulations), font2, 220, 380, congratulations_start,
+                        congratulations_end);
+        Draw_Intro_Text(texts->Get_Text(txt_end_chickens_saved), font1, 220, 402, congratulations_start + 30,
+                        congratulations_end + 30);
     }
-    if (end_counter > the_end_alku) {
-        Draw_Intro_Text(texts->Get_Text(txt_end_the_end), font2, 280, 190, the_end_alku, the_end_loppu);
+    if (end_counter > the_end_start) {
+        Draw_Intro_Text(texts->Get_Text(txt_end_the_end), font2, 280, 190, the_end_start, the_end_end);
     }
 /*
-	if (intro_counter > tekijat_alku) {
-		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_a_game_by),font1, 120, 230, tekijat_alku, tekijat_loppu);
-		PK_Piirra_Intro_Teksti("janne kivilahti",			font1, 120, 250, tekijat_alku+20, tekijat_loppu+20);
-		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_original), font1, 120, 275, tekijat_alku+40, tekijat_loppu+40);
-		PK_Piirra_Intro_Teksti("antti suuronen 1998",		font1, 120, 295, tekijat_alku+50, tekijat_loppu+50);
+	if (intro_counter > credits_start) {
+		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_a_game_by),font1, 120, 230, credits_start, credits_end);
+		PK_Piirra_Intro_Teksti("janne kivilahti",			font1, 120, 250, credits_start+20, credits_end+20);
+		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_original), font1, 120, 275, credits_start+40, credits_end+40);
+		PK_Piirra_Intro_Teksti("antti suuronen 1998",		font1, 120, 295, credits_start+50, credits_end+50);
 	}
-	if (intro_counter > testaajat_alku) {
-		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_tested_by),font1, 120, 230, testaajat_alku, testaajat_loppu);
-		PK_Piirra_Intro_Teksti("antti suuronen",			font1, 120, 250, testaajat_alku+10, testaajat_loppu+10);
-		PK_Piirra_Intro_Teksti("toni hurskainen",			font1, 120, 260, testaajat_alku+20, testaajat_loppu+20);
-		PK_Piirra_Intro_Teksti("juho rytk�nen",				font1, 120, 270, testaajat_alku+30, testaajat_loppu+30);
-		PK_Piirra_Intro_Teksti("annukka korja",				font1, 120, 280, testaajat_alku+40, testaajat_loppu+40);
-		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_thanks_to),font1, 120, 300, testaajat_alku+70, testaajat_loppu+70);
-		PK_Piirra_Intro_Teksti("oskari raunio",				font1, 120, 310, testaajat_alku+70, testaajat_loppu+70);
-		PK_Piirra_Intro_Teksti("assembly organization",		font1, 120, 320, testaajat_alku+70, testaajat_loppu+70);
+	if (intro_counter > testers_start) {
+		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_tested_by),font1, 120, 230, testers_start, testers_end);
+		PK_Piirra_Intro_Teksti("antti suuronen",			font1, 120, 250, testers_start+10, testers_end+10);
+		PK_Piirra_Intro_Teksti("toni hurskainen",			font1, 120, 260, testers_start+20, testers_end+20);
+		PK_Piirra_Intro_Teksti("juho rytk�nen",				font1, 120, 270, testers_start+30, testers_end+30);
+		PK_Piirra_Intro_Teksti("annukka korja",				font1, 120, 280, testers_start+40, testers_end+40);
+		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_thanks_to),font1, 120, 300, testers_start+70, testers_end+70);
+		PK_Piirra_Intro_Teksti("oskari raunio",				font1, 120, 310, testers_start+70, testers_end+70);
+		PK_Piirra_Intro_Teksti("assembly organization",		font1, 120, 320, testers_start+70, testers_end+70);
 	}
-	if (intro_counter > kaantaja_alku) {
-		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_translation), font1, 120, 230, kaantaja_alku, kaantaja_loppu);
-		Draw_Intro_Text(texts->Get_Text(txt_intro_translator),  font1, 120, 250, kaantaja_alku+20, kaantaja_loppu+20);
+	if (intro_counter > translator_start) {
+		PK_Piirra_Intro_Teksti(texts->Hae_Teksti(txt_intro_translation), font1, 120, 230, translator_start, translator_end);
+		Draw_Intro_Text(texts->Get_Text(txt_intro_translator),  font1, 120, 250, translator_start+20, translator_end+20);
 	}
 	if ((intro_counter / 10) % 50 == 0)
 		PisteDraw_Buffer_Flip_Fast(background_image,PD_BACKBUFFER,353, 313, 242, 313, 275, 432);
@@ -8883,8 +8882,8 @@ int Main_Scoreboard(void) {
     Draw_Scoreboard();
     degree = 1 + degree % 360;
 
-    // PISTELASKU
-    int energia = sprites[player_index].health;
+    // SCORE COUNTING
+    int energy = sprites[player_index].health; //TODO: energy_points?
     if (score_calculation_delay == 0)
         if (bonus_points < stage_points) {
             score_calculation_phase = 1;
@@ -8927,12 +8926,12 @@ int Main_Scoreboard(void) {
     if (score_calculation_delay > 0)
         score_calculation_delay--;
     if (switch_from_score_to_map && PisteDraw_Fade_Palette_Done()) {
-        /*tarkistetaan oliko viimeinen stage*/
-        if (current_stage_index == EPISODE_MAX_STAGES - 1) { // ihan niin kuin joku tekisi n�in monta jaksoa...
+        /*checking if it was the last stage*/
+        if (current_stage_index == EPISODE_MAX_STAGES - 1) { // just as if someone made this many episodes...
             next_game_state = STATE_END;
         } else if (stages[current_stage_index + 1].order == -1)
             next_game_state = STATE_END;
-        else { // jos ei niin palataan karttaan...
+        else { // if not, return to the map...
             next_game_state = STATE_MAP;
             //game_in_progress = false;
             current_menu = MENU_MAIN;
@@ -9337,7 +9336,7 @@ int Main(void) {
     if (PisteInput_KeyDown(DIK_LALT) && PisteInput_KeyDown(DIK_TAB)) {
         PisteLog_Write("- ALT+TAB pressed. \n");
         if (window_active)
-            SendMessage(window_handle, WM_ACTIVATE, HIunsigned short(TRUE), 0);
+            SendMessage(window_handle, WM_ACTIVATE, HIunsigned short(true), 0);
         //SendMessage(window_handle, WM_CLOSE,0,0);
         //window_closed = true;
     }
@@ -9345,7 +9344,7 @@ int Main(void) {
 	if (PisteInput_Keydown(DIK_LALT) && PisteInput_KeyDown(DIK_Q))
 	{
 		if (window_active)
-			SendMessage(window_handle, WM_ACTIVATE,HIunsigned short(TRUE),0);
+			SendMessage(window_handle, WM_ACTIVATE,HIunsigned short(true),0);
 		PisteLog_Write("- ALT+Q pressed. \n");
 		//SendMessage(window_handle, WM_CLOSE,0,0);
 		//window_closed = true;
@@ -9487,7 +9486,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
                     window_closed = true;
                 }
                 else {
-                    ShowCursor(TRUE);
+                    ShowCursor(true);
                 }
 */
             }
@@ -9509,7 +9508,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
                     }
                     else {
                         window_active = true;
-                        ShowCursor(FALSE);
+                        ShowCursor(false);
                     }
                     //if (PisteDraw_GetFrameCount() == PD_ERROR) {
                     //    PisteLog_Write("  - Reallocation of surfaces failed.\n");
@@ -9578,10 +9577,10 @@ LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
                     PisteLog_Write("    - Setting Midas config. \n");
                     if (!MIDASconfig()) {
                         MIDASerror = true;
-                        settings.musiikki = false;
+                        settings.music = false;
                     } else {
                         MIDASsaveConfig("data\\msetup.ini");
-                        settings.musiikki = true;
+                        settings.music = true;
                     }
                 } break;
                 case ID_BT_Play: {
@@ -9599,13 +9598,13 @@ LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
                         SCREEN_HEIGHT = 600;
                     }
                     if (SendMessage(hCB_Music, BM_GETSTATE, 0, 0) == BST_CHECKED) {
-                        settings.musiikki = true;
+                        settings.music = true;
                     } else
-                        settings.musiikki = false;
+                        settings.music = false;
                     if (SendMessage(hCB_SFX, BM_GETSTATE, 0, 0) == BST_CHECKED) {
-                        settings.aanet = true;
+                        settings.sounds = true;
                     } else
-                        settings.aanet = false;
+                        settings.sounds = false;
                     // Get the selected language
                     char language_file[_MAX_PATH];
                     char directory[_MAX_PATH];
@@ -9754,26 +9753,26 @@ int PK_SetupWindow(HWND & hwnd, HINSTANCE & hinstance, int & ncmdshow) {
 
     switch (settings.screen_width) {
         case 800:
-            SendMessage(hRB_800x600, BM_SETCHECK, TRUE, 0);
+            SendMessage(hRB_800x600, BM_SETCHECK, true, 0);
             break;
         case 640:
-            SendMessage(hRB_640x480, BM_SETCHECK, TRUE, 0);
+            SendMessage(hRB_640x480, BM_SETCHECK, true, 0);
             break;
         case 1024:
-            SendMessage(hRB_1024x768, BM_SETCHECK, TRUE, 0);
+            SendMessage(hRB_1024x768, BM_SETCHECK, true, 0);
             break;
         default:
-            SendMessage(hRB_800x600, BM_SETCHECK, TRUE, 0);
+            SendMessage(hRB_800x600, BM_SETCHECK, true, 0);
             break;
     }
     if (settings.music)
-        SendMessage(hCB_Music, BM_SETCHECK, TRUE, 0);
+        SendMessage(hCB_Music, BM_SETCHECK, true, 0);
     else
-        SendMessage(hCB_Music, BM_SETCHECK, FALSE, 0);
+        SendMessage(hCB_Music, BM_SETCHECK, false, 0);
     if (settings.sounds)
-        SendMessage(hCB_SFX, BM_SETCHECK, TRUE, 0);
+        SendMessage(hCB_SFX, BM_SETCHECK, true, 0);
     else
-        SendMessage(hCB_SFX, BM_SETCHECK, FALSE, 0);
+        SendMessage(hCB_SFX, BM_SETCHECK, false, 0);
     Language_Files_Get();
 /*
 	SendMessage(hCMB_Languages,CB_ADDSTRING, 0, (LPARAM)(LPCTSTR)"suomi.txt");
@@ -9857,7 +9856,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
     window_handle = hwnd;
     Initialize_States();
     //PK_Init();
-    ShowCursor(FALSE);
+    ShowCursor(false);
 
     if (cheats)
         next_game_state = STATE_MENUS;
@@ -9886,7 +9885,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
     PisteLog_Write("========================\n");
     PisteLog_Write("PK2 EXITS\n");
     PisteLog_Write("========================\n");
-    ShowCursor(TRUE);
+    ShowCursor(true);
 
     return(msg.wParam);
 }
