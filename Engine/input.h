@@ -6,9 +6,9 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
 #define DIRECTINPUT_VERSION 0x0700
-//#include "dinput.h" // TODO: Remember to fix the path //MUISTA KORJATA POLKU OIKEIN!!!!
-//#include <windows.h>
-#include "../old_headers.h"
+#include "dinput.h" // TODO: Remember to fix the path //MUISTA KORJATA POLKU OIKEIN!!!!
+#include <windows.h>
+//#include "../old_headers.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 

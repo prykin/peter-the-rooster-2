@@ -37,17 +37,17 @@ v1.2
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-//#include <tchar.h>
-//#include <windows.h>
-//#include <windowsx.h>
-//#include <fstream.h>
-//#include <mmsystem.h>
+#include <tchar.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <fstream.h>
+#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-//#include <direct.h>
-//#include <io.h>
+#include <direct.h>
+#include <io.h>
 #include "Engine/input.h"
 #include "Engine/draw.h"
 #include "Engine/wait.h"
@@ -56,9 +56,14 @@ v1.2
 #include "Language/language.h"
 #include "map.h"
 #include "sprites.h"
-//#include "midasdll.h" // TODO: midas library
+#include "midasdll.h" // TODO: midas library
 
-#include "old_headers.h"
+//#include "old_headers.h"
+
+// #include "Include/ddraw.h"
+// #include "Include/dsound.h"
+// #include "Include/dinput.h"
+// #include "Include/midasdll.h"
 
 /* TYPE DEFINITIONS ---------------------------------------------------------------------------*/
 
@@ -930,6 +935,8 @@ int Midas_Init() {
 
     return 0;
 }
+
+
 
 void Midas_End() {
     if (settings.music) {
@@ -6853,7 +6860,7 @@ int Initialize_States() {
             int comparison_result;
 
             /* Check if the player has broken the level's score or speed record */
-            comparison_result = Compare_Episode_Scores(current_stage_index, temp_pisteet, map->duration - game_time,
+            comparison_result = Compare_Episode_Scores(current_stage_index, temp_pisteet, map->time - game_time,
                                                      false);
             if (comparison_result > 0) {
                 Save_Episode_Scores(score_file);
@@ -9611,11 +9618,11 @@ LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
                     long selected = SendMessage(hCMB_Languages, CB_GETCURSEL, 0, 0);
                     SendMessage(hCMB_Languages, CB_GETLBTEXT, selected, (LPARAM)(LPCSTR)language_file);
                     //texts->Read_File(language_file);
-                    if (strcmp(language_file, settings.kieli) != 0) {
-                        strcpy(settings.kieli,language_file);
+                    if (strcmp(language_file, settings.language) != 0) {
+                        strcpy(settings.language, language_file);
                         strcpy(directory, "language\\");
                         strcat(directory, language_file);
-                        PK_Load_Language(directory);
+                        Load_Language(directory);
                     }
                     //DestroyWindow(hSetupWindow);
                     //SendMessage(hSetupWindow, WM_CLOSE,0,0);
@@ -9649,11 +9656,14 @@ LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
             break;
         }
 */
-        default:break;
+        default:
+            break;
     }
 
     return (DefWindowProc(hwnd, msg, wparam, lparam));
 }
+
+int IDI_ICON1;
 
 int PK_SetupWindow(HWND & hwnd, HINSTANCE & hinstance, int & ncmdshow) {
     WNDCLASSEX wc; // new window class (struct)
@@ -9786,6 +9796,9 @@ int PK_SetupWindow(HWND & hwnd, HINSTANCE & hinstance, int & ncmdshow) {
     return 0;
 }
 
+int IDI_ICON1;
+int IDC_CURSOR1;
+
 // The beginning and the end: WinMain. Everything starts here and the game runs within this.
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int ncmdshow) {
     WNDCLASSEX winclass;
@@ -9816,8 +9829,8 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
     char directory[_MAX_PATH];
 
     strcpy(directory, "language\\");
-    strcat(directory, settings.kieli);
-    if (!PK_Load_Language(directory)) {
+    strcat(directory, settings.language);
+    if (!Load_Language(directory)) {
         MessageBox(window_handle, "Could not find the default language file!", "Pekka Kana 2", MB_OK | MB_ICONEXCLAMATION);
         return 0;
     }

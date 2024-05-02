@@ -7,7 +7,7 @@
 #include "../Engine/wait.h"
 #include "../map.h"
 #include "../sprites.h"
-#include "../old_headers.h"
+//#include "../old_headers.h"
 
 /* PROTOTYPES --------------------------------------------------------------------------------*/
 

@@ -1,9 +1,9 @@
-//#include <windows.h>
-//#include <windowsx.h>
-//#include <mmsystem.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <fstream.h>
+#include <fstream.h>
 #include "sprites.h"
 #include "Engine/draw.h"
 #include "Engine/sound.h"

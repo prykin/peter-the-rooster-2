@@ -1,5 +1,4 @@
-//#include <windows.h>
-/*
+#include <windows.h>
 #include <windowsx.h> 
 #include <mmsystem.h>
 #include <iostream.h> 
@@ -13,7 +12,6 @@
 #include <math.h>
 #include <io.h>
 #include <fcntl.h>
-*/
 #include "sfx.h"
 
 bool play_sfx = true;

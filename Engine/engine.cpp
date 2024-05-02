@@ -34,9 +34,9 @@
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-//#include <windows.h>
-//#include <windowsx.h>
-//#include <mmsystem.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
 #include <math.h>
 #include "input.h"
 #include "draw.h"
@@ -286,7 +286,7 @@ int Game_Main_Piirra(void) {
     /* PIIRRET��N RUUDULLE VAPAAN VIDEOMUISTIN M��R�*/
 
     char vram[30];
-    ltoa(PisteDraw_GetMemoryUsed(), vram, 10);
+    _ltoa(PisteDraw_GetMemoryUsed(), vram, 10);
     PisteDraw_Font_Write(font2, vram, PD_BACKBUFFER, 300, 10);
 
 
@@ -517,6 +517,9 @@ DefWindowProc(hwnd, msg, wparam, lparam
 }
 
 // Kaiken alku ja juuri: WinMain. T�st� se kaikki alkaa ja t�m�n sis�ll� peli py�rii.
+
+int IDI_ICON1;
+int IDC_CURSOR1;
 
 int WINAPI
 WinMain(    HINSTANCE

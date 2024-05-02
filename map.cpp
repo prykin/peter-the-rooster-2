@@ -1,12 +1,12 @@
-//#include <windows.h>
-//#include <windowsx.h>
-//#include <mmsystem.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-//#include <io.h>
-//#include <fstream.h>
-//#include <iostream.h>
+#include <io.h>
+#include <fstream.h>
+#include <iostream.h>
 
 #include "map.h"
 #include "Engine/draw.h"

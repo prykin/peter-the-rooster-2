@@ -1,12 +1,12 @@
 //#define WIN32_LEAN_AND_MEAN
 //#define INITGUID
 
-//#include "ddraw.h" //TODO: DDRAW
+#include "ddraw.h" //TODO: DDRAW
 #include <string.h>
-//#include <istream.h>
+#include <istream.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <mmsystem.h>
+#include <mmsystem.h>
 
 #include "../sprites.h"
 

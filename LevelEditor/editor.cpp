@@ -5,16 +5,16 @@
 
 /* INCLUDES -----------------------------------------------------------------------------------*/
 
-//#include <windows.h>
-//#include <windowsx.h>
-//#include <mmsystem.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <direct.h>
-//#include <io.h>
-//#include <fstream.h>
-//#include <iostream.h>
+#include <direct.h>
+#include <io.h>
+#include <fstream.h>
+#include <iostream.h>
 #include <string.h>
 #include "editor.h"
 
@@ -3996,8 +3996,7 @@ strcpy(backupfile, editor_hakemisto
 );
 strcat(backupfile,
 "\\backup.mop");
-map->
-Tallenna(backupfile);
+map->Save(backupfile);
 PostQuitMessage(0);
 window_closed = true;
 }}}
@@ -4037,6 +4036,10 @@ DefWindowProc(hwnd, msg, wparam, lparam
 }
 
 // Kaiken alku ja juuri: WinMain. T�st� se kaikki alkaa ja t�m�n sis�ll� peli py�rii.
+
+int IDI_ICON1;
+
+int IDC_CURSOR1;
 
 int WINAPI
 WinMain(    HINSTANCE

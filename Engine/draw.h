@@ -55,9 +55,9 @@ Version 1.4
 
 /* INCLUDES ----------------------------------------------------------------------------------*/
 #define DIRECTDRAW_VERSION 0x0700
-//#include "ddraw.h" // TODO: DDRAW
-//#include <windows.h>
-#include "../old_headers.h"
+#include "ddraw.h" // TODO: DDRAW
+#include <windows.h>
+//#include "../old_headers.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 

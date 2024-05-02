@@ -4,9 +4,9 @@
 /* INCLUDES ----------------------------------------------------------------------------------*/
 
 #define DIRECTSOUND_VERSION 0x0700
-//#include "dsound.h" // TODO: Remember to fix the path
-//#include <windows.h>
-#include "../old_headers.h"
+#include "dsound.h" // TODO: Remember to fix the path
+#include <windows.h>
+//#include "../old_headers.h"
 
 /* DEFINES -----------------------------------------------------------------------------------*/
 

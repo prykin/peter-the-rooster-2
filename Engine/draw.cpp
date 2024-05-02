@@ -57,11 +57,11 @@ Versio 1.5
 #include "draw.h"
 #include "font.h"
 #include "log.h"
-//#include <io.h>
+#include <io.h>
 #include <stdio.h>
-//#include <fstream.h>
-//#include <mmsystem.h>
-//#include <malloc.h>
+#include <fstream.h>
+#include <mmsystem.h>
+#include <malloc.h>
 #include <memory.h>
 
 /* DEFINES -----------------------------------------------------------------------------------*/
@@ -443,14 +443,13 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
     bool ok = false;
 
     char paate[4];
-
     for (int i = 0; i < 4; i++)
         paate[i] = toupper(filename[strlen(filename) - 3 + i]);
     paate[4] = '\0';
 
     if (strcmp(paate, "BMP") == 0) {
         ok = true;
-        if (PD_buffers[i].lpdds) {
+        if (PD_buffers[index].lpdds) {
             if (PisteDraw_Load_Bitmap(&bitmap, filename) != 0) {
                 strcpy(virhe, "Could not load picture ");
                 strcat(virhe, filename);
@@ -463,7 +462,7 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
 
             DD_INIT_STRUCT(PD_ddsd);
 
-            if (FAILED(PD_buffers[i].lpdds->Lock(NULL, &PD_ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL))) {
+            if (FAILED(PD_buffers[index].lpdds->Lock(NULL, &PD_ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL))) {
                 strcpy(virhe, "Could not lock surface after loading movement_x picture!");
                 PisteLog_Write("[Error] Piste Draw: Could not lock surface after loading movement_x picture! \n");
                 return PD_ERROR;
@@ -475,13 +474,13 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
             int y;
             int leveys, korkeus;
 
-            if (bitmap.bitmapinfoheader.biWidth > PD_buffers[i].leveys)
-                leveys = PD_buffers[i].leveys;
+            if (bitmap.bitmapinfoheader.biWidth > PD_buffers[index].leveys)
+                leveys = PD_buffers[index].leveys;
             else
                 leveys = bitmap.bitmapinfoheader.biWidth;
 
-            if (bitmap.bitmapinfoheader.biHeight > PD_buffers[i].korkeus)
-                korkeus = PD_buffers[i].korkeus;
+            if (bitmap.bitmapinfoheader.biHeight > PD_buffers[index].korkeus)
+                korkeus = PD_buffers[index].korkeus;
             else
                 korkeus = bitmap.bitmapinfoheader.biHeight;
 
@@ -491,7 +490,7 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
                 }
             }
 
-            if (FAILED(PD_buffers[i].lpdds->Unlock(NULL))) {
+            if (FAILED(PD_buffers[index].lpdds->Unlock(NULL))) {
                 strcpy(virhe, "Could not unlock surface after loading movement_x picture!");
                 PisteLog_Write("[Error] Piste Draw: Could not unlock surface after loading movement_x picture! \n");
                 return PD_ERROR;
@@ -523,7 +522,7 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
 
     if (strcmp(paate, "PCX") == 0) {
         ok = true;
-        if (PisteDraw_Lataa_PCX(filename, i, load_palette) == PD_ERROR) {
+        if (PisteDraw_Lataa_PCX(filename, index, load_palette) == PD_ERROR) {
             strcpy(virhe, "Could not load picture ");
             strcat(virhe, filename);
             strcat(virhe, "!");
@@ -857,7 +856,7 @@ int PisteDraw_Buffer_Clear(int i, unsigned char color) {
     return 0;
 }
 
-int PisteDraw_Buffer_Clear(int i, const int left, const int top, const int right, const int bottom, unsigned char color) {
+int PisteDraw_Buffer_Clear(int i,  int left, int top, int right, int bottom, unsigned char color) {
 
     DD_INIT_STRUCT(PD_ddbltfx);
     PD_ddbltfx.dwFillColor = color;

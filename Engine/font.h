@@ -3,6 +3,7 @@
 
 #include "draw.h"
 #include "../Language/language.h"
+#include "../old_headers.h"
 
 class PisteFont {
 private:

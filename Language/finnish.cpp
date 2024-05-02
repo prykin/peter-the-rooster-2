@@ -2,11 +2,12 @@
 #define INITGUID
 
 #include <string.h>
-//#include <istream.h>
+#include <istream.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include "language.h"
+#include "../old_headers.h"
 
 int main() {
     PisteLanguage *language = new PisteLanguage();
@@ -25,7 +26,7 @@ int main() {
         cout << "Index: " << i << " text: |" << language->Get_Text(i) << "|\n";
         text_index++;
     }
-    cin;
+    std::cin;
 
     delete language;
 

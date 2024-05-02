@@ -1,7 +1,7 @@
 #ifndef PISTELANGUAGE
 #define PISTELANGUAGE
 
-#include "../old_headers.h"
+//#include "../old_headers.h"
 
 const int MAX_TEXTS = 200;
 const int MAX_TEXT_LENGTH = 80;

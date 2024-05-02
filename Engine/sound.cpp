@@ -8,7 +8,7 @@ PisteEngine - PisteSound 0.1
 #include "sound.h"
 #include "sfx.h"
 #include "log.h"
-#include "../old_headers.h"
+//#include "../old_headers.h"
 
 /* VARIABLES ---------------------------------------------------------------------------------*/
 

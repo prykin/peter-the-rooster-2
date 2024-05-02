@@ -6,10 +6,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <direct.h>
-//#include <io.h>
-//#include <fstream.h>
-//#include <iostream.h>
+#include <direct.h>
+#include <io.h>
+#include <fstream.h>
+#include <iostream.h>
 #include <string.h>
 #include "log.h"
 

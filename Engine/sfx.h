@@ -2,8 +2,8 @@
 #define P_SFX
 
 #include "sound.h"
-//#include <io.h>
-#include "../old_headers.h"
+#include <io.h>
+//#include "../old_headers.h"
 
 class PisteSFX {
 private:
