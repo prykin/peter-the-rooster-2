@@ -76,6 +76,9 @@ const int MAX_SPRITES = 800;//600;
 const int MAX_ITEMS = 4;
 const int MAX_SAVES = 10;
 
+int IDI_ICON1;
+int IDC_CURSOR1;
+
 const unsigned char BLOCK_BACKGROUND = 0;
 const unsigned char BLOCK_WALL = 1;
 const unsigned char BLOCK_SLOPE_RIGHT_UP = 2;
@@ -9663,8 +9666,6 @@ LRESULT CALLBACK WindowProcSetup(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
     return (DefWindowProc(hwnd, msg, wparam, lparam));
 }
 
-int IDI_ICON1;
-
 int PK_SetupWindow(HWND & hwnd, HINSTANCE & hinstance, int & ncmdshow) {
     WNDCLASSEX wc; // new window class (struct)
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -9795,9 +9796,6 @@ int PK_SetupWindow(HWND & hwnd, HINSTANCE & hinstance, int & ncmdshow) {
 
     return 0;
 }
-
-int IDI_ICON1;
-int IDC_CURSOR1;
 
 // The beginning and the end: WinMain. Everything starts here and the game runs within this.
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int ncmdshow) {

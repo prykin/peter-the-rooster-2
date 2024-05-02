@@ -436,7 +436,6 @@ int Game_Main(void) {
 }
 
 int Game_Quit(void) {
-
     PisteSound_Stop();
     PisteDraw_Quit();
     PisteInput_Quit();
@@ -453,67 +452,41 @@ int Game_Quit(void) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 /* IKKUNA -------------------------------------------------------------------------------------*/
 
 // Seuraa ikkuna-koodia. Allaoleva on ikkunan "tapahtumakuuntelija".
 
 
-LRESULT CALLBACK
-WindowProc(HWND
-hwnd,
-UINT msg, WPARAM
-wparam,
-LPARAM lparam
-)
-{
-PAINTSTRUCT ps;
-HDC hdc;
+LRESULT CALLBACK WindowProc(HWND hwnd,UINT msg, WPARAM wparam,LPARAM lparam) {
+    PAINTSTRUCT ps;
+    HDC hdc;
 
-switch(msg)
-{
-case WM_CREATE:
-{
+    switch(msg)
+    {
+        case WM_CREATE:
+        {
+            return(0);
+        }    break;
 
-return(0);
-}    break;
+        case WM_PAINT:
+        {
+            hdc = BeginPaint(hwnd, &ps);
+            EndPaint(hwnd, &ps);
+            return(0);
+        } break;
 
-case WM_PAINT:
-{
+        case WM_DESTROY:
+        {
+            PostQuitMessage(0);
+            return(0);
+        } break;
 
-hdc = BeginPaint(hwnd, &ps);
+        default:
+            break;
 
-EndPaint(hwnd, &ps
-);
+    }
 
-return(0);
-}    break;
-
-case WM_DESTROY:
-{
-
-PostQuitMessage(0);
-return(0);
-}    break;
-
-default:break;
-
-}
-
-return (
-DefWindowProc(hwnd, msg, wparam, lparam
-));
-
+    return (DefWindowProc(hwnd, msg, wparam, lparam));
 }
 
 // Kaiken alku ja juuri: WinMain. T�st� se kaikki alkaa ja t�m�n sis�ll� peli py�rii.
@@ -521,87 +494,49 @@ DefWindowProc(hwnd, msg, wparam, lparam
 int IDI_ICON1;
 int IDC_CURSOR1;
 
-int WINAPI
-WinMain(    HINSTANCE
-hinstance,
-HINSTANCE hprevinstance, LPSTR
-lpcmdline,
-int ncmdshow
-)
-{
+int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int ncmdshow) {
+    WNDCLASSEX winclass;
+    HWND hwnd;
+    MSG msg;
 
-WNDCLASSEX winclass;
-HWND hwnd;
-MSG msg;
+    winclass.cbSize = sizeof(WNDCLASSEX);
+    winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+    winclass.lpfnWndProc = WindowProc;
+    winclass.cbClsExtra = 0;
+    winclass.cbWndExtra = 0;
+    winclass.hInstance = hinstance;
+    winclass.hIcon = LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1));
+    winclass.hCursor = LoadCursor(hinstance, MAKEINTRESOURCE(IDC_CURSOR1));
+    winclass.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
+    winclass.lpszMenuName = NULL;
+    winclass.lpszClassName = WINDOW_CLASS_NAME;
+    winclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    hinstance_app = hinstance;
 
-winclass.
-cbSize = sizeof(WNDCLASSEX);
-winclass.
-style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-winclass.
-lpfnWndProc = WindowProc;
-winclass.
-cbClsExtra = 0;
-winclass.
-cbWndExtra = 0;
-winclass.
-hInstance = hinstance;
-winclass.
-hIcon = LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1));
-winclass.
-hCursor = LoadCursor(hinstance, MAKEINTRESOURCE(IDC_CURSOR1));
-winclass.
-hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
-winclass.
-lpszMenuName = NULL;
-winclass.
-lpszClassName = WINDOW_CLASS_NAME;
-winclass.
-hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    if (!RegisterClassEx(&winclass))
+        return(0);
 
+    if (!(hwnd = CreateWindowEx(NULL, WINDOW_CLASS_NAME, GAME_NAME, WS_POPUP | WS_VISIBLE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                          NULL, NULL, hinstance, NULL)))
+        return(0);
 
-hinstance_app = hinstance;
+    window_handle = hwnd;
+    Game_Init();
+    ShowCursor(FALSE);
 
-if (!
-RegisterClassEx(&winclass)
-)
-return(0);
+    while(!DirectX_virhe)
+    {
+        if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+                break;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        Game_Main();
+    }
 
-if (!(
-hwnd = CreateWindowEx(NULL, WINDOW_CLASS_NAME, GAME_NAME, WS_POPUP | WS_VISIBLE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                      NULL, NULL, hinstance, NULL)
-))
-return(0);
-
-window_handle = hwnd;
-
-Game_Init();
-
-ShowCursor(FALSE);
-
-while(!DirectX_virhe)
-{
-
-if (
-PeekMessage(&msg,
-NULL,0,0,PM_REMOVE))
-{
-
-if (msg.message == WM_QUIT)
-break;
-
-TranslateMessage(&msg);
-
-DispatchMessage(&msg);
+    Game_Quit();
+    ShowCursor(TRUE);
+    return(msg.wParam);
 }
-
-Game_Main();
-
-}
-
-Game_Quit();
-
-ShowCursor(TRUE);
-
-return(msg.wParam);
-} 
