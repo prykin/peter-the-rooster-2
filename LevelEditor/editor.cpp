@@ -125,7 +125,7 @@ HWND window_handle = NULL; // p��ikkunan kahva
 HINSTANCE hinstance_app = NULL; // hinstance?
 HDC global_dc = NULL; // global dc?
 
-bool DirectX_virhe = false;// jos t�m� muuttuu todeksi niin ohjelma lopetetaan
+bool DirectX_error = false;// jos t�m� muuttuu todeksi niin ohjelma lopetetaan
 char virheviesti[60];
 
 bool window_closed = false;// onko ikkuna kiinni
@@ -1792,7 +1792,7 @@ void Level_Editor_Aseta_Palikat(char *filename) {
     Level_Editor_Loki_Kirjaa("loading tile palette.", LOKI_INFO);
 
     if (map->Load_Block_Palette("", filename) == 1)
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     Level_Editor_Laske_TileVarit();
 
@@ -1803,7 +1803,7 @@ void Level_Editor_Aseta_Taustakuva(char *filename) {
     Level_Editor_Loki_Kirjaa("loading background image.", LOKI_INFO);
 
     if (map->Load_Background_Image("", filename) == 1)
-        DirectX_virhe = true;
+        DirectX_error = true;
 }
 
 int Level_Editor_Init(void) {
@@ -1845,29 +1845,29 @@ int Level_Editor_Init(void) {
 
 
     if ((PisteInput_Init((HWND &) window_handle, (HINSTANCE &) hinstance_app)) == PI_ERROR)
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     if ((PisteDraw_Init((HWND &) window_handle, (HINSTANCE &) hinstance_app, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP,
                         MAX_COLORS_PALETTE)) == PD_ERROR)
-        DirectX_virhe = true;
+        DirectX_error = true;
 
 
     if ((kuva_editori = PisteDraw_Buffer_Create(SCREEN_WIDTH, SCREEN_HEIGHT, true, 255)) == PD_ERROR)
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     if ((kuva_kartta = PisteDraw_Buffer_Create(MAP_WIDTH, MAP_HEIGHT, true, 255)) == PD_ERROR)
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     if (PisteDraw_Image_Load(kuva_editori, "pk2edit.bmp", true) == PD_ERROR) {
         Level_Editor_Loki_Kirjaa("could not load pk2edit.bmp.", LOKI_INFO);
-        DirectX_virhe = true;
+        DirectX_error = true;
     }
 
     map = new PK2Map();
     undo = new PK2Map();
 
     if ((font1 = PisteDraw_Font_Create(kuva_editori, 1, 456, 8, 8, 52)) == PD_ERROR)
-        DirectX_virhe = true;
+        DirectX_error = true;
     /*
 	prototypes[PROTOTYPE_CHICKEN].Kana("pk2spr01.bmp");
 	prototypes[PROTOTYPE_EGG].Muna("pk2spr01.bmp");
@@ -3774,11 +3774,11 @@ int Level_Editor_Main(void) {
 
     // N�pp�imist�
     if (!PisteInput_Update_Keyboard())        //Haetaan n�pp�inten tilat
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     // Hiirulainen
     if (!PisteInput_Update_Mouse())            //Haetaan hiiren tila
-        DirectX_virhe = true;
+        DirectX_error = true;
 
     //editoi_tekstia = false;
 
@@ -3928,7 +3928,7 @@ int Level_Editor_Quit(void) {
     PisteDraw_Quit();
     PisteInput_Quit();
 
-    if (DirectX_virhe) {
+    if (DirectX_error) {
         strcpy(virheviesti, PisteDraw_GetError());
         MessageBox(window_handle, virheviesti, "PK2 LevelEditor", MB_OK | MB_ICONEXCLAMATION);
     }
@@ -4099,7 +4099,7 @@ Level_Editor_Init();
 
 ShowCursor(FALSE);
 
-while(!DirectX_virhe)
+while(!DirectX_error)
 {
 
 if (

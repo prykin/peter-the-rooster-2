@@ -3,7 +3,7 @@ PisteEngine - PisteInput 2.0
 09.12.2001	Janne Kivilahti / Piste Gamez
 
 
-Versio 2.0
+Version 2.0
 ----------
 
     Controls = reading from keyboard, mouse, or game controller with a single subroutine

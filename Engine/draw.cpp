@@ -5,50 +5,47 @@ PisteEngine - PisteDraw 1.5
 Versio 1.2
 ----------
 
-	Maksimim��r� buffereita korotettu 200 -> 2000.
+    Maximum number of buffers raised from 200 to 2000.
 
-	PisteDraw_Buffer_Clear(int i, int left_bound, int top_bound, int right_bound, int bottom_bound, unsigned char color);
-	Klipperi lis�tty.
+    PisteDraw_Buffer_Clear(int i, int left_bound, int top_bound, int right_bound, int bottom_bound, unsigned char color);
+    Clipper added.
 
-	PisteDraw_Font_Write_Transparent(int font_index, char *merkkijono, int buffer_index, int x, int y, int pros)
-	Lis�tty. Toimii vain 256-v�risess�, 32:n osiin pilkotussa paletissa.
+    PisteDraw_Font_Write_Transparent(int font_index, char *string, int buffer_index, int x, int y, int percentage)
+    Added. Works only with 256-color, palette divided into 32 parts.
 
-	PisteDraw_Draw_End(int i);
-	Lis�tty kuormitettu version, jossa on int muotoinen parametri.
-	Mahdollistaa useiden pintojen lukitsemisen yht�aikaa. Vanha version toimii my�s.
+    PisteDraw_Draw_End(int i);
+    Added overloaded version with an int parameter.
+    Allows locking multiple surfaces simultaneously. The old version also works.
 
-	PisteDraw_Buffer_Flip(int lahde_index, int kohde_index, int x, int y, bool peilaa_x, bool peilaa_y);
-	Lis�tty kuormitettu version.
-	Mahdollistaa bittikartan piirron, joka on peilattu sivusuunnassa ja/tai yl�salaisin.
+    PisteDraw_Buffer_Flip(int source_index, int destination_index, int x, int y, bool flip_x, bool flip_y);
+    Added overloaded version.
+    Allows drawing a bitmap that is mirrored horizontally and/or vertically.
 
 Versio 1.3
 ----------
 
-	char *PisteDraw_GetError() lis�tty. Helpottaa virheen etsint��.
+    char *PisteDraw_GetError() added. Facilitates error tracking.
 
-	PisteDraw_Lataa_Kuva(int index, char *filename, bool lataa_paletti)
-	Eri kokoisten kuvien charge_time on nyt mahdollista.
+    PisteDraw_Load_Image(int index, char *filename, bool load_palette)
+    It is now possible to load images of different sizes with different charge times.
 
-	int PisteDraw_Palette_Rotate(int eka_vari, int vika_vari)
-	mahdollistaa v�rien py�ritt�misen
+    int PisteDraw_Palette_Rotate(int first_color, int last_color)
+    allows rotating colors
 
 Versio 1.4
 ----------
 
-	PCX-kuvien charge_time PisteDraw_Image_Load() -aliohjelmalla. Aliohjelma tutkii onko tiedoston
-	p��te bmp vai pcx ja lataa kuvan sen perusteella. Virhett� pukkaa, jos file ei ole
-	kumpaakaan type�.
+    PCX images have a charge time in PisteDraw_Image_Load() subroutine. The subroutine checks whether the file extension is bmp or pcx and loads the image accordingly. An error occurs if the file is neither type.
 
-
-	unsigned long PisteDraw_GetMemoryUsedMax()
+    unsigned long PisteDraw_GetMemoryUsedMax()
 
     PisteDraw_SetMarginLeft(int left_bound);
-	PisteDraw_SetMarginTop(int top_bound);
+    PisteDraw_SetMarginTop(int top_bound);
 
 Versio 1.5
 ----------
 
-	Pintojen palautus.
+	Surface return.
 
 */
 
@@ -79,11 +76,11 @@ typedef struct BITMAP_FILE_TAG {
 
 struct BITMAP_BUFFER {
     LPDIRECTDRAWSURFACE4 lpdds;
-    RECT klipperi;
-    bool video_muisti;
-    int leveys;
-    int korkeus;
-    bool lukittu;
+    RECT clipper;
+    bool video_memory;
+    int width;
+    int height;
+    bool locked;
 };
 
 struct RECTA {
@@ -106,8 +103,8 @@ HDC PD_global_dc = NULL; // tracks movement_x global dc
 
 LPDIRECTDRAW4 PD_lpdd = NULL;   // dd object
 LPDIRECTDRAWSURFACE4 PD_lpddsprimary = NULL;   // dd primary surface
-PALETTEENTRY PD_paletti[256];          // color palette
-PALETTEENTRY PD_paletti_nyt[256];      // paletin talletusta varten
+PALETTEENTRY PD_palette[256];          // color palette
+PALETTEENTRY PD_palette_now[256];      // for saving the palette
 LPDIRECTDRAWPALETTE PD_lpddpal = NULL;   // movement_x pointer to the created dd palette
 DDSURFACEDESC2 PD_ddsd;                  // movement_x direct draw surface description struct
 DDBLTFX PD_ddbltfx;               // used to fill
@@ -149,39 +146,35 @@ int PisteDraw_Lataa_PCX_Paletti(char *filename);
 
 /* METHODS -----------------------------------------------------------------------------------*/
 
-int PD_Loki_Kirjoita(char *viesti) {
+int PD_Log_Write(char *message) {
     return (0);
 
-    int virhe = 0;
+    int error = 0;
 
-    char *filename = "fonttiloki.txt";
+    char *filename = "font_log.txt";
 
-    FILE *tiedosto;
+    FILE *file;
 
-    if ((tiedosto = fopen(filename, "movement_x")) == NULL) {
+    if ((file = fopen(filename, "movement_x")) == NULL) {
         return (1);
     }
 
-    char mjono[255];
+    char string[255];
 
     //memset(mjono,' ',sizeof(mjono));
     //mjono[60] = '\n';
 
-    strcpy(mjono, viesti);
+    strcpy(string, message);
 
-    fwrite(mjono, sizeof(CHAR), strlen(mjono), tiedosto);
+    fwrite(string, sizeof(CHAR), strlen(string), file);
 
-    fclose(tiedosto);
+    fclose(file);
 
     return (0);
 }
 
-
-int
-PisteDraw_Init(HWND &main_window_handle, HINSTANCE &hinstance_app, int width, int height, int bpp, int max_colors) {
-
+int PisteDraw_Init(HWND &main_window_handle, HINSTANCE &hinstance_app, int width, int height, int bpp, int max_colors) {
     if (PD_unload) {
-
         strcpy(virhe, "Uh, oh, I think we have movement_x bug...");
 
         PD_main_window_handle = (HWND &) main_window_handle;
@@ -237,8 +230,8 @@ PisteDraw_Init(HWND &main_window_handle, HINSTANCE &hinstance_app, int width, in
             return PD_ERROR;
         }
 
-        PD_buffers[PD_BACKBUFFER].leveys = width;
-        PD_buffers[PD_BACKBUFFER].korkeus = height;
+        PD_buffers[PD_BACKBUFFER].width = width;
+        PD_buffers[PD_BACKBUFFER].height = height;
         PisteDraw_SetClipper(PD_BACKBUFFER, 0, 0, width, height);
         PD_ddsd.ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
 
@@ -248,19 +241,19 @@ PisteDraw_Init(HWND &main_window_handle, HINSTANCE &hinstance_app, int width, in
             return PD_ERROR;
         }
 
-        PD_buffers[PD_BACKBUFFER2].leveys = width;
-        PD_buffers[PD_BACKBUFFER2].korkeus = height;
+        PD_buffers[PD_BACKBUFFER2].width = width;
+        PD_buffers[PD_BACKBUFFER2].height = height;
         PisteDraw_SetClipper(PD_BACKBUFFER2, 0, 0, width, height);
 
         for (i = 1; i < 255; i++)                            //Luodaan 8-bittinen paletti
         {
-            PD_paletti[i].peRed = 0;
-            PD_paletti[i].peGreen = 0;
-            PD_paletti[i].peBlue = 0;
-            PD_paletti[i].peFlags = PC_NOCOLLAPSE;
+            PD_palette[i].peRed = 0;
+            PD_palette[i].peGreen = 0;
+            PD_palette[i].peBlue = 0;
+            PD_palette[i].peFlags = PC_NOCOLLAPSE;
         }
 
-        if (FAILED(PD_lpdd->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256 | DDPCAPS_INITIALIZE, PD_paletti, &PD_lpddpal,
+        if (FAILED(PD_lpdd->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256 | DDPCAPS_INITIALIZE, PD_palette, &PD_lpddpal,
                                           NULL))) {
             PisteLog_Write("[Error] Piste Draw: Cannot create 8-bit palette! \n");
             strcpy(virhe, "Cannot create 8-bit palette!");
@@ -394,14 +387,14 @@ int PisteDraw_Buffer_Create(int width, int height, bool video_memory, unsigned c
         if (PD_buffers[i].lpdds == NULL)    // Onko puskurin pinta jo varattu?
         {
             if ((PD_buffers[i].lpdds = PisteDraw_Create_Surface(width, height, varaus, color)) != NULL) {
-                PD_buffers[i].leveys = width;
-                PD_buffers[i].korkeus = height;
-                PD_buffers[i].klipperi.left = 0;
-                PD_buffers[i].klipperi.top = 0;
-                PD_buffers[i].klipperi.right = width;
-                PD_buffers[i].klipperi.bottom = height;
-                PD_buffers[i].video_muisti = video_memory;
-                PD_buffers[i].lukittu = false;
+                PD_buffers[i].width = width;
+                PD_buffers[i].height = height;
+                PD_buffers[i].clipper.left = 0;
+                PD_buffers[i].clipper.top = 0;
+                PD_buffers[i].clipper.right = width;
+                PD_buffers[i].clipper.bottom = height;
+                PD_buffers[i].video_memory = video_memory;
+                PD_buffers[i].locked = false;
                 find = true;
                 PD_buffereita_varattu++;
             } else {
@@ -474,13 +467,13 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
             int y;
             int leveys, korkeus;
 
-            if (bitmap.bitmapinfoheader.biWidth > PD_buffers[index].leveys)
-                leveys = PD_buffers[index].leveys;
+            if (bitmap.bitmapinfoheader.biWidth > PD_buffers[index].width)
+                leveys = PD_buffers[index].width;
             else
                 leveys = bitmap.bitmapinfoheader.biWidth;
 
-            if (bitmap.bitmapinfoheader.biHeight > PD_buffers[index].korkeus)
-                korkeus = PD_buffers[index].korkeus;
+            if (bitmap.bitmapinfoheader.biHeight > PD_buffers[index].height)
+                korkeus = PD_buffers[index].height;
             else
                 korkeus = bitmap.bitmapinfoheader.biHeight;
 
@@ -508,10 +501,10 @@ int PisteDraw_Image_Load(int index, char *filename, bool load_palette) {
                 }
 
                 for (int pi = 0; pi < 256; pi++) {
-                    PD_paletti[pi].peBlue = bitmap.paletti[pi].peBlue;
-                    PD_paletti[pi].peRed = bitmap.paletti[pi].peRed;
-                    PD_paletti[pi].peGreen = bitmap.paletti[pi].peGreen;
-                    PD_paletti[pi].peFlags = bitmap.paletti[pi].peFlags;
+                    PD_palette[pi].peBlue = bitmap.paletti[pi].peBlue;
+                    PD_palette[pi].peRed = bitmap.paletti[pi].peRed;
+                    PD_palette[pi].peGreen = bitmap.paletti[pi].peGreen;
+                    PD_palette[pi].peFlags = bitmap.paletti[pi].peFlags;
                 }
 
             }
@@ -583,8 +576,8 @@ int PisteDraw_Buffer_Flip(int source_index, int destination_index, int x, int y,
     if (flip_x && flip_y)
         PD_ddbltfx.dwDDFX = DDBLTFX_MIRRORLEFTRIGHT | DDBLTFX_MIRRORUPDOWN;
 
-    klipperi_kohde = &PD_buffers[destination_index].klipperi;
-    klipperi_lahde = &PD_buffers[source_index].klipperi;
+    klipperi_kohde = &PD_buffers[destination_index].clipper;
+    klipperi_lahde = &PD_buffers[source_index].clipper;
 
     int vasen = klipperi_lahde->left;
     int oikea = klipperi_lahde->right;
@@ -666,20 +659,20 @@ PisteDraw_Buffer_Flip_Fast(int source_index, int destination_index, int x, int y
     x += vasen_marginaali;
     y += yla_marginaali;
 
-    klipperi_kohde = &PD_buffers[destination_index].klipperi;
-    klipperi_lahde = &PD_buffers[source_index].klipperi;
+    klipperi_kohde = &PD_buffers[destination_index].clipper;
+    klipperi_lahde = &PD_buffers[source_index].clipper;
 
-    if (left < PD_buffers[source_index].klipperi.left)    //Tarkistetaan ett� dataa ei oteta l�hdebufferin
-        left = PD_buffers[source_index].klipperi.left;    //rajojen ulkopuolelta
+    if (left < PD_buffers[source_index].clipper.left)    //Tarkistetaan ett� dataa ei oteta l�hdebufferin
+        left = PD_buffers[source_index].clipper.left;    //rajojen ulkopuolelta
 
-    if (right > PD_buffers[source_index].klipperi.right)
-        right = PD_buffers[source_index].klipperi.right;
+    if (right > PD_buffers[source_index].clipper.right)
+        right = PD_buffers[source_index].clipper.right;
 
-    if (top < PD_buffers[source_index].klipperi.top)
-        top = PD_buffers[source_index].klipperi.top;
+    if (top < PD_buffers[source_index].clipper.top)
+        top = PD_buffers[source_index].clipper.top;
 
-    if (bottom > PD_buffers[source_index].klipperi.bottom)
-        bottom = PD_buffers[source_index].klipperi.bottom;
+    if (bottom > PD_buffers[source_index].clipper.bottom)
+        bottom = PD_buffers[source_index].clipper.bottom;
 
     leveys = right - left;    // lasketaan apuja
     korkeus = bottom - top;
@@ -731,8 +724,8 @@ int PisteDraw_Buffer_Flip_Fast(int source_index, int destination_index, int x, i
     x += vasen_marginaali;
     y += yla_marginaali;
 
-    klipperi_kohde = &PD_buffers[destination_index].klipperi;
-    klipperi_lahde = &PD_buffers[source_index].klipperi;
+    klipperi_kohde = &PD_buffers[destination_index].clipper;
+    klipperi_lahde = &PD_buffers[source_index].clipper;
 
     int vasen = klipperi_lahde->left;
     int oikea = klipperi_lahde->right;
@@ -778,7 +771,7 @@ int PisteDraw_Buffer_Flip_Fast(int source_index, int destination_index, int x, i
 }
 
 int PisteDraw_Draw_Begin(int i, unsigned char *&back_buffer, unsigned long &lPitch) {
-    if (PD_buffers[i].lukittu)
+    if (PD_buffers[i].locked)
         if (PisteDraw_Draw_End(i) == PD_ERROR) {
             PisteLog_Write("[Error] Piste Draw: Can't start free draw: Surface unlock failed!\n");
             return PD_ERROR;
@@ -795,7 +788,7 @@ int PisteDraw_Draw_Begin(int i, unsigned char *&back_buffer, unsigned long &lPit
     back_buffer = (unsigned char *) PD_ddsd.lpSurface;
     lPitch = (unsigned long &) PD_ddsd.lPitch;
 
-    PD_buffers[i].lukittu = true;
+    PD_buffers[i].locked = true;
 
     return 0;
 }
@@ -805,26 +798,26 @@ int PisteDraw_Draw_End(void) {
 
     while (i < MAX_BUFFEREITA /*PD_buffereita_varattu*/) {
         if (PD_buffers[i].lpdds != NULL)
-            if (PD_buffers[i].lukittu) {
+            if (PD_buffers[i].locked) {
                 if (FAILED(PD_buffers[i].lpdds->Unlock(NULL))) {
                     PisteLog_Write("[Error] Piste Draw: Free draw - surface unlock failed!\n");
                     return PD_ERROR;
                 }
 
-                PD_buffers[i].lukittu = false;
+                PD_buffers[i].locked = false;
             }
     }
     return 0;
 }
 
 int PisteDraw_Draw_End(int i) {
-    if (PD_buffers[i].lukittu) {
+    if (PD_buffers[i].locked) {
         if (FAILED(PD_buffers[i].lpdds->Unlock(NULL))) {
             PisteLog_Write("[Error] Piste Draw: Free draw - surface unlock failed!\n");
             return PD_ERROR;
         }
 
-        PD_buffers[i].lukittu = false;
+        PD_buffers[i].locked = false;
     }
     return 0;
 }
@@ -844,9 +837,9 @@ int PisteDraw_Buffer_Clear(int i, unsigned char color) {
 
     RECT dest_rect;
     dest_rect.left = 0;
-    dest_rect.right = PD_buffers[i].leveys;
+    dest_rect.right = PD_buffers[i].width;
     dest_rect.top = 0;
-    dest_rect.bottom = PD_buffers[i].korkeus;
+    dest_rect.bottom = PD_buffers[i].height;
 
     if (FAILED(buffer->Blt(&dest_rect, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &PD_ddbltfx))) {
         PisteLog_Write("[Error] Piste Draw: Buffer fill failed!\n");
@@ -882,17 +875,17 @@ int PisteDraw_Buffer_Clear(int i,  int left, int top, int right, int bottom, uns
     dest_rect.top = (long) top;
     dest_rect.bottom = (long) bottom;
 
-    if (dest_rect.left < PD_buffers[i].klipperi.left)
-        dest_rect.left = PD_buffers[i].klipperi.left;
+    if (dest_rect.left < PD_buffers[i].clipper.left)
+        dest_rect.left = PD_buffers[i].clipper.left;
 
-    if (dest_rect.right > PD_buffers[i].klipperi.right)
-        dest_rect.right = PD_buffers[i].klipperi.right;
+    if (dest_rect.right > PD_buffers[i].clipper.right)
+        dest_rect.right = PD_buffers[i].clipper.right;
 
-    if (dest_rect.top < PD_buffers[i].klipperi.top)
-        dest_rect.top = PD_buffers[i].klipperi.top;
+    if (dest_rect.top < PD_buffers[i].clipper.top)
+        dest_rect.top = PD_buffers[i].clipper.top;
 
-    if (dest_rect.bottom > PD_buffers[i].klipperi.bottom)
-        dest_rect.bottom = PD_buffers[i].klipperi.bottom;
+    if (dest_rect.bottom > PD_buffers[i].clipper.bottom)
+        dest_rect.bottom = PD_buffers[i].clipper.bottom;
 
     if (FAILED(buffer->Blt(&dest_rect, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &PD_ddbltfx))) {
         PisteLog_Write("[Error] Piste Draw: Buffer fill area failed!\n");
@@ -907,10 +900,10 @@ void PisteDraw_SetClipper(int i, int left, int top, int right, int bottom) {
 
     buffer = &PD_buffers[i];
 
-    buffer->klipperi.left = left;
-    buffer->klipperi.right = right;
-    buffer->klipperi.top = top;
-    buffer->klipperi.bottom = bottom;
+    buffer->clipper.left = left;
+    buffer->clipper.right = right;
+    buffer->clipper.top = top;
+    buffer->clipper.bottom = bottom;
 }
 
 void PisteDraw_SetMarginLeft(int left) {
@@ -926,18 +919,18 @@ void PisteDraw_SetMarginTop(int top) {
 int PisteDraw_Fade_Paletti_Do(int pros) {
     unsigned char i;
 
-    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette get entries failed!\n");
         return PD_ERROR;
     }
 
     for (i = 0; i < 255; i++) {
-        PD_paletti_nyt[i].peRed = (PD_paletti[i].peRed * pros / 100);
-        PD_paletti_nyt[i].peGreen = (PD_paletti[i].peGreen * pros / 100);
-        PD_paletti_nyt[i].peBlue = (PD_paletti[i].peBlue * pros / 100);
+        PD_palette_now[i].peRed = (PD_palette[i].peRed * pros / 100);
+        PD_palette_now[i].peGreen = (PD_palette[i].peGreen * pros / 100);
+        PD_palette_now[i].peBlue = (PD_palette[i].peBlue * pros / 100);
     }
 
-    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette set entries failed!\n");
         return PD_ERROR;
     }
@@ -948,28 +941,28 @@ int PisteDraw_Fade_Paletti_Do(int pros) {
 int PisteDraw_Palette_Rotate(unsigned char first_color, unsigned char last_color) {
     unsigned char i;
 
-    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette get entries failed!\n");
         return PD_ERROR;
     }
 
     PALETTEENTRY temp_vari;
 
-    temp_vari.peRed = PD_paletti_nyt[last_color].peRed;
-    temp_vari.peGreen = PD_paletti_nyt[last_color].peGreen;
-    temp_vari.peBlue = PD_paletti_nyt[last_color].peBlue;
+    temp_vari.peRed = PD_palette_now[last_color].peRed;
+    temp_vari.peGreen = PD_palette_now[last_color].peGreen;
+    temp_vari.peBlue = PD_palette_now[last_color].peBlue;
 
     for (i = last_color; i > first_color; i--) {
-        PD_paletti_nyt[i].peRed = PD_paletti_nyt[i - 1].peRed;
-        PD_paletti_nyt[i].peGreen = PD_paletti_nyt[i - 1].peGreen;
-        PD_paletti_nyt[i].peBlue = PD_paletti_nyt[i - 1].peBlue;
+        PD_palette_now[i].peRed = PD_palette_now[i - 1].peRed;
+        PD_palette_now[i].peGreen = PD_palette_now[i - 1].peGreen;
+        PD_palette_now[i].peBlue = PD_palette_now[i - 1].peBlue;
     }
 
-    PD_paletti_nyt[first_color].peRed = temp_vari.peRed;
-    PD_paletti_nyt[first_color].peGreen = temp_vari.peGreen;
-    PD_paletti_nyt[first_color].peBlue = temp_vari.peBlue;
+    PD_palette_now[first_color].peRed = temp_vari.peRed;
+    PD_palette_now[first_color].peGreen = temp_vari.peGreen;
+    PD_palette_now[first_color].peBlue = temp_vari.peBlue;
 
-    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette set entries failed!\n");
         return PD_ERROR;
     }
@@ -1047,7 +1040,7 @@ bool PisteDraw_Fade_Palette_Done(void) {
 }
 
 int PisteDraw_Reset_Palette(void) {
-    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_paletti))) {
+    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_palette))) {
         PisteLog_Write("[Error] Piste Draw: Palette reset failed!\n");
         return PD_ERROR;
     }
@@ -1056,18 +1049,18 @@ int PisteDraw_Reset_Palette(void) {
 }
 
 int PisteDraw_Palette_Get(PALETTEENTRY *&palette) {
-    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->GetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette get failed!\n");
         return PD_ERROR;
     }
 
-    palette = (PALETTEENTRY *) PD_paletti_nyt;
+    palette = (PALETTEENTRY *) PD_palette_now;
 
     return 0;
 }
 
 int PisteDraw_Palette_Set(void) {
-    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_paletti_nyt))) {
+    if (FAILED(PD_lpddpal->SetEntries(0, 0, 255, PD_palette_now))) {
         PisteLog_Write("[Error] Piste Draw: Palette set failed!\n");
         return PD_ERROR;
     }
@@ -1195,7 +1188,7 @@ int PisteDraw_Font_Write_Transparent(int font_index, char *text, int buffer_inde
         return PD_ERROR;
 
     tekstin_leveys = PD_fontit[font_index]->DrawStringTransparent(x, y, ruudun_leveys,
-                                                                  PD_buffers[buffer_index].klipperi, text,
+                                                                  PD_buffers[buffer_index].clipper, text,
                                                                   buffer, false, transparency);
 
     if (PisteDraw_Draw_End(buffer_index) == PD_ERROR)

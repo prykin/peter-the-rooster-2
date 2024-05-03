@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(Engine, Language, LevelEditor libs/dx7/include libs/midas/include libs/msvs6/Include)
 
-add_executable(pk2 main.cpp sprites.cpp map.cpp LevelEditor/editor.cpp Language/language.cpp Language/finnish.cpp Engine/wait.cpp Engine/sound.cpp Engine/sfx.cpp Engine/log.cpp LevelEditor/editor.h Engine/draw.cpp Engine/engine.cpp Engine/font.cpp Engine/input.cpp old_headers.h SpriteCreator/sprite_creator.cpp)
+add_executable(pk2 main.cpp sprites.cpp map.cpp LevelEditor/editor.cpp Language/language.cpp Language/finnish.cpp Engine/wait.cpp Engine/sound.cpp Engine/sfx.cpp Engine/log.cpp LevelEditor/editor.h Engine/draw.cpp Engine/example.cpp Engine/font.cpp Engine/input.cpp old_headers.h SpriteCreator/sprite_creator.cpp)
