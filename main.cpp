@@ -4483,10 +4483,10 @@ int Move_Sprite(int i) {
     sprite.movement_x = sprite_a;
     sprite.movement_y = sprite_b;
 
-    sprite.right = right;
-    sprite.left = left;
-    sprite.down = down;
-    sprite.up = up;
+    sprite.can_move_right= right;
+    sprite.can_move_left = left;
+    sprite.can_move_down = down;
+    sprite.can_move_up = up;
 /*
 	sprite.weight = sprite.type->weight;
 
@@ -4494,7 +4494,7 @@ int Move_Sprite(int i) {
 		sprite.weight = 1;
 */
     if (sprite.jump_timer < 0)
-        sprite.down = false;
+        sprite.can_move_down = false;
 
     //sprite.is_crouching   = false;
 
@@ -5097,7 +5097,7 @@ int Move_Sprite2(int i) {
                 a_addition += 0.09;//0.05
             }
 
-            if (sprite.down)
+            if (sprite.can_move_down)
                 a_addition /= 1.5;//2.0
 
             sprite.flip_horizontal = false;
@@ -5114,7 +5114,7 @@ int Move_Sprite2(int i) {
                 a_addition -= 0.09;
             }
 
-            if (sprite.down)    // when the sprite touches the ground, friction affects
+            if (sprite.can_move_down)    // when the sprite touches the ground, friction affects
                 a_addition /= 1.5;//2.0
 
             sprite.flip_horizontal = true;
@@ -5609,10 +5609,10 @@ int Move_Sprite2(int i) {
     sprite.movement_x = sprite_a;
     sprite.movement_y = sprite_b;
 
-    sprite.right = right;
-    sprite.left = left;
-    sprite.down = down;
-    sprite.up = up;
+    sprite.can_move_right = right;
+    sprite.can_move_left = left;
+    sprite.can_move_down = down;
+    sprite.can_move_up = up;
 /*
 	sprite.weight = sprite.type->weight;
 
@@ -5620,7 +5620,7 @@ int Move_Sprite2(int i) {
 		sprite.weight = 1;
 */
     if (sprite.jump_timer < 0)
-        sprite.down = false;
+        sprite.can_move_down = false;
     //sprite.is_crouching = false;
 
     /*****************************************************************************************/
@@ -6311,10 +6311,10 @@ int Move_Bonus_Sprite(int i) {
         sprite.movement_x = sprite_a;
         sprite.movement_y = sprite_b;
 
-        sprite.right = right;
-        sprite.left = left;
-        sprite.down = down;
-        sprite.up = up;
+        sprite.can_move_right = right;
+        sprite.can_move_left = left;
+        sprite.can_move_down = down;
+        sprite.can_move_up = up;
     } else {   // if sprite's weight is zero, make the sprite "floating"
         sprite.y = sprite.start_y + cos_table[int(degree + (sprite.start_x + sprite.start_y)) % 360] / 3.0;
         sprite_y = sprite.y;
