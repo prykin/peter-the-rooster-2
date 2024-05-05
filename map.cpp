@@ -291,7 +291,7 @@ RECT PK2Map::CalculateSaveArea(unsigned char *source, unsigned char *&target) {
 }
 
 // TODO: =>
-RECT PK2Map::LaskeTallennusAlue(unsigned char *alue) {
+RECT PK2Map::CalculateSaveArea(unsigned char *alue) {
     unsigned long x, y;
     unsigned long kartan_vasen = MAP_WIDTH, kartan_oikea = 0, kartan_yla = MAP_HEIGHT, kartan_ala = 0;
     RECT rajat = {0, 0, 0, 0};
@@ -601,11 +601,11 @@ int PK2Map::Save(char *filename) {
 
 // TODO: =>
 int PK2Map::Load(char *path, char *name) {
-    char file[_MAX_PATH];
-    strcpy(file, path);
-    strcat(file, name);
+    char filename[_MAX_PATH];
+    strcpy(filename, path);
+    strcat(filename, name);
 
-    ifstream *file = new ifstream(file, ios::binary);// | ios::nocreate);
+    ifstream *file = new ifstream(filename, ios::binary);// | ios::nocreate);
     char versio[8] = "\0";
     if (file->fail()) {
         delete (file);
@@ -619,23 +619,23 @@ int PK2Map::Load(char *path, char *name) {
     delete (file);
     int ok = 2;
     if (strcmp(versio, "1.3") == 0) {
-        this->LoadVersion13(file);
+        this->LoadVersion13(filename);
         ok = 0;
     }
     if (strcmp(versio, "1.2") == 0) {
-        this->LoadVersion12(file);
+        this->LoadVersion12(filename);
         ok = 0;
     }
     if (strcmp(versio, "1.1") == 0) {
-        this->LoadVersion11(file);
+        this->LoadVersion11(filename);
         ok = 0;
     }
     if (strcmp(versio, "1.0") == 0) {
-        this->LoadVersion10(file);
+        this->LoadVersion10(filename);
         ok = 0;
     }
     if (strcmp(versio, "0.1") == 0) {
-        this->LoadVersion01(file);
+        this->LoadVersion01(filename);
         ok = 0;
     }
     Load_Block_Palette(path, this->block_bmp);
