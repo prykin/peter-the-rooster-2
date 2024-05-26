@@ -1118,10 +1118,10 @@ int PisteDraw_Font_Create(int buffer_index, int buffer_x, int buffer_y, int widt
 int PisteDraw_Font_Create(char *path, char *file) {
     int index = 0;
     bool found = false;
-
-    PD_Loki_Kirjoita("PisteDraw_Font_Create\n");
-    PD_Loki_Kirjoita(path);
-    PD_Loki_Kirjoita(file);
+    
+    PD_Log_Write("PisteDraw_Font_Create\n");
+    PD_Log_Write(path);
+    PD_Log_Write(file);
 
     PisteLog_Write("- PisteDraw: Loading movement_x font from file: ");
     PisteLog_Write(path);
@@ -1130,7 +1130,7 @@ int PisteDraw_Font_Create(char *path, char *file) {
 
     while (index < MAX_FONTTEJA && !found) {
         if (PD_fontit[index] == NULL) {
-            PD_Loki_Kirjoita("Tyhja font\n");
+            PD_Log_Write("Tyhja font\n");
 
             PD_fontit[index] = new PisteFont();
 
@@ -1138,12 +1138,12 @@ int PisteDraw_Font_Create(char *path, char *file) {
                 strcpy(virhe, "PisteEngine can't load movement_x font from file!");
                 PisteLog_Write("[Error] Piste Draw: Loading font failed!\n");
 
-                PD_Loki_Kirjoita("Lataus ep�onnistui\n");
+                PD_Log_Write("Lataus ep�onnistui\n");
 
                 return PD_ERROR;
             }
 
-            PD_Loki_Kirjoita("Lataus onnistui\n");
+            PD_Log_Write("Lataus onnistui\n");
 
             found = true;
 
@@ -1163,7 +1163,7 @@ int PisteDraw_Font_Create(char *path, char *file) {
         index = PD_ERROR;
     }
 
-    PD_Loki_Kirjoita("Kaikki ok.\n");
+    PD_Log_Write("Kaikki ok.\n");
 
     return index;
 }

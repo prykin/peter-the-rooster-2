@@ -58,3 +58,11 @@ Header Files:
 - PisteFont.h
 - PisteInput.h
 - PisteSound.h
+
+---
+
+*Update from 2024*
+
+You will need Visual Studio 6, DirectX 7 SDK and Midas SDK
+
+After installation, create a new folder named 'libs' and place the SDKs there accordingly. You can find the correct names in the CMakeLists.txt file

@@ -1,10 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define INITGUID
 
-#include <string.h>
-#include <istream.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <iostream>
 #include "language.h"
 #include "../old_headers.h"
